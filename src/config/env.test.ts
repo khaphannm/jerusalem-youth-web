@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { validateEnvironment } from "@/config/env";
+import { environmentDefinition, validateEnvironment } from "@/config/env";
 
 const requiredEnvironment = {
   server: ["SERVER_REQUIRED"],
@@ -8,6 +8,13 @@ const requiredEnvironment = {
 } as const;
 
 describe("validateEnvironment", () => {
+  it("requires the server-only CMS endpoint", () => {
+    expect(environmentDefinition).toEqual({
+      server: ["CMS_BASE_URL"],
+      public: [],
+    });
+  });
+
   it("accepts an environment that supplies every required value", () => {
     expect(() =>
       validateEnvironment(

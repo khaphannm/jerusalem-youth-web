@@ -1,0 +1,233 @@
+import { z } from "zod";
+
+const requiredString = z.string().trim().min(1);
+const nullableString = requiredString.nullable().optional();
+const nullableUrl = z.url().nullable().optional();
+const dateTime = z.iso.datetime({ offset: true });
+const richTextSchema = z.array(z.record(z.string(), z.unknown()));
+const mediaUrl = requiredString.refine((value) => {
+  try {
+    const url = new URL(value, "https://cms.example.invalid");
+    return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}, "Media URL must be an HTTP URL or a relative path.");
+
+const documentSchema = z.object({
+  documentId: requiredString,
+});
+
+export const mediaSchema = documentSchema.extend({
+  name: requiredString,
+  url: mediaUrl,
+  alternativeText: nullableString,
+  mime: requiredString,
+  width: z.number().int().positive().nullable().optional(),
+  height: z.number().int().positive().nullable().optional(),
+  size: z.number().nonnegative(),
+});
+
+export const seoSchema = z.object({
+  metaTitle: nullableString,
+  metaDescription: nullableString,
+  canonical: nullableString,
+  socialImage: mediaSchema.nullable().optional(),
+  noIndex: z.boolean(),
+});
+
+export const authorSchema = documentSchema.extend({
+  displayName: requiredString,
+  slug: requiredString,
+  avatar: mediaSchema.nullable().optional(),
+  bio: nullableString,
+});
+
+export const categorySchema = documentSchema.extend({
+  name: requiredString,
+  slug: requiredString,
+  description: nullableString,
+});
+
+export const sermonSeriesSchema = documentSchema.extend({
+  name: requiredString,
+  slug: requiredString,
+  description: nullableString,
+  coverImage: mediaSchema.nullable().optional(),
+});
+
+const publishedDocumentSchema = documentSchema.extend({
+  publishedAt: dateTime,
+});
+
+export const articleSchema = publishedDocumentSchema.extend({
+  title: requiredString,
+  slug: requiredString,
+  excerpt: requiredString,
+  body: richTextSchema.min(1),
+  featuredImage: mediaSchema,
+  author: authorSchema,
+  category: categorySchema,
+  tags: z.array(z.object({ name: requiredString })),
+  bibleReferences: z.array(z.object({ reference: requiredString })),
+  featured: z.boolean(),
+  seo: seoSchema.nullable().optional(),
+});
+
+export const eventSchema = publishedDocumentSchema
+  .extend({
+    title: requiredString,
+    slug: requiredString,
+    summary: requiredString,
+    description: richTextSchema.min(1),
+    banner: mediaSchema,
+    startDateTime: dateTime,
+    endDateTime: dateTime.nullable().optional(),
+    locationName: requiredString,
+    address: nullableString,
+    mapURL: nullableUrl,
+    registrationURL: nullableUrl,
+    registrationDeadline: dateTime.nullable().optional(),
+    contactName: nullableString,
+    contactLink: nullableString,
+    gallery: z.array(mediaSchema),
+    featured: z.boolean(),
+    seo: seoSchema.nullable().optional(),
+  })
+  .superRefine((event, context) => {
+    if (
+      event.endDateTime &&
+      Date.parse(event.endDateTime) < Date.parse(event.startDateTime)
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "Event end date cannot precede its start date.",
+        path: ["endDateTime"],
+      });
+    }
+  });
+
+export const sermonSchema = publishedDocumentSchema.extend({
+  title: requiredString,
+  slug: requiredString,
+  speaker: requiredString,
+  date: z.iso.date(),
+  summary: requiredString,
+  videoURL: z.url(),
+  series: sermonSeriesSchema.nullable().optional(),
+  biblePassage: nullableString,
+  audioURL: nullableUrl,
+  thumbnail: mediaSchema.nullable().optional(),
+  notesURL: nullableUrl,
+  seo: seoSchema.nullable().optional(),
+});
+
+export const storySchema = publishedDocumentSchema.extend({
+  title: requiredString,
+  slug: requiredString,
+  summary: requiredString,
+  body: richTextSchema.min(1),
+  featuredImage: mediaSchema,
+  personDisplayName: nullableString,
+  videoURL: nullableUrl,
+  featured: z.boolean(),
+  seo: seoSchema.nullable().optional(),
+});
+
+export const resourceSchema = publishedDocumentSchema
+  .extend({
+    title: requiredString,
+    slug: requiredString,
+    description: requiredString,
+    category: categorySchema,
+    file: mediaSchema.nullable().optional(),
+    externalURL: nullableUrl,
+    author: authorSchema.nullable().optional(),
+    thumbnail: mediaSchema.nullable().optional(),
+    seo: seoSchema.nullable().optional(),
+  })
+  .superRefine((resource, context) => {
+    if (Boolean(resource.file) === Boolean(resource.externalURL)) {
+      context.addIssue({
+        code: "custom",
+        message: "Resource must contain exactly one source.",
+        path: ["file"],
+      });
+    }
+  });
+
+const navigationItemSchema = z.object({
+  label: requiredString,
+  url: requiredString,
+  openInNewTab: z.boolean(),
+});
+
+export const navigationSchema = publishedDocumentSchema.extend({
+  primaryItems: z.array(navigationItemSchema),
+  utilityItems: z.array(navigationItemSchema),
+  footerItems: z.array(navigationItemSchema),
+});
+
+const socialLinkSchema = z.object({
+  platform: requiredString,
+  url: z.url(),
+  displayOrder: z.number().int(),
+});
+
+export const socialLinksSchema = publishedDocumentSchema.extend({
+  links: z.array(socialLinkSchema),
+});
+
+const contactSchema = z.object({
+  email: z.email().nullable().optional(),
+  phone: nullableString,
+  address: nullableString,
+});
+
+const callToActionSchema = z.object({
+  label: requiredString,
+  url: requiredString,
+});
+
+export const siteSettingsSchema = publishedDocumentSchema.extend({
+  siteName: requiredString,
+  siteDescription: requiredString,
+  defaultSeo: seoSchema.nullable().optional(),
+  defaultSocialImage: mediaSchema.nullable().optional(),
+  organizationContact: contactSchema.nullable().optional(),
+  primaryCta: callToActionSchema.nullable().optional(),
+  footerContent: richTextSchema.nullable().optional(),
+});
+
+export const paginationSchema = z.object({
+  page: z.number().int().positive(),
+  pageSize: z.number().int().positive(),
+  pageCount: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+});
+
+export const collectionEnvelopeSchema = <Schema extends z.ZodType>(
+  itemSchema: Schema,
+) =>
+  z.object({
+    data: z.array(itemSchema),
+    meta: z.object({ pagination: paginationSchema }),
+  });
+
+export const singleEnvelopeSchema = <Schema extends z.ZodType>(
+  itemSchema: Schema,
+) => z.object({ data: itemSchema.nullable() });
+
+export type RawMedia = z.infer<typeof mediaSchema>;
+export type RawSeo = z.infer<typeof seoSchema>;
+export type RawAuthor = z.infer<typeof authorSchema>;
+export type RawCategory = z.infer<typeof categorySchema>;
+export type RawSermonSeries = z.infer<typeof sermonSeriesSchema>;
+export type RawArticle = z.infer<typeof articleSchema>;
+export type RawEvent = z.infer<typeof eventSchema>;
+export type RawSermon = z.infer<typeof sermonSchema>;
+export type RawStory = z.infer<typeof storySchema>;
+export type RawResource = z.infer<typeof resourceSchema>;
+export type RawNavigation = z.infer<typeof navigationSchema>;
+export type RawSocialLinks = z.infer<typeof socialLinksSchema>;
+export type RawSiteSettings = z.infer<typeof siteSettingsSchema>;

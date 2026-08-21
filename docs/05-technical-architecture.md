@@ -71,6 +71,13 @@ Prefer feature-local code when behavior is feature-specific. Do not create gener
 - error normalization
 - cache/revalidation integration
 
+CMS-004 implements this boundary through the server-only `getCmsClient()` entry
+point. It validates flattened Strapi 5 REST envelopes with Zod, maps them into
+the domain contracts in `src/lib/cms/domain.ts`, resolves relative media URLs,
+and exposes normalized `CmsError` failures. UI code imports domain types but
+must perform reads only through this client. Publication caching and webhook
+revalidation remain CMS-005 scope.
+
 Public UI must not import raw Strapi generated/request types directly.
 
 Example logical flow:

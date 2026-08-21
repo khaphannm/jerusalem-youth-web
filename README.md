@@ -18,6 +18,16 @@ A repository-ready operating system for building a professional, scalable, fast,
 
 Do not hard-pin framework/package versions in documentation. At project initialization, use current stable versions, commit the lockfile, and let Renovate/Dependabot manage updates.
 
+## Local frontend setup
+
+Copy `.env.example` to `.env.local` and set `CMS_BASE_URL` to the Strapi origin.
+The value is server-only, must not contain credentials, and must use HTTPS
+outside local development. Start the CMS before running frontend routes that
+read content.
+
+To reproduce the live Strapi/PostgreSQL endpoint checks and frontend contract
+tests, follow [`docs/cms-boundary-verification.md`](docs/cms-boundary-verification.md).
+
 ## How to use this kit
 
 1. Copy the entire kit into the root of the Git repository.

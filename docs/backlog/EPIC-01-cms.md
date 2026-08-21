@@ -32,6 +32,8 @@ Acceptance criteria:
 - no anonymous write access
 
 ## CMS-004 Typed frontend CMS boundary
+Status: Implemented
+
 Acceptance criteria:
 - all CMS reads route through one server-side module
 - raw Strapi payload is validated and mapped

@@ -3,9 +3,8 @@ export type EnvironmentDefinition = Readonly<{
   public: readonly `NEXT_PUBLIC_${string}`[];
 }>;
 
-// No application-specific variables have been approved for the foundation.
 export const environmentDefinition = {
-  server: [],
+  server: ["CMS_BASE_URL"],
   public: [],
 } as const satisfies EnvironmentDefinition;
 

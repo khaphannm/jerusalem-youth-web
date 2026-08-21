@@ -1,0 +1,235 @@
+import type {
+  Article,
+  Author,
+  Category,
+  Event,
+  MediaAsset,
+  Navigation,
+  Resource,
+  Seo,
+  Sermon,
+  SermonSeries,
+  SiteSettings,
+  SocialLinks,
+  Story,
+} from "./domain";
+import type {
+  RawArticle,
+  RawAuthor,
+  RawCategory,
+  RawEvent,
+  RawMedia,
+  RawNavigation,
+  RawResource,
+  RawSeo,
+  RawSermon,
+  RawSermonSeries,
+  RawSiteSettings,
+  RawSocialLinks,
+  RawStory,
+} from "./schemas";
+
+export const mapMedia = (media: RawMedia, cmsBaseUrl: string): MediaAsset => ({
+  id: media.documentId,
+  name: media.name,
+  url: new URL(media.url, `${cmsBaseUrl}/`).toString(),
+  alternativeText: media.alternativeText ?? null,
+  mimeType: media.mime,
+  width: media.width ?? null,
+  height: media.height ?? null,
+  sizeInKilobytes: media.size,
+});
+
+const mapOptionalMedia = (
+  media: RawMedia | null | undefined,
+  cmsBaseUrl: string,
+) => (media ? mapMedia(media, cmsBaseUrl) : null);
+
+export const mapSeo = (seo: RawSeo, cmsBaseUrl: string): Seo => ({
+  metaTitle: seo.metaTitle ?? null,
+  metaDescription: seo.metaDescription ?? null,
+  canonical: seo.canonical ?? null,
+  socialImage: mapOptionalMedia(seo.socialImage, cmsBaseUrl),
+  noIndex: seo.noIndex,
+});
+
+const mapOptionalSeo = (seo: RawSeo | null | undefined, cmsBaseUrl: string) =>
+  seo ? mapSeo(seo, cmsBaseUrl) : null;
+
+export const mapAuthor = (author: RawAuthor, cmsBaseUrl: string): Author => ({
+  id: author.documentId,
+  displayName: author.displayName,
+  slug: author.slug,
+  avatar: mapOptionalMedia(author.avatar, cmsBaseUrl),
+  bio: author.bio ?? null,
+});
+
+export const mapCategory = (category: RawCategory): Category => ({
+  id: category.documentId,
+  name: category.name,
+  slug: category.slug,
+  description: category.description ?? null,
+});
+
+export const mapSermonSeries = (
+  series: RawSermonSeries,
+  cmsBaseUrl: string,
+): SermonSeries => ({
+  id: series.documentId,
+  name: series.name,
+  slug: series.slug,
+  description: series.description ?? null,
+  coverImage: mapOptionalMedia(series.coverImage, cmsBaseUrl),
+});
+
+export const mapArticle = (
+  article: RawArticle,
+  cmsBaseUrl: string,
+): Article => ({
+  id: article.documentId,
+  title: article.title,
+  slug: article.slug,
+  excerpt: article.excerpt,
+  body: article.body,
+  featuredImage: mapMedia(article.featuredImage, cmsBaseUrl),
+  author: mapAuthor(article.author, cmsBaseUrl),
+  category: mapCategory(article.category),
+  tags: article.tags.map(({ name }) => name),
+  bibleReferences: article.bibleReferences.map(({ reference }) => reference),
+  featured: article.featured,
+  seo: mapOptionalSeo(article.seo, cmsBaseUrl),
+  publishedAt: article.publishedAt,
+});
+
+export const mapEvent = (event: RawEvent, cmsBaseUrl: string): Event => ({
+  id: event.documentId,
+  title: event.title,
+  slug: event.slug,
+  summary: event.summary,
+  description: event.description,
+  banner: mapMedia(event.banner, cmsBaseUrl),
+  startDateTime: event.startDateTime,
+  endDateTime: event.endDateTime ?? null,
+  locationName: event.locationName,
+  address: event.address ?? null,
+  mapUrl: event.mapURL ?? null,
+  registrationUrl: event.registrationURL ?? null,
+  registrationDeadline: event.registrationDeadline ?? null,
+  contactName: event.contactName ?? null,
+  contactLink: event.contactLink ?? null,
+  gallery: event.gallery.map((media) => mapMedia(media, cmsBaseUrl)),
+  featured: event.featured,
+  seo: mapOptionalSeo(event.seo, cmsBaseUrl),
+  publishedAt: event.publishedAt,
+});
+
+export const mapSermon = (
+  sermon: RawSermon,
+  cmsBaseUrl: string,
+): Sermon => ({
+  id: sermon.documentId,
+  title: sermon.title,
+  slug: sermon.slug,
+  speaker: sermon.speaker,
+  date: sermon.date,
+  summary: sermon.summary,
+  videoUrl: sermon.videoURL,
+  series: sermon.series ? mapSermonSeries(sermon.series, cmsBaseUrl) : null,
+  biblePassage: sermon.biblePassage ?? null,
+  audioUrl: sermon.audioURL ?? null,
+  thumbnail: mapOptionalMedia(sermon.thumbnail, cmsBaseUrl),
+  notesUrl: sermon.notesURL ?? null,
+  seo: mapOptionalSeo(sermon.seo, cmsBaseUrl),
+  publishedAt: sermon.publishedAt,
+});
+
+export const mapStory = (story: RawStory, cmsBaseUrl: string): Story => ({
+  id: story.documentId,
+  title: story.title,
+  slug: story.slug,
+  summary: story.summary,
+  body: story.body,
+  featuredImage: mapMedia(story.featuredImage, cmsBaseUrl),
+  personDisplayName: story.personDisplayName ?? null,
+  videoUrl: story.videoURL ?? null,
+  featured: story.featured,
+  seo: mapOptionalSeo(story.seo, cmsBaseUrl),
+  publishedAt: story.publishedAt,
+});
+
+export const mapResource = (
+  resource: RawResource,
+  cmsBaseUrl: string,
+): Resource => {
+  let source: Resource["source"];
+
+  if (resource.file) {
+    source = { kind: "file", asset: mapMedia(resource.file, cmsBaseUrl) };
+  } else if (resource.externalURL) {
+    source = { kind: "external", url: resource.externalURL };
+  } else {
+    throw new Error("Validated resource did not contain a source.");
+  }
+
+  return {
+    id: resource.documentId,
+    title: resource.title,
+    slug: resource.slug,
+    description: resource.description,
+    category: mapCategory(resource.category),
+    source,
+    author: resource.author ? mapAuthor(resource.author, cmsBaseUrl) : null,
+    thumbnail: mapOptionalMedia(resource.thumbnail, cmsBaseUrl),
+    seo: mapOptionalSeo(resource.seo, cmsBaseUrl),
+    publishedAt: resource.publishedAt,
+  };
+};
+
+export const mapNavigation = (navigation: RawNavigation): Navigation => ({
+  primaryItems: navigation.primaryItems.map((item) => ({
+    label: item.label,
+    url: item.url,
+    openInNewTab: item.openInNewTab,
+  })),
+  utilityItems: navigation.utilityItems.map((item) => ({
+    label: item.label,
+    url: item.url,
+    openInNewTab: item.openInNewTab,
+  })),
+  footerItems: navigation.footerItems.map((item) => ({
+    label: item.label,
+    url: item.url,
+    openInNewTab: item.openInNewTab,
+  })),
+});
+
+export const mapSocialLinks = (socialLinks: RawSocialLinks): SocialLinks => ({
+  links: socialLinks.links
+    .map((link) => ({
+      platform: link.platform,
+      url: link.url,
+      displayOrder: link.displayOrder,
+    }))
+    .sort((left, right) => left.displayOrder - right.displayOrder),
+});
+
+export const mapSiteSettings = (
+  settings: RawSiteSettings,
+  cmsBaseUrl: string,
+): SiteSettings => ({
+  siteName: settings.siteName,
+  siteDescription: settings.siteDescription,
+  defaultSeo: mapOptionalSeo(settings.defaultSeo, cmsBaseUrl),
+  defaultSocialImage: mapOptionalMedia(settings.defaultSocialImage, cmsBaseUrl),
+  organizationContact: settings.organizationContact
+    ? {
+        email: settings.organizationContact.email ?? null,
+        phone: settings.organizationContact.phone ?? null,
+        address: settings.organizationContact.address ?? null,
+      }
+    : null,
+  primaryCallToAction: settings.primaryCta
+    ? { label: settings.primaryCta.label, url: settings.primaryCta.url }
+    : null,
+  footerContent: settings.footerContent ?? null,
+});
