@@ -1,0 +1,20 @@
+# Dependencies
+/node_modules/
+
+# Next.js build output
+/.next/
+/out/
+
+# Test output
+/coverage/
+/playwright-report/
+/test-results/
+
+# Local environment files (the example contract remains versioned)
+.env*
+!.env.example
+
+# Tooling and operating-system files
+*.tsbuildinfo
+.DS_Store
+npm-debug.log*
