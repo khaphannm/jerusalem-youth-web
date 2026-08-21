@@ -1,0 +1,73 @@
+# Content Operations
+
+A website is only successful if the ministry can operate it after launch.
+
+## Editorial workflow
+
+```text
+Idea -> Draft -> Review -> Approve -> Publish -> Distribute -> Measure -> Archive/Update
+```
+
+## Roles
+
+### Contributor
+- create/edit own drafts
+- no production publishing
+
+### Editor
+- review/edit content
+- manage taxonomy
+- prepare publication
+
+### Publisher / Ministry Lead
+- final approval/publish for sensitive or high-visibility content
+
+### Administrator
+- CMS/system administration
+- not required for ordinary publishing
+
+Use the CMS capability that best approximates these roles; do not grant broad access merely for convenience.
+
+## Publishing checklist
+
+Before publication:
+- title clear
+- excerpt useful
+- body proofread
+- correct author/category
+- dates/times/timezone correct
+- images licensed/approved and optimized
+- alt text present
+- links work
+- SEO title/description reasonable
+- social preview checked
+- consent/privacy reviewed for people/stories/photos
+
+## Event lifecycle
+
+- Upcoming: prominently discoverable.
+- Registration closed: clearly indicated if applicable.
+- Past: retained in archive when useful, not presented as upcoming.
+- Cancelled/changed: updated clearly and quickly.
+
+## Content freshness
+
+Assign recurring ownership for:
+- upcoming events
+- contact details
+- leadership/about information
+- broken external links
+- resource downloads
+- featured homepage content
+
+## Content seed for launch
+
+Recommended minimum:
+- complete About/Vision/Mission
+- current contact/social links
+- current upcoming events
+- 5–10 articles/devotionals
+- 5–10 sermons
+- 3–5 stories/testimonies
+- initial resources
+- approved photography
