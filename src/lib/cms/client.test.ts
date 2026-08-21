@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createCmsClient, normalizeCmsBaseUrl } from "./client";
+import { cmsCacheTags, eventCacheLifetimeSeconds } from "./cache";
 
 const mediaFixture = {
   documentId: "image-1",
@@ -102,6 +103,36 @@ describe("CMS client", () => {
     expect(requestedUrl).toContain("populate=featuredImage");
     expect(requestedUrl).toContain("pagination%5Bpage%5D=1");
     expect(requestedUrl).toContain("pagination%5BpageSize%5D=10");
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: {
+        revalidate: false,
+        tags: [
+          cmsCacheTags.articles,
+          cmsCacheTags.authors,
+          cmsCacheTags.categories,
+        ],
+      },
+    });
+  });
+
+  it("uses a five-minute fallback refresh for event reads", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse(collectionPayload([])));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.events.list();
+
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: {
+        revalidate: eventCacheLifetimeSeconds,
+        tags: [cmsCacheTags.events],
+      },
+    });
   });
 
   it("rejects malformed CMS payloads with a normalized error", async () => {

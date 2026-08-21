@@ -75,8 +75,14 @@ CMS-004 implements this boundary through the server-only `getCmsClient()` entry
 point. It validates flattened Strapi 5 REST envelopes with Zod, maps them into
 the domain contracts in `src/lib/cms/domain.ts`, resolves relative media URLs,
 and exposes normalized `CmsError` failures. UI code imports domain types but
-must perform reads only through this client. Publication caching and webhook
-revalidation remain CMS-005 scope.
+must perform reads only through this client.
+
+CMS-005 adds fixed cache tags to those reads and exposes the authenticated
+`POST /api/revalidate` Strapi webhook. The handler maps allowlisted Strapi UIDs
+to server-owned tags and immediately expires matching data; callers cannot
+submit paths or tags. Stable content is webhook-driven, while event reads have
+a five-minute fallback refresh. Deployment and operations are documented in
+`docs/cms-publication-revalidation.md`.
 
 Public UI must not import raw Strapi generated/request types directly.
 

@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       CMS_BASE_URL: https://cms.example.invalid
+      CMS_REVALIDATION_SECRET: ci-only-revalidation-secret-at-least-32-characters
 
     steps:
       - name: Check out repository

@@ -8,9 +8,9 @@ const requiredEnvironment = {
 } as const;
 
 describe("validateEnvironment", () => {
-  it("requires the server-only CMS endpoint", () => {
+  it("requires the server-only CMS configuration", () => {
     expect(environmentDefinition).toEqual({
-      server: ["CMS_BASE_URL"],
+      server: ["CMS_BASE_URL", "CMS_REVALIDATION_SECRET"],
       public: [],
     });
   });

@@ -42,6 +42,8 @@ Acceptance criteria:
 - tests for representative valid and malformed payloads
 
 ## CMS-005 Publication revalidation
+Status: Implemented
+
 Acceptance criteria:
 - published content can trigger secure site revalidation using APIs appropriate to installed Next.js
 - webhook is authenticated

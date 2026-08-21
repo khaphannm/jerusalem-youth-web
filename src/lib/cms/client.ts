@@ -17,6 +17,11 @@ import type {
   SocialLinks,
   Story,
 } from "./domain";
+import {
+  cmsCacheTags,
+  eventCacheLifetimeSeconds,
+  type CmsCacheTag,
+} from "./cache";
 import { CmsError } from "./errors";
 import {
   mapArticle,
@@ -56,6 +61,7 @@ type ClientConfiguration = Readonly<{
 }>;
 
 type CollectionDefinition<Raw, Domain> = Readonly<{
+  cache: CachePolicy;
   endpoint: string;
   populate: readonly string[];
   schema: z.ZodType<Raw>;
@@ -63,10 +69,16 @@ type CollectionDefinition<Raw, Domain> = Readonly<{
 }>;
 
 type SingleDefinition<Raw, Domain> = Readonly<{
+  cache: CachePolicy;
   endpoint: string;
   populate: readonly string[];
   schema: z.ZodType<Raw>;
   map: (value: Raw, cmsBaseUrl: string) => Domain;
+}>;
+
+type CachePolicy = Readonly<{
+  revalidate: number | false;
+  tags: readonly CmsCacheTag[];
 }>;
 
 const defaultTimeoutMs = 8_000;
@@ -223,14 +235,22 @@ export const createCmsClient = ({
 
   const request = async (
     url: URL,
-    options: Readonly<{ notFoundAsNull?: boolean }> = {},
+    options: Readonly<{
+      cache: CachePolicy;
+      notFoundAsNull?: boolean;
+    }>,
   ): Promise<unknown> => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const response = await fetchImplementation(url, {
+        cache: "force-cache",
         headers: { Accept: "application/json" },
+        next: {
+          revalidate: options.cache.revalidate,
+          tags: [...options.cache.tags],
+        },
         signal: controller.signal,
       });
 
@@ -280,6 +300,7 @@ export const createCmsClient = ({
   ): Promise<CollectionResult<Domain>> => {
     const payload = await request(
       buildUrl(baseUrl, definition.endpoint, definition.populate, options),
+      { cache: definition.cache },
     );
     const result = collectionEnvelopeSchema(definition.schema).safeParse(payload);
 
@@ -303,6 +324,7 @@ export const createCmsClient = ({
   ): Promise<Domain | null> => {
     const payload = await request(
       buildUrl(baseUrl, definition.endpoint, definition.populate, {}, slug),
+      { cache: definition.cache },
     );
     const result = collectionEnvelopeSchema(definition.schema).safeParse(payload);
 
@@ -323,7 +345,7 @@ export const createCmsClient = ({
   ): Promise<Domain | null> => {
     const payload = await request(
       buildUrl(baseUrl, definition.endpoint, definition.populate),
-      { notFoundAsNull: true },
+      { cache: definition.cache, notFoundAsNull: true },
     );
 
     if (payload === null) {
@@ -345,48 +367,76 @@ export const createCmsClient = ({
   };
 
   const articles = {
+    cache: {
+      revalidate: false,
+      tags: [
+        cmsCacheTags.articles,
+        cmsCacheTags.authors,
+        cmsCacheTags.categories,
+      ],
+    },
     endpoint: "articles",
     populate: populate.article,
     schema: articleSchema,
     map: mapArticle,
   } satisfies CollectionDefinition<z.infer<typeof articleSchema>, Article>;
   const authors = {
+    cache: { revalidate: false, tags: [cmsCacheTags.authors] },
     endpoint: "authors",
     populate: populate.author,
     schema: authorSchema,
     map: mapAuthor,
   } satisfies CollectionDefinition<z.infer<typeof authorSchema>, Author>;
   const categories = {
+    cache: { revalidate: false, tags: [cmsCacheTags.categories] },
     endpoint: "categories",
     populate: [],
     schema: categorySchema,
     map: (category: z.infer<typeof categorySchema>) => mapCategory(category),
   } satisfies CollectionDefinition<z.infer<typeof categorySchema>, Category>;
   const events = {
+    cache: {
+      revalidate: eventCacheLifetimeSeconds,
+      tags: [cmsCacheTags.events],
+    },
     endpoint: "events",
     populate: populate.event,
     schema: eventSchema,
     map: mapEvent,
   } satisfies CollectionDefinition<z.infer<typeof eventSchema>, Event>;
   const resources = {
+    cache: {
+      revalidate: false,
+      tags: [
+        cmsCacheTags.resources,
+        cmsCacheTags.authors,
+        cmsCacheTags.categories,
+      ],
+    },
     endpoint: "resources",
     populate: populate.resource,
     schema: resourceSchema,
     map: mapResource,
   } satisfies CollectionDefinition<z.infer<typeof resourceSchema>, Resource>;
   const sermonSeries = {
+    cache: { revalidate: false, tags: [cmsCacheTags.sermonSeries] },
     endpoint: "series",
     populate: populate.sermonSeries,
     schema: sermonSeriesSchema,
     map: mapSermonSeries,
   } satisfies CollectionDefinition<z.infer<typeof sermonSeriesSchema>, SermonSeries>;
   const sermons = {
+    cache: {
+      revalidate: false,
+      tags: [cmsCacheTags.sermons, cmsCacheTags.sermonSeries],
+    },
     endpoint: "sermons",
     populate: populate.sermon,
     schema: sermonSchema,
     map: mapSermon,
   } satisfies CollectionDefinition<z.infer<typeof sermonSchema>, Sermon>;
   const stories = {
+    cache: { revalidate: false, tags: [cmsCacheTags.stories] },
     endpoint: "stories",
     populate: populate.story,
     schema: storySchema,
@@ -429,6 +479,7 @@ export const createCmsClient = ({
     },
     navigation: () =>
       readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.navigation] },
         endpoint: "navigation",
         populate: populate.navigation,
         schema: navigationSchema,
@@ -439,6 +490,7 @@ export const createCmsClient = ({
       >),
     siteSettings: () =>
       readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.siteSettings] },
         endpoint: "site-setting",
         populate: populate.siteSettings,
         schema: siteSettingsSchema,
@@ -449,6 +501,7 @@ export const createCmsClient = ({
       >),
     socialLinks: () =>
       readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.socialLinks] },
         endpoint: "social-links",
         populate: populate.socialLinks,
         schema: socialLinksSchema,

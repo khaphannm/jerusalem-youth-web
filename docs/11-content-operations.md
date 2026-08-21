@@ -60,6 +60,20 @@ Assign recurring ownership for:
 - resource downloads
 - featured homepage content
 
+Publishing, unpublishing, or deleting public content triggers the authenticated
+frontend revalidation webhook. Supporting Author, Category, and Series changes
+also invalidate cached payloads that embed those records. Editors should treat
+a non-2xx webhook delivery as a publication incident and notify the site owner.
+
+Event reads have a five-minute cache fallback so upcoming/past transitions do
+not depend solely on a content edit or webhook delivery. Frontend event status
+must be derived from `startDateTime` and `endDateTime` using the current server
+time; it must not be persisted as a duplicate CMS status field. Urgent event
+changes should still be published immediately and the public result checked.
+
+See `docs/cms-publication-revalidation.md` for configuration, response codes,
+secret rotation, and multi-instance deployment requirements.
+
 ## Content seed for launch
 
 Recommended minimum:
