@@ -1,0 +1,47 @@
+{
+  "name": "cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Youth Ministry content management service",
+  "scripts": {
+    "build": "strapi build",
+    "console": "strapi console",
+    "deploy": "strapi deploy",
+    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "test": "tsc --project tsconfig.test.json && node --test .tmp/tests/src/validation/content-rules.test.js",
+    "typecheck": "tsc --noEmit",
+    "upgrade": "npx @strapi/upgrade latest",
+    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+  },
+  "dependencies": {
+    "@strapi/strapi": "5.52.1",
+    "@strapi/utils": "5.52.1",
+    "pg": "8.23.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "@strapi/strapi": {
+      "vite": "6.4.3"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0 <=26.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "82d82aee-f02c-4845-947d-d07271cfef25",
+    "installId": "095a4ae26d5582d279ae23cb269c708fd843abc05ed0d4def7e1d4d4d3cfa2c5"
+  }
+}

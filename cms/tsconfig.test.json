@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "outDir": ".tmp/tests",
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["src/validation/**/*.ts"],
+  "exclude": ["node_modules", "build", "dist"]
+}

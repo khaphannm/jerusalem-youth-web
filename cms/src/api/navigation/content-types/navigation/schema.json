@@ -1,0 +1,29 @@
+{
+  "kind": "singleType",
+  "collectionName": "navigations",
+  "info": {
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "primaryItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.navigation-item"
+    },
+    "utilityItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.navigation-item"
+    },
+    "footerItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.navigation-item"
+    }
+  }
+}

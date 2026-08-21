@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_bible_references",
+  "info": {
+    "displayName": "Bible Reference"
+  },
+  "options": {},
+  "attributes": {
+    "reference": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
