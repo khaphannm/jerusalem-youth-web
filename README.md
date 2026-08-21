@@ -9,7 +9,7 @@ A repository-ready operating system for building a professional, scalable, fast,
 - UI primitives: shadcn/ui where it reduces custom boilerplate
 - CMS: Strapi 5
 - Database: PostgreSQL
-- Media: Cloudinary or S3-compatible object storage/CDN
+- Media: S3-compatible object storage/CDN
 - Validation: Zod at external-data boundaries
 - Tests: unit/component + Playwright end-to-end
 - CI/CD: GitHub Actions + deployment-provider checks

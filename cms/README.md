@@ -1,6 +1,6 @@
 # Youth Ministry CMS
 
-Strapi 5 content-management service backed exclusively by PostgreSQL. CMS-001 initializes the service and CMS-002 defines the core editorial schemas. Public permissions and production media configuration remain deferred to CMS-003.
+Strapi 5 content-management service backed by PostgreSQL with S3-compatible production media storage and a least-privilege public Content API.
 
 ## Requirements
 
@@ -32,13 +32,13 @@ cp .env.example .env
 
 Set the local server values (`HOST=0.0.0.0`, `PORT=1337`), PostgreSQL connection values matching your database, and `DATABASE_CLIENT=postgres`. `DATABASE_URL` can replace the discrete host, port, database, username, and password settings.
 
-Generate independent random values for every secret. `APP_KEYS` requires four comma-separated values; the remaining secret variables require one value each:
+Generate independent random values for every secret. `APP_KEYS` requires four comma-separated values; the remaining secret variables, including `JWT_SECRET`, require one value each:
 
 ```bash
 openssl rand -base64 32
 ```
 
-For production, inject secrets through the hosting platform, use environment-specific database credentials, and enable PostgreSQL SSL according to the provider's certificate requirements. Never commit `.env`.
+For production, inject secrets through the hosting platform, use environment-specific database credentials, enable PostgreSQL SSL according to the provider's certificate requirements, and configure the S3/CDN variables described in `docs/media-permissions-operations.md`. Never commit `.env`.
 
 ## Install and run
 
@@ -66,7 +66,7 @@ CMS-002 defines these collection types:
 
 It also defines the Site Settings, Navigation, and Social Links single types, plus reusable SEO, navigation, contact, CTA, tag, Bible-reference, and social-link components.
 
-All public editorial content types use draft/publish. Authors, categories, and series are supporting taxonomy records and do not use draft/publish. Public API permissions are intentionally not enabled by this story.
+All public editorial content types use draft/publish. Authors, categories, and series are supporting taxonomy records and do not use draft/publish.
 
 The schema has two cross-field rules:
 
@@ -80,6 +80,10 @@ Schema JSON and generated Strapi declarations are committed so contract changes 
 ```bash
 npm run strapi -- ts:generate-types
 ```
+
+## Media and permissions
+
+Production media, upload constraints, the exact anonymous read allowlist, and the administrator-role setup checklist are documented in [`docs/media-permissions-operations.md`](docs/media-permissions-operations.md).
 
 ## Dependency compatibility note
 

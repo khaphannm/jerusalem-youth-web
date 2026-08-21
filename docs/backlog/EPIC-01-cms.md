@@ -22,6 +22,8 @@ Acceptance criteria:
 - schema changes are reviewable in source control
 
 ## CMS-003 Configure media and permissions
+Status: Implemented
+
 Acceptance criteria:
 - media provider/storage strategy configured
 - anonymous/public read permissions are least-privilege

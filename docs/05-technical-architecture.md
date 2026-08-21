@@ -109,6 +109,8 @@ Before using a specific cache API, verify it against the installed Next.js docum
 Do not serve large original media from the application server.
 Use a media service/object storage/CDN.
 
+Production uses the S3-compatible storage and CDN strategy defined in `docs/decisions/ADR-002-s3-media-storage.md`.
+
 Video:
 - prefer YouTube/external video hosting for V1;
 - embed responsibly and avoid loading heavy players until needed where practical.

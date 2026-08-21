@@ -56,6 +56,7 @@ jobs:
       ADMIN_JWT_SECRET: ci-only-admin-jwt-secret
       TRANSFER_TOKEN_SALT: ci-only-transfer-token-salt
       ENCRYPTION_KEY: ci-only-encryption-key
+      JWT_SECRET: ci-only-users-permissions-jwt-secret
       DATABASE_CLIENT: postgres
       DATABASE_HOST: 127.0.0.1
       DATABASE_PORT: 5432
@@ -63,6 +64,14 @@ jobs:
       DATABASE_USERNAME: strapi
       DATABASE_PASSWORD: strapi-ci-only
       DATABASE_SSL: "false"
+      AWS_REGION: auto
+      AWS_BUCKET: ci-only-bucket
+      AWS_ENDPOINT: https://s3.example.invalid
+      AWS_FORCE_PATH_STYLE: "true"
+      AWS_ACCESS_KEY_ID: ci-only-access-key
+      AWS_ACCESS_SECRET: ci-only-secret-key
+      CDN_URL: https://cdn.example.invalid
+      CDN_ROOT_PATH: ci
     defaults:
       run:
         working-directory: cms
@@ -108,7 +117,7 @@ jobs:
       - name: Build CMS admin
         run: npm run build
 
-      - name: Verify CMS startup health
+      - name: Verify CMS startup and public permissions
         env:
           NODE_ENV: production
         run: |
@@ -116,3 +125,13 @@ jobs:
           cms_pid=$!
           trap 'kill "$cms_pid"' EXIT
           curl --fail --retry 30 --retry-connrefused --retry-delay 1 http://localhost:1337/_health
+          curl --fail --silent --show-error http://localhost:1337/api/articles > /dev/null
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --request POST --header 'Content-Type: application/json' \
+            --data '{"data":{}}' http://localhost:1337/api/articles)" = "403"
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --request POST http://localhost:1337/api/upload)" = "403"
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --request POST --header 'Content-Type: application/json' \
+            --data '{"username":"denied","email":"denied@example.invalid","password":"denied-in-ci"}' \
+            http://localhost:1337/api/auth/local/register)" = "403"

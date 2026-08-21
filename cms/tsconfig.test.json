@@ -6,6 +6,10 @@
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["src/validation/**/*.ts"],
+  "include": [
+    "config/utils/**/*.ts",
+    "src/permissions/**/*.ts",
+    "src/validation/**/*.ts"
+  ],
   "exclude": ["node_modules", "build", "dist"]
 }

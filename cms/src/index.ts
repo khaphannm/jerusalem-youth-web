@@ -6,6 +6,7 @@ import {
   getResourceSourceError,
   type ContentValues,
 } from './validation/content-rules';
+import { syncPublicReadPermissions } from './permissions/public-read';
 
 type WriteContext = {
   action: string;
@@ -82,7 +83,9 @@ const lifecycle = {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    await syncPublicReadPermissions(strapi);
+  },
 };
 
 export default lifecycle;
