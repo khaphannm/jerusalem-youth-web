@@ -26,6 +26,7 @@ const contentUidSchema = z.enum(
 );
 
 const cmsUidModelNames = {
+  "api::about-page.about-page": "about-page",
   "api::article.article": "article",
   "api::author.author": "author",
   "api::category.category": "category",

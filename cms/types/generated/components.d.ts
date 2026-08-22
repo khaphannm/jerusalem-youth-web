@@ -33,6 +33,17 @@ export interface SharedCta extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedMinistryValue extends Struct.ComponentSchema {
+  collectionName: 'components_shared_ministry_values';
+  info: {
+    displayName: 'Ministry Value';
+  };
+  attributes: {
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedNavigationItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_navigation_items';
   info: {
@@ -92,6 +103,7 @@ declare module '@strapi/strapi' {
       'shared.bible-reference': SharedBibleReference;
       'shared.contact': SharedContact;
       'shared.cta': SharedCta;
+      'shared.ministry-value': SharedMinistryValue;
       'shared.navigation-item': SharedNavigationItem;
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;

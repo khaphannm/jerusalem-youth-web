@@ -12,8 +12,9 @@ test('public permissions contain only content find actions', () => {
   }
 });
 
-test('public permissions cover every CMS-002 content type', () => {
+test('public permissions cover every public content type', () => {
   const expectedActions = [
+    'api::about-page.about-page.find',
     'api::article.article.find',
     'api::article.article.findOne',
     'api::author.author.find',

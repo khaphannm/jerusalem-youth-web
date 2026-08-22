@@ -23,6 +23,7 @@ CMS-002 implements reusable component contracts as follows:
 - `socialLink`: required `platform`, required `url`, required `displayOrder`
 - `contact`: `email`, `phone`, `address`
 - `cta`: required `label`, required `url`
+- `ministryValue`: required `title`, required `description`
 
 CTA URLs must be either root-relative site paths or absolute HTTP(S) URLs.
 The frontend rejects unsupported schemes at the CMS boundary.
@@ -149,6 +150,17 @@ Optional:
 
 ## Single types
 
+### About Page
+- `vision` as required plain text
+- `mission` as required plain text
+- `values` as one or more `ministryValue` components
+- `primaryCta` as a required `cta` component
+
+The published About Page single type is the editorial source of truth for the
+ministry's vision, mission, values, and About-page action. Site Settings remains
+the source for the ministry name and concise identity description used in the
+About-page hero.
+
 ### Site Settings
 - siteName
 - siteDescription
@@ -188,6 +200,7 @@ Canonical URLs, when supplied, must be absolute HTTP(S) URLs.
 ## Frontend contract
 
 The frontend must map CMS payloads into domain models such as:
+- `AboutPage`
 - `Article`
 - `Event`
 - `Sermon`

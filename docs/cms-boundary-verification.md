@@ -10,7 +10,7 @@ commit production secrets.
 ## What the checks prove
 
 - Strapi starts in production mode with PostgreSQL.
-- Every CMS-002 collection endpoint accepts the populate query used by the
+- Every public collection endpoint accepts the populate query used by the
   frontend client and returns a valid Strapi collection envelope.
 - Uncreated single types return HTTP 404, which the frontend client normalizes
   to `null`; created and published single types return HTTP 200.
@@ -138,6 +138,9 @@ longer agree. HTTP 401 or 403 indicates public-role permission drift.
 
 ```bash
 curl -sS -w '\nHTTP %{http_code}\n' \
+  "$cms_url/about-page?populate=values&populate=primaryCta"
+
+curl -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/navigation?populate=primaryItems&populate=utilityItems&populate=footerItems"
 
 curl -sS -w '\nHTTP %{http_code}\n' \
@@ -194,7 +197,7 @@ For populated response coverage, first replace the placeholder S3 settings with
 a real non-production S3-compatible endpoint and bucket because several content
 types require media. Then create an administrator at
 `http://127.0.0.1:1343/admin`, then create the required supporting records and
-one valid record for each CMS-002 type. Publish every draft/publish-enabled
+one valid record for each public V1 type. Publish every draft/publish-enabled
 entry. Repeat the endpoint checks and confirm:
 
 - collection `data` arrays contain the expected entries;

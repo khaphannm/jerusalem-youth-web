@@ -37,3 +37,36 @@ test("the homepage is usable without horizontal overflow on mobile", async ({
     ),
   ).toBe(true);
 });
+
+test("the About page presents ministry identity and a clear next step", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/about");
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: /^About / }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Why we gather" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "What shapes our community",
+    }),
+  ).toBeVisible();
+
+  const nextAction = page
+    .locator("main > section")
+    .last()
+    .getByRole("link");
+  await expect(nextAction).toBeVisible();
+  await expect(nextAction).toHaveAttribute("href", /^(?:\/|https?:\/\/)/);
+  expect((await nextAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});

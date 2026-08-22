@@ -1,6 +1,7 @@
 import type { Core } from '@strapi/strapi';
 
 export const publicReadActions = [
+  'api::about-page.about-page.find',
   'api::article.article.find',
   'api::article.article.findOne',
   'api::author.author.find',

@@ -100,6 +100,24 @@ const siteSettingsFixture = {
   publishedAt: "2026-08-21T03:00:00.000Z",
 };
 
+const aboutPageFixture = {
+  documentId: "about-page-1",
+  vision: "Young people rooted in Jesus and alive with hope.",
+  mission: "We gather, grow, and serve together.",
+  values: [
+    {
+      title: "Faith",
+      description: "We follow Jesus in every part of life.",
+    },
+    {
+      title: "Belonging",
+      description: "We make room for every young person.",
+    },
+  ],
+  primaryCta: { label: "Join us", url: "/join" },
+  publishedAt: "2026-08-21T03:00:00.000Z",
+};
+
 const collectionPayload = (data: unknown[], pageSize = 25) => ({
   data,
   meta: {
@@ -276,6 +294,60 @@ describe("CMS client", () => {
     });
 
     await expect(client.siteSettings()).resolves.toBeNull();
+  });
+
+  it("validates and maps the About Page single type", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse({ data: aboutPageFixture }));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.aboutPage()).resolves.toEqual({
+      id: "about-page-1",
+      vision: "Young people rooted in Jesus and alive with hope.",
+      mission: "We gather, grow, and serve together.",
+      values: [
+        {
+          title: "Faith",
+          description: "We follow Jesus in every part of life.",
+        },
+        {
+          title: "Belonging",
+          description: "We make room for every young person.",
+        },
+      ],
+      callToAction: { label: "Join us", url: "/join" },
+      publishedAt: "2026-08-21T03:00:00.000Z",
+    });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/about-page");
+    expect(requestedUrl.searchParams.getAll("populate")).toEqual([
+      "values",
+      "primaryCta",
+    ]);
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: { revalidate: false, tags: [cmsCacheTags.aboutPage] },
+    });
+  });
+
+  it("rejects incomplete About Page content", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({ data: { ...aboutPageFixture, values: [] } }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.aboutPage()).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid about-page payload.",
+    });
   });
 
   it("maps a safe site-wide primary action", async () => {

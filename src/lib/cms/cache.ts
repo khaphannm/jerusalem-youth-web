@@ -1,4 +1,5 @@
 export const cmsCacheTags = {
+  aboutPage: "cms:about-page",
   articles: "cms:articles",
   authors: "cms:authors",
   categories: "cms:categories",
@@ -15,6 +16,7 @@ export const cmsCacheTags = {
 export type CmsCacheTag = (typeof cmsCacheTags)[keyof typeof cmsCacheTags];
 
 export const cmsUidCacheTags = {
+  "api::about-page.about-page": cmsCacheTags.aboutPage,
   "api::article.article": cmsCacheTags.articles,
   "api::author.author": cmsCacheTags.authors,
   "api::category.category": cmsCacheTags.categories,

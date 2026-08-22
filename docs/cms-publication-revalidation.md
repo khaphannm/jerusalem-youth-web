@@ -23,10 +23,11 @@ provide a cache tag or site path to invalidate.
   Updating supporting content therefore expires every cached payload that
   embeds it without globally flushing unrelated content.
 
-The fixed UID mapping covers every CMS-002 type:
+The fixed UID mapping covers every public V1 CMS type:
 
 | Strapi UID | Cache tag |
 | --- | --- |
+| `api::about-page.about-page` | `cms:about-page` |
 | `api::article.article` | `cms:articles` |
 | `api::author.author` | `cms:authors` |
 | `api::category.category` | `cms:categories` |
@@ -67,7 +68,7 @@ In **Settings → Webhooks**, create a webhook with:
 - Events: Entry create, update, delete, publish, and unpublish
 
 Strapi sends `event`, `createdAt`, `model`, `uid`, and `entry`. The endpoint
-validates the complete top-level payload and accepts only the CMS-002 UID
+validates the complete top-level payload and accepts only the public-content UID
 allowlist.
 
 Publishable types behave as follows:

@@ -169,6 +169,20 @@ export type CallToAction = Readonly<{
   url: string;
 }>;
 
+export type MinistryValue = Readonly<{
+  description: string;
+  title: string;
+}>;
+
+export type AboutPage = Readonly<{
+  id: string;
+  vision: string;
+  mission: string;
+  values: readonly MinistryValue[];
+  callToAction: CallToAction;
+  publishedAt: string;
+}>;
+
 export type SiteSettings = Readonly<{
   siteName: string;
   siteDescription: string;

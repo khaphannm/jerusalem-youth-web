@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "about_pages",
+  "info": {
+    "singularName": "about-page",
+    "pluralName": "about-pages",
+    "displayName": "About Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "vision": {
+      "type": "text",
+      "required": true
+    },
+    "mission": {
+      "type": "text",
+      "required": true
+    },
+    "values": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "component": "shared.ministry-value"
+    },
+    "primaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "shared.cta"
+    }
+  }
+}

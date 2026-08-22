@@ -3,6 +3,7 @@ import "server-only";
 import type { z } from "zod";
 
 import type {
+  AboutPage,
   Article,
   Author,
   Category,
@@ -25,6 +26,7 @@ import {
 } from "./cache";
 import { CmsError } from "./errors";
 import {
+  mapAboutPage,
   mapArticle,
   mapAuthor,
   mapCategory,
@@ -38,6 +40,7 @@ import {
   mapStory,
 } from "./mappers";
 import {
+  aboutPageSchema,
   articleSchema,
   authorSchema,
   categorySchema,
@@ -95,6 +98,7 @@ type CollectionQuery = CollectionOptions &
 const defaultTimeoutMs = 8_000;
 
 const populate = {
+  aboutPage: ["values", "primaryCta"],
   article: [
     "featuredImage",
     "author.avatar",
@@ -475,6 +479,17 @@ export const createCmsClient = ({
   } satisfies CollectionDefinition<z.infer<typeof storySchema>, Story>;
 
   return {
+    aboutPage: () =>
+      readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.aboutPage] },
+        endpoint: "about-page",
+        populate: populate.aboutPage,
+        schema: aboutPageSchema,
+        map: (aboutPage) => mapAboutPage(aboutPage),
+      } satisfies SingleDefinition<
+        z.infer<typeof aboutPageSchema>,
+        AboutPage
+      >),
     articles: {
       list: (options?: CollectionOptions) => readCollection(articles, options),
       findBySlug: (slug: string) => findBySlug(articles, slug),

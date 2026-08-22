@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_ministry_values",
+  "info": {
+    "displayName": "Ministry Value"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

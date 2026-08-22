@@ -55,6 +55,21 @@ describe("POST /api/revalidate", () => {
     });
   });
 
+  it("expires the About Page cache after publication", async () => {
+    const response = await POST(
+      createRequest({
+        ...validPayload,
+        model: "about-page",
+        uid: "api::about-page.about-page",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(revalidateTag).toHaveBeenCalledExactlyOnceWith("cms:about-page", {
+      expire: 0,
+    });
+  });
+
   it("expires supporting-content tags on public data changes", async () => {
     const response = await POST(
       createRequest({

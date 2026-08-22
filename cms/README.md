@@ -64,7 +64,9 @@ CMS-002 defines these collection types:
 - Article, Event, Sermon, Story / Testimony, and Resource
 - Author, Category, and Series
 
-It also defines the Site Settings, Navigation, and Social Links single types, plus reusable SEO, navigation, contact, CTA, tag, Bible-reference, and social-link components.
+HOME-004 adds the About Page single type. The CMS also defines Site Settings,
+Navigation, and Social Links, plus reusable SEO, navigation, contact, CTA,
+ministry-value, tag, Bible-reference, and social-link components.
 
 All public editorial content types use draft/publish. Authors, categories, and series are supporting taxonomy records and do not use draft/publish.
 

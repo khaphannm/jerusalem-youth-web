@@ -1,4 +1,5 @@
 import type {
+  AboutPage,
   Article,
   Author,
   Category,
@@ -14,6 +15,7 @@ import type {
   Story,
 } from "./domain";
 import type {
+  RawAboutPage,
   RawArticle,
   RawAuthor,
   RawCategory,
@@ -28,6 +30,21 @@ import type {
   RawSocialLinks,
   RawStory,
 } from "./schemas";
+
+export const mapAboutPage = (aboutPage: RawAboutPage): AboutPage => ({
+  id: aboutPage.documentId,
+  vision: aboutPage.vision,
+  mission: aboutPage.mission,
+  values: aboutPage.values.map((value) => ({
+    description: value.description,
+    title: value.title,
+  })),
+  callToAction: {
+    label: aboutPage.primaryCta.label,
+    url: aboutPage.primaryCta.url,
+  },
+  publishedAt: aboutPage.publishedAt,
+});
 
 export const mapMedia = (media: RawMedia, cmsBaseUrl: string): MediaAsset => ({
   id: media.documentId,

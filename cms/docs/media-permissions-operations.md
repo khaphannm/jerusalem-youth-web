@@ -40,7 +40,7 @@ Large audio and video remain externally hosted for V1. Editors must provide mean
 Application bootstrap synchronizes the Users & Permissions `Public` role to an exact read-only allowlist:
 
 - collection types: `find` and `findOne` for Article, Author, Category, Event, Resource, Series, Sermon, and Story
-- single types: `find` for Navigation, Site Settings, and Social Links
+- single types: `find` for About Page, Navigation, Site Settings, and Social Links
 
 No public upload, create, update, delete, publish, authentication, user, or role action is granted. Public self-registration is disabled. Changes made manually to the Public role are replaced on the next CMS startup so permission drift fails closed.
 

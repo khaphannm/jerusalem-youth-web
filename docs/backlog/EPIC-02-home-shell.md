@@ -37,6 +37,8 @@ Acceptance criteria:
 - metadata/OG configured
 
 ## HOME-004 About page
+Status: Implemented
+
 Acceptance criteria:
 - ministry identity/vision/mission content
 - content source explicitly defined

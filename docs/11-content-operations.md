@@ -60,6 +60,11 @@ Assign recurring ownership for:
 - resource downloads
 - featured homepage content
 
+Vision, mission, values, and the About-page action are maintained in the
+published **About Page** single type. Ministry name and concise identity copy
+remain in **Site Settings**. The content owner should review both records
+together whenever ministry identity or leadership direction changes.
+
 Publishing, unpublishing, or deleting public content triggers the authenticated
 frontend revalidation webhook. Supporting Author, Category, and Series changes
 also invalidate cached payloads that embed those records. Editors should treat

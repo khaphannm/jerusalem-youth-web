@@ -244,6 +244,18 @@ const callToActionSchema = z.object({
   url: navigationUrl,
 });
 
+export const ministryValueSchema = z.object({
+  description: requiredString,
+  title: requiredString,
+});
+
+export const aboutPageSchema = publishedDocumentSchema.extend({
+  mission: requiredString,
+  primaryCta: callToActionSchema,
+  values: z.array(ministryValueSchema).min(1),
+  vision: requiredString,
+});
+
 export const siteSettingsSchema = publishedDocumentSchema.extend({
   siteName: requiredString,
   siteDescription: requiredString,
@@ -285,4 +297,5 @@ export type RawStory = z.infer<typeof storySchema>;
 export type RawResource = z.infer<typeof resourceSchema>;
 export type RawNavigation = z.infer<typeof navigationSchema>;
 export type RawSocialLinks = z.infer<typeof socialLinksSchema>;
+export type RawAboutPage = z.infer<typeof aboutPageSchema>;
 export type RawSiteSettings = z.infer<typeof siteSettingsSchema>;

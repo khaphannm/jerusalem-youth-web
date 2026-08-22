@@ -21,6 +21,7 @@
 - 404 / not found
 
 ### CMS capabilities
+- About Page
 - Article
 - Event
 - Sermon
