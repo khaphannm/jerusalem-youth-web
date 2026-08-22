@@ -26,7 +26,7 @@ below before calling the endpoints.
 - Node.js and npm versions supported by the repository
 - Docker
 - project dependencies installed in both the repository root and `cms/`
-- ports `1343` and `55437` available
+- ports `1337` and `55437` available
 
 ## 1. Start disposable PostgreSQL
 
@@ -54,7 +54,7 @@ From `cms/`:
 env \
   NODE_ENV=production \
   HOST=127.0.0.1 \
-  PORT=1343 \
+  PORT=1337 \
   APP_KEYS=review-one,review-two,review-three,review-four \
   API_TOKEN_SALT=review-api-salt \
   ADMIN_JWT_SECRET=review-admin-secret \
@@ -87,10 +87,13 @@ endpoint checks; do not attempt uploads with this configuration.
 In a second terminal:
 
 ```bash
-cms_url=http://127.0.0.1:1343/api
+cms_url=http://127.0.0.1:1337/api
 
-curl -sS -w '\nHTTP %{http_code}\n' \
-  "$cms_url/articles?populate=featuredImage&populate=author.avatar&populate=category&populate=tags&populate=bibleReferences&populate=seo.socialImage"
+curl -g -sS -w '\nHTTP %{http_code}\n' \
+  "$cms_url/articles?populate=featuredImage&populate=author.avatar&populate=category&populate=tags&populate=bibleReferences&populate=seo.socialImage&status=published&sort[0]=publishedAt:desc&pagination[page]=1&pagination[pageSize]=6"
+
+curl -g -sS -w '\nHTTP %{http_code}\n' \
+  "$cms_url/articles?populate=featuredImage&populate=author.avatar&populate=category&populate=tags&populate=bibleReferences&populate=seo.socialImage&status=published&filters[slug][$eq]=replace-with-a-published-slug&pagination[pageSize]=1"
 
 curl -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/authors?populate=avatar"
@@ -114,8 +117,9 @@ curl -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/stories?populate=featuredImage&populate=seo.socialImage"
 ```
 
-Each collection must return HTTP 200. On an empty database, the expected shape
-is:
+Each collection request, including the article detail lookup, must return HTTP
+200. On an empty database or when the detail slug does not match a published
+article, the expected shape is:
 
 ```json
 {
@@ -186,7 +190,10 @@ These tests verify:
 - a valid flattened Strapi payload maps to domain models without Strapi response
   nesting;
 - relative media paths become absolute CMS URLs;
-- malformed payloads are rejected as `INVALID_RESPONSE`;
+- valid Blocks content and embedded media map into the typed rich-content
+  domain model;
+- malformed payloads, unsupported Blocks, and unsafe rich-content links are
+  rejected as `INVALID_RESPONSE`;
 - missing slug records and uncreated single types return `null`;
 - HTTP, network, and timeout failures become normalized `CmsError` values;
 - upstream error response bodies are not exposed.
@@ -196,7 +203,7 @@ These tests verify:
 For populated response coverage, first replace the placeholder S3 settings with
 a real non-production S3-compatible endpoint and bucket because several content
 types require media. Then create an administrator at
-`http://127.0.0.1:1343/admin`, then create the required supporting records and
+`http://127.0.0.1:1337/admin`, then create the required supporting records and
 one valid record for each public V1 type. Publish every draft/publish-enabled
 entry. Repeat the endpoint checks and confirm:
 

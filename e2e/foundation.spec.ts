@@ -70,3 +70,59 @@ test("the About page presents ministry identity and a clear next step", async ({
     ),
   ).toBe(true);
 });
+
+test("the article listing remains useful when CMS content is empty or unavailable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/articles");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Articles for everyday faith",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Explore the articles" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:New articles are coming|Articles are temporarily unavailable)$/,
+    }),
+  ).toBeVisible();
+
+  const retryAction = page.getByRole("link", { name: "Try again" });
+  if (await retryAction.count()) {
+    await expect(retryAction).toHaveAttribute("href", "/articles");
+    expect((await retryAction.boundingBox())?.height).toBeGreaterThanOrEqual(
+      44,
+    );
+  }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("an invalid article slug returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto("/articles/not_a_public_slug");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Article not found" }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all articles" });
+  await expect(returnAction).toHaveAttribute("href", "/articles");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});

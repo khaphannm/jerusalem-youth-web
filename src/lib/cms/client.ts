@@ -93,6 +93,7 @@ type CollectionQuery = CollectionOptions &
       value: boolean | string;
     }>[];
     sort?: readonly string[];
+    status?: "published";
   }>;
 
 const defaultTimeoutMs = 8_000;
@@ -228,6 +229,10 @@ const buildUrl = (
     url.searchParams.set(`filters[${field}][${operator}]`, String(value));
   });
 
+  if (options.status) {
+    url.searchParams.set("status", options.status);
+  }
+
   if (slug !== undefined) {
     const normalizedSlug = slug.trim();
 
@@ -347,9 +352,10 @@ export const createCmsClient = ({
   const findBySlug = async <Raw, Domain>(
     definition: CollectionDefinition<Raw, Domain>,
     slug: string,
+    options: CollectionQuery = {},
   ): Promise<Domain | null> => {
     const payload = await request(
-      buildUrl(baseUrl, definition.endpoint, definition.populate, {}, slug),
+      buildUrl(baseUrl, definition.endpoint, definition.populate, options, slug),
       { cache: definition.cache },
     );
     const result = collectionEnvelopeSchema(definition.schema).safeParse(payload);
@@ -491,8 +497,14 @@ export const createCmsClient = ({
         AboutPage
       >),
     articles: {
-      list: (options?: CollectionOptions) => readCollection(articles, options),
-      findBySlug: (slug: string) => findBySlug(articles, slug),
+      list: (options?: CollectionOptions) =>
+        readCollection(articles, {
+          ...options,
+          sort: ["publishedAt:desc"],
+          status: "published",
+        }),
+      findBySlug: (slug: string) =>
+        findBySlug(articles, slug, { status: "published" }),
       latest: () => readLatest(articles, ["publishedAt:desc"]),
     },
     authors: {

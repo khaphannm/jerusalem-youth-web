@@ -19,7 +19,6 @@ const nullableHttpUrl = requiredString
   .nullable()
   .optional();
 const dateTime = z.iso.datetime({ offset: true });
-const richTextSchema = z.array(z.record(z.string(), z.unknown()));
 const mediaUrl = requiredString.refine((value) => {
   try {
     const url = new URL(value, "https://cms.example.invalid");
@@ -52,6 +51,121 @@ export const mediaSchema = documentSchema.extend({
     .nullable()
     .optional(),
 });
+
+const contentLinkUrl = requiredString.refine((value) => {
+  if (value.startsWith("#")) {
+    return /^#[^\s#]+$/.test(value);
+  }
+
+  try {
+    const siteOrigin = "https://site.example.invalid";
+    const url = new URL(value, siteOrigin);
+
+    if (value.startsWith("/")) {
+      return !value.startsWith("//") && url.origin === siteOrigin;
+    }
+
+    return (
+      ["http:", "https:", "mailto:", "tel:"].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+    );
+  } catch {
+    return false;
+  }
+}, "Content link must use a supported safe URL.");
+
+const richTextTextSchema = z.object({
+  bold: z.boolean().optional(),
+  code: z.boolean().optional(),
+  italic: z.boolean().optional(),
+  strikethrough: z.boolean().optional(),
+  text: z.string(),
+  type: z.literal("text"),
+  underline: z.boolean().optional(),
+});
+
+const richTextLinkSchema = z.object({
+  children: z.array(richTextTextSchema).min(1),
+  type: z.literal("link"),
+  url: contentLinkUrl,
+});
+
+const richTextInlineSchema = z.discriminatedUnion("type", [
+  richTextTextSchema,
+  richTextLinkSchema,
+]);
+
+const richTextListItemSchema = z.object({
+  children: z.array(richTextInlineSchema).min(1),
+  type: z.literal("list-item"),
+});
+
+export type RawRichTextList = Readonly<{
+  children: readonly (
+    | z.infer<typeof richTextListItemSchema>
+    | RawRichTextList
+  )[];
+  format: "ordered" | "unordered";
+  type: "list";
+}>;
+
+const richTextListSchema: z.ZodType<RawRichTextList> = z.lazy(() =>
+  z.object({
+    children: z
+      .array(z.union([richTextListItemSchema, richTextListSchema]))
+      .min(1),
+    format: z.enum(["ordered", "unordered"]),
+    type: z.literal("list"),
+  }),
+);
+
+const richTextContainerSchema = z.object({
+  children: z.array(richTextInlineSchema).min(1),
+  type: z.enum(["paragraph", "quote", "code"]),
+});
+
+const richTextHeadingSchema = z.object({
+  children: z.array(richTextInlineSchema).min(1),
+  level: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+  ]),
+  type: z.literal("heading"),
+});
+
+const richTextImageSchema = z.object({
+  children: z.array(richTextTextSchema).max(1),
+  image: z.object({
+    alternativeText: nullableString,
+    caption: nullableString,
+    formats: z
+      .record(z.string(), mediaVariantSchema)
+      .nullable()
+      .optional(),
+    hash: requiredString,
+    height: z.number().int().positive(),
+    mime: requiredString,
+    name: requiredString,
+    size: z.number().nonnegative(),
+    url: mediaUrl,
+    width: z.number().int().positive(),
+  }),
+  type: z.literal("image"),
+});
+
+export const richTextSchema = z.array(
+  z.union([
+    richTextContainerSchema,
+    richTextHeadingSchema,
+    richTextListSchema,
+    richTextImageSchema,
+  ]),
+);
 
 export const seoSchema = z.object({
   metaTitle: nullableString,
@@ -286,6 +400,8 @@ export const singleEnvelopeSchema = <Schema extends z.ZodType>(
 ) => z.object({ data: itemSchema.nullable() });
 
 export type RawMedia = z.infer<typeof mediaSchema>;
+export type RawRichTextInline = z.infer<typeof richTextInlineSchema>;
+export type RawRichText = z.infer<typeof richTextSchema>;
 export type RawSeo = z.infer<typeof seoSchema>;
 export type RawAuthor = z.infer<typeof authorSchema>;
 export type RawCategory = z.infer<typeof categorySchema>;

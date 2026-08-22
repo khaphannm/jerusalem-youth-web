@@ -7,6 +7,9 @@ import type {
   MediaAsset,
   Navigation,
   Resource,
+  RichText,
+  RichTextInline,
+  RichTextList,
   Seo,
   Sermon,
   SermonSeries,
@@ -23,6 +26,9 @@ import type {
   RawMedia,
   RawNavigation,
   RawResource,
+  RawRichText,
+  RawRichTextInline,
+  RawRichTextList,
   RawSeo,
   RawSermon,
   RawSermonSeries,
@@ -63,6 +69,78 @@ export const mapMedia = (media: RawMedia, cmsBaseUrl: string): MediaAsset => ({
     }))
     .sort((left, right) => left.width - right.width),
 });
+
+const mapRichTextInline = (inline: RawRichTextInline): RichTextInline => {
+  if (inline.type === "link") {
+    return {
+      children: inline.children.map((child) => ({ ...child })),
+      type: "link",
+      url: inline.url,
+    };
+  }
+
+  return { ...inline };
+};
+
+const mapRichTextList = (list: RawRichTextList): RichTextList => ({
+  children: list.children.map((child) =>
+    child.type === "list"
+      ? mapRichTextList(child)
+      : {
+          children: child.children.map(mapRichTextInline),
+          type: "list-item",
+        },
+  ),
+  format: list.format,
+  type: "list",
+});
+
+export const mapRichText = (
+  blocks: RawRichText,
+  cmsBaseUrl: string,
+): RichText =>
+  blocks.map((block) => {
+    if (block.type === "list") {
+      return mapRichTextList(block);
+    }
+
+    if (block.type === "image") {
+      return {
+        caption: block.image.caption ?? null,
+        image: {
+          alternativeText: block.image.alternativeText ?? null,
+          height: block.image.height,
+          id: block.image.hash,
+          mimeType: block.image.mime,
+          name: block.image.name,
+          sizeInKilobytes: block.image.size,
+          url: new URL(block.image.url, `${cmsBaseUrl}/`).toString(),
+          variants: Object.values(block.image.formats ?? {})
+            .map((format) => ({
+              height: format.height,
+              url: new URL(format.url, `${cmsBaseUrl}/`).toString(),
+              width: format.width,
+            }))
+            .sort((left, right) => left.width - right.width),
+          width: block.image.width,
+        },
+        type: "image",
+      };
+    }
+
+    if (block.type === "heading") {
+      return {
+        children: block.children.map(mapRichTextInline),
+        level: block.level,
+        type: "heading",
+      };
+    }
+
+    return {
+      children: block.children.map(mapRichTextInline),
+      type: block.type,
+    };
+  });
 
 const mapOptionalMedia = (
   media: RawMedia | null | undefined,
@@ -114,7 +192,7 @@ export const mapArticle = (
   title: article.title,
   slug: article.slug,
   excerpt: article.excerpt,
-  body: article.body,
+  body: mapRichText(article.body, cmsBaseUrl),
   featuredImage: mapMedia(article.featuredImage, cmsBaseUrl),
   author: mapAuthor(article.author, cmsBaseUrl),
   category: mapCategory(article.category),
@@ -130,7 +208,7 @@ export const mapEvent = (event: RawEvent, cmsBaseUrl: string): Event => ({
   title: event.title,
   slug: event.slug,
   summary: event.summary,
-  description: event.description,
+  description: mapRichText(event.description, cmsBaseUrl),
   banner: mapMedia(event.banner, cmsBaseUrl),
   startDateTime: event.startDateTime,
   endDateTime: event.endDateTime ?? null,
@@ -172,7 +250,7 @@ export const mapStory = (story: RawStory, cmsBaseUrl: string): Story => ({
   title: story.title,
   slug: story.slug,
   summary: story.summary,
-  body: story.body,
+  body: mapRichText(story.body, cmsBaseUrl),
   featuredImage: mapMedia(story.featuredImage, cmsBaseUrl),
   personDisplayName: story.personDisplayName ?? null,
   videoUrl: story.videoURL ?? null,
@@ -255,5 +333,7 @@ export const mapSiteSettings = (
   primaryCallToAction: settings.primaryCta
     ? { label: settings.primaryCta.label, url: settings.primaryCta.url }
     : null,
-  footerContent: settings.footerContent ?? null,
+  footerContent: settings.footerContent
+    ? mapRichText(settings.footerContent, cmsBaseUrl)
+    : null,
 });

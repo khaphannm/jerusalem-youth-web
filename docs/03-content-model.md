@@ -46,6 +46,30 @@ Optional:
 - featured
 - seo
 
+Listing behavior:
+- `/articles` requests published entries explicitly and orders them by
+  `publishedAt` descending.
+- The public listing uses six-entry server-rendered pages selected by the
+  validated `page` query parameter.
+- Article cards expose their category name for topic discovery. Category
+  landing-page navigation remains owned by ART-003.
+
+Detail behavior:
+- `/articles/[slug]` accepts lowercase, hyphen-separated public slugs and
+  requests an exact match with `status=published`; invalid and empty results
+  resolve through the route's not-found boundary.
+- The frontend validates Strapi Blocks at the CMS boundary and server-renders
+  paragraphs, headings, quotes, code, ordered/unordered lists, links, formatted
+  text, and embedded images. Unsupported blocks and unsafe link schemes reject
+  the payload instead of being rendered.
+- Embedded image URLs and responsive formats are normalized through the same
+  media boundary as featured images.
+- Article metadata uses optional SEO overrides when supplied, otherwise the
+  article title, excerpt, and featured image. JSON-LD contains only fields
+  supported by the article contract; it does not infer an author type,
+  publisher, or modified date.
+- Category detail links and related-category queries remain owned by ART-003.
+
 ## Event
 
 Required:

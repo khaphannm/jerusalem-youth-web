@@ -158,6 +158,12 @@ describe("CMS client", () => {
     expect(result.items[0]).toMatchObject({
       id: "article-1",
       title: "Retreat reflection",
+      body: [
+        {
+          type: "paragraph",
+          children: [{ type: "text", text: "Hello" }],
+        },
+      ],
       tags: ["Retreat"],
       bibleReferences: ["Romans 12:5"],
       featuredImage: {
@@ -176,11 +182,17 @@ describe("CMS client", () => {
     });
     expect(result.items[0]).not.toHaveProperty("documentId");
 
-    const requestedUrl = String(fetchMock.mock.calls[0]?.[0]);
-    expect(requestedUrl).toContain("api/articles?");
-    expect(requestedUrl).toContain("populate=featuredImage");
-    expect(requestedUrl).toContain("pagination%5Bpage%5D=1");
-    expect(requestedUrl).toContain("pagination%5BpageSize%5D=10");
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/articles");
+    expect(requestedUrl.searchParams.getAll("populate")).toContain(
+      "featuredImage",
+    );
+    expect(requestedUrl.searchParams.get("pagination[page]")).toBe("1");
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("10");
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe(
+      "publishedAt:desc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       cache: "force-cache",
       next: {
@@ -271,6 +283,81 @@ describe("CMS client", () => {
     });
   });
 
+  it("maps validated embedded Blocks images to absolute media URLs", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    const articleWithEmbeddedImage = {
+      ...articleFixture,
+      body: [
+        ...articleFixture.body,
+        {
+          type: "image",
+          children: [{ type: "text", text: "" }],
+          image: {
+            ...mediaFixture,
+            hash: "embedded-image",
+            caption: "Worship at retreat",
+            url: "/uploads/embedded.jpg",
+          },
+        },
+      ],
+    };
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([articleWithEmbeddedImage])),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    const result = await client.articles.findBySlug("retreat-reflection");
+
+    expect(result?.body[1]).toMatchObject({
+      caption: "Worship at retreat",
+      image: {
+        id: "embedded-image",
+        url: "https://cms.example.test/uploads/embedded.jpg",
+      },
+      type: "image",
+    });
+  });
+
+  it.each([
+    [
+      "an unsafe rich-text link",
+      [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "link",
+              url: "javascript:alert(1)",
+              children: [{ type: "text", text: "Unsafe" }],
+            },
+          ],
+        },
+      ],
+    ],
+    [
+      "an unsupported rich-text block",
+      [{ type: "video", url: "https://video.example.test/watch" }],
+    ],
+  ])("rejects an article containing %s", async (_name, body) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([{ ...articleFixture, body }])),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.articles.findBySlug("retreat-reflection")).rejects
+      .toMatchObject({
+        code: "INVALID_RESPONSE",
+        message: "CMS returned an invalid articles detail payload.",
+      });
+  });
+
   it("returns null for a valid empty slug lookup", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(jsonResponse(collectionPayload([])));
@@ -280,9 +367,12 @@ describe("CMS client", () => {
     });
 
     await expect(client.articles.findBySlug("missing")).resolves.toBeNull();
-    expect(String(fetchMock.mock.calls[0]?.[0])).toContain(
-      "filters%5Bslug%5D%5B%24eq%5D=missing",
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[slug][$eq]")).toBe(
+      "missing",
     );
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
   });
 
   it("returns null when a single type has not been created", async () => {

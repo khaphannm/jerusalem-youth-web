@@ -47,7 +47,12 @@ const featuredEvent = {
   title: "Friday Youth Night",
   slug: "friday-youth-night",
   summary: "Worship, teaching, and time together.",
-  description: [{ type: "paragraph" }],
+  description: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Event description" }],
+    },
+  ],
   banner: media,
   startDateTime: "2026-09-04T11:00:00.000Z",
   endDateTime: null,
@@ -77,7 +82,12 @@ const latestArticle = {
   title: "Faith in everyday moments",
   slug: "faith-in-everyday-moments",
   excerpt: "Small choices can shape a life of faith.",
-  body: [{ type: "paragraph" }],
+  body: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Article body" }],
+    },
+  ],
   featuredImage: media,
   author: {
     id: "author-1",
@@ -121,7 +131,12 @@ const story = {
   title: "Finding a place to belong",
   slug: "finding-a-place-to-belong",
   summary: "A story about friendship and growing in faith.",
-  body: [{ type: "paragraph" }],
+  body: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Story body" }],
+    },
+  ],
   featuredImage: media,
   personDisplayName: "Jordan",
   videoUrl: null,

@@ -49,7 +49,12 @@ const event = {
   title: "Youth Night",
   slug: "youth-night",
   summary: "A weekly gathering.",
-  description: [{ type: "paragraph" }],
+  description: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Event description" }],
+    },
+  ],
   banner: media,
   startDateTime: "2026-09-04T11:00:00.000Z",
   endDateTime: null,
@@ -71,7 +76,12 @@ const story = {
   title: "A new beginning",
   slug: "a-new-beginning",
   summary: "A story from our community.",
-  body: [{ type: "paragraph" }],
+  body: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Article body" }],
+    },
+  ],
   featuredImage: media,
   personDisplayName: null,
   videoUrl: null,

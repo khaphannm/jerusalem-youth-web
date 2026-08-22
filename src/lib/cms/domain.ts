@@ -1,5 +1,31 @@
-export type RichTextBlock = Readonly<Record<string, unknown>>;
-export type RichText = readonly RichTextBlock[];
+export type RichTextText = Readonly<{
+  type: "text";
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+  code?: boolean;
+}>;
+
+export type RichTextLink = Readonly<{
+  type: "link";
+  url: string;
+  children: readonly RichTextText[];
+}>;
+
+export type RichTextInline = RichTextText | RichTextLink;
+
+export type RichTextListItem = Readonly<{
+  type: "list-item";
+  children: readonly RichTextInline[];
+}>;
+
+export type RichTextList = Readonly<{
+  type: "list";
+  format: "ordered" | "unordered";
+  children: readonly (RichTextListItem | RichTextList)[];
+}>;
 
 export type MediaVariant = Readonly<{
   height: number;
@@ -18,6 +44,25 @@ export type MediaAsset = Readonly<{
   sizeInKilobytes: number;
   variants: readonly MediaVariant[];
 }>;
+
+export type RichTextBlock =
+  | Readonly<{
+      type: "paragraph" | "quote" | "code";
+      children: readonly RichTextInline[];
+    }>
+  | Readonly<{
+      type: "heading";
+      level: 1 | 2 | 3 | 4 | 5 | 6;
+      children: readonly RichTextInline[];
+    }>
+  | RichTextList
+  | Readonly<{
+      type: "image";
+      image: MediaAsset;
+      caption: string | null;
+    }>;
+
+export type RichText = readonly RichTextBlock[];
 
 export type Seo = Readonly<{
   metaTitle: string | null;

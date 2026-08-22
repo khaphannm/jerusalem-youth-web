@@ -1,6 +1,8 @@
 # EPIC-03 — Articles / Devotionals
 
 ## ART-001 Articles listing
+Status: Implemented
+
 Acceptance criteria:
 - published articles only
 - newest-first default
@@ -11,6 +13,8 @@ Acceptance criteria:
 - SEO metadata
 
 ## ART-002 Article detail
+Status: Implemented
+
 Acceptance criteria:
 - route `/articles/[slug]`
 - title, metadata, author, rich content, image as available

@@ -16,6 +16,7 @@ export function ArticleCard({ article }: Readonly<{ article: Article }>) {
       />
       <div className="flex flex-col justify-center p-6 sm:p-10">
         <p className="font-label text-label font-bold uppercase text-secondary">
+          <span className="sr-only">Category: </span>
           {article.category.name}
         </p>
         <h3 className="mt-4 font-heading text-heading-3 font-bold">
