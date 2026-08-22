@@ -124,6 +124,10 @@ describe("ArticlePage", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText("Devotional")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Devotional" })).toHaveAttribute(
+      "href",
+      "/articles/category/devotional",
+    );
     expect(screen.getByText(/By Youth Team/)).toBeInTheDocument();
     expect(screen.getByText("August 21, 2026")).toBeInTheDocument();
     expect(

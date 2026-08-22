@@ -51,8 +51,8 @@ Listing behavior:
   `publishedAt` descending.
 - The public listing uses six-entry server-rendered pages selected by the
   validated `page` query parameter.
-- Article cards expose their category name for topic discovery. Category
-  landing-page navigation remains owned by ART-003.
+- Article cards expose their category name and link to its category landing
+  page for topic discovery.
 
 Detail behavior:
 - `/articles/[slug]` accepts lowercase, hyphen-separated public slugs and
@@ -68,7 +68,17 @@ Detail behavior:
   article title, excerpt, and featured image. JSON-LD contains only fields
   supported by the article contract; it does not infer an author type,
   publisher, or modified date.
-- Category detail links and related-category queries remain owned by ART-003.
+
+Category behavior:
+- `/articles/category/[slug]` validates lowercase, hyphen-separated public
+  slugs and resolves the category separately from its article collection so an
+  existing category with no articles remains distinct from a missing category.
+- Category article requests filter by `category.slug`, explicitly request
+  `status=published`, order by `publishedAt` descending, and use the same
+  six-entry server-rendered pagination as the main listing.
+- Category titles and descriptions supply page and social metadata. When the
+  current category page contains an article, its first featured image supplies
+  the social preview image; no image is fabricated for an empty category.
 
 ## Event
 

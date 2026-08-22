@@ -25,6 +25,8 @@ Acceptance criteria:
 - social metadata
 
 ## ART-003 Category page
+Status: Implemented
+
 Acceptance criteria:
 - route `/articles/category/[slug]`
 - only matching published articles

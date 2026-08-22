@@ -126,3 +126,28 @@ test("an invalid article slug returns a useful mobile not-found page", async ({
     ),
   ).toBe(true);
 });
+
+test("an invalid article category returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto(
+    "/articles/category/not_a_public_category",
+  );
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Article category not found",
+    }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all articles" });
+  await expect(returnAction).toHaveAttribute("href", "/articles");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});

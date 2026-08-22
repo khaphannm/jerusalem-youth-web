@@ -6,6 +6,9 @@ import { formatPublicationDate } from "@/lib/format-date";
 
 export function ArticleCard({ article }: Readonly<{ article: Article }>) {
   const href = `/articles/${encodeURIComponent(article.slug)}`;
+  const categoryHref = `/articles/category/${encodeURIComponent(
+    article.category.slug,
+  )}`;
 
   return (
     <article className="overflow-hidden rounded-large border border-calm-foreground/20 bg-background md:grid md:grid-cols-2">
@@ -17,7 +20,12 @@ export function ArticleCard({ article }: Readonly<{ article: Article }>) {
       <div className="flex flex-col justify-center p-6 sm:p-10">
         <p className="font-label text-label font-bold uppercase text-secondary">
           <span className="sr-only">Category: </span>
-          {article.category.name}
+          <Link
+            className="rounded-small underline decoration-border underline-offset-4 transition-colors duration-fast ease-standard hover:text-primary motion-reduce:transition-none"
+            href={categoryHref}
+          >
+            {article.category.name}
+          </Link>
         </p>
         <h3 className="mt-4 font-heading text-heading-3 font-bold">
           <Link

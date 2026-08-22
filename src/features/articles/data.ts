@@ -3,6 +3,7 @@ import "server-only";
 import { getCmsClient } from "@/lib/cms";
 import type {
   Article,
+  Category,
   CollectionResult,
   SiteSettings,
 } from "@/lib/cms/domain";
@@ -13,6 +14,15 @@ export type ArticleListingData = CollectionResult<Article> | null;
 
 export type ArticleDetailData =
   | Readonly<{ article: Article; status: "found" }>
+  | Readonly<{ status: "not-found" }>
+  | Readonly<{ status: "error" }>;
+
+export type ArticleCategoryData =
+  | Readonly<{
+      category: Category;
+      listing: CollectionResult<Article>;
+      status: "found";
+    }>
   | Readonly<{ status: "not-found" }>
   | Readonly<{ status: "error" }>;
 
@@ -76,6 +86,47 @@ export async function loadArticleDetail(
       : { status: "not-found" };
   } catch (error) {
     logArticleDataError("detail", error);
+    return { status: "error" };
+  }
+}
+
+export async function loadArticleCategory(
+  slug: string,
+  page: number,
+): Promise<ArticleCategoryData> {
+  if (!isValidArticleSlug(slug)) {
+    return { status: "not-found" };
+  }
+
+  try {
+    const client = getCmsClient();
+    const [categoryResult, listingResult] = await Promise.allSettled([
+      client.categories.findBySlug(slug),
+      client.articles.listByCategory(slug, {
+        page,
+        pageSize: articlesPageSize,
+      }),
+    ]);
+
+    if (categoryResult.status === "rejected") {
+      throw categoryResult.reason;
+    }
+
+    if (!categoryResult.value) {
+      return { status: "not-found" };
+    }
+
+    if (listingResult.status === "rejected") {
+      throw listingResult.reason;
+    }
+
+    return {
+      category: categoryResult.value,
+      listing: listingResult.value,
+      status: "found",
+    };
+  } catch (error) {
+    logArticleDataError("category", error);
     return { status: "error" };
   }
 }

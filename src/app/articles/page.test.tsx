@@ -122,6 +122,9 @@ describe("ArticlesPage", () => {
     const cards = screen.getAllByRole("article");
     expect(cards).toHaveLength(2);
     expect(within(cards[0]).getByText("Devotional")).toBeInTheDocument();
+    expect(
+      within(cards[0]).getByRole("link", { name: "Devotional" }),
+    ).toHaveAttribute("href", "/articles/category/devotional");
     expect(within(cards[0]).getByText(/By Youth Team/)).toBeInTheDocument();
     expect(
       within(cards[0]).getByRole("link", {

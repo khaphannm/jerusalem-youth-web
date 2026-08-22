@@ -1,14 +1,16 @@
 import Link from "next/link";
 
 type ArticlePaginationProps = Readonly<{
+  basePath?: string;
   currentPage: number;
   pageCount: number;
 }>;
 
-const articlePageHref = (page: number) =>
-  page === 1 ? "/articles" : `/articles?page=${page}`;
+const articlePageHref = (basePath: string, page: number) =>
+  page === 1 ? basePath : `${basePath}?page=${page}`;
 
 export function ArticlePagination({
+  basePath = "/articles",
   currentPage,
   pageCount,
 }: ArticlePaginationProps) {
@@ -24,7 +26,7 @@ export function ArticlePagination({
       {currentPage > 1 ? (
         <Link
           className="inline-flex min-h-11 items-center gap-2 rounded-small border border-border bg-background px-4 py-2 font-label text-label font-bold text-primary transition-colors duration-fast ease-standard hover:border-primary hover:text-secondary motion-reduce:transition-none"
-          href={articlePageHref(currentPage - 1)}
+          href={articlePageHref(basePath, currentPage - 1)}
           rel="prev"
         >
           <span aria-hidden="true">←</span>
@@ -47,7 +49,7 @@ export function ArticlePagination({
       {currentPage < pageCount ? (
         <Link
           className="inline-flex min-h-11 items-center gap-2 rounded-small border border-border bg-background px-4 py-2 font-label text-label font-bold text-primary transition-colors duration-fast ease-standard hover:border-primary hover:text-secondary motion-reduce:transition-none"
-          href={articlePageHref(currentPage + 1)}
+          href={articlePageHref(basePath, currentPage + 1)}
           rel="next"
         >
           Next

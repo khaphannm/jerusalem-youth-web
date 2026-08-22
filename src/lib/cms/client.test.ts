@@ -375,6 +375,47 @@ describe("CMS client", () => {
     expect(requestedUrl.searchParams.get("status")).toBe("published");
   });
 
+  it("requests only published articles in the matching category", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([articleFixture], 6)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    const result = await client.articles.listByCategory("community", {
+      page: 2,
+      pageSize: 6,
+    });
+
+    expect(result.items[0]?.category.slug).toBe("community");
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[category][slug][$eq]")).toBe(
+      "community",
+    );
+    expect(requestedUrl.searchParams.get("pagination[page]")).toBe("2");
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("6");
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe(
+      "publishedAt:desc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it("rejects a blank article category slug before making a request", () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    expect(() => client.articles.listByCategory("  ")).toThrowError(
+      "categorySlug must not be blank.",
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("returns null when a single type has not been created", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(jsonResponse({ data: null }, 404));

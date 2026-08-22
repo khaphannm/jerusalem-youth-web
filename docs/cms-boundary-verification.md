@@ -95,6 +95,9 @@ curl -g -sS -w '\nHTTP %{http_code}\n' \
 curl -g -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/articles?populate=featuredImage&populate=author.avatar&populate=category&populate=tags&populate=bibleReferences&populate=seo.socialImage&status=published&filters[slug][$eq]=replace-with-a-published-slug&pagination[pageSize]=1"
 
+curl -g -sS -w '\nHTTP %{http_code}\n' \
+  "$cms_url/articles?populate=featuredImage&populate=author.avatar&populate=category&populate=tags&populate=bibleReferences&populate=seo.socialImage&status=published&filters[category][slug][$eq]=replace-with-a-category-slug&sort[0]=publishedAt:desc&pagination[page]=1&pagination[pageSize]=6"
+
 curl -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/authors?populate=avatar"
 
@@ -117,9 +120,10 @@ curl -sS -w '\nHTTP %{http_code}\n' \
   "$cms_url/stories?populate=featuredImage&populate=seo.socialImage"
 ```
 
-Each collection request, including the article detail lookup, must return HTTP
-200. On an empty database or when the detail slug does not match a published
-article, the expected shape is:
+Each collection request, including the article detail and category-filtered
+lookups, must return HTTP 200. On an empty database, when the detail slug does
+not match a published article, or when a category has no published articles,
+the expected shape is:
 
 ```json
 {

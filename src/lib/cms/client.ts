@@ -88,8 +88,8 @@ type CachePolicy = Readonly<{
 type CollectionQuery = CollectionOptions &
   Readonly<{
     filters?: readonly Readonly<{
-      field: string;
       operator: "$eq" | "$gte";
+      path: readonly [string, ...string[]];
       value: boolean | string;
     }>[];
     sort?: readonly string[];
@@ -225,8 +225,16 @@ const buildUrl = (
     url.searchParams.set(`sort[${index}]`, sort);
   });
 
-  options.filters?.forEach(({ field, operator, value }) => {
-    url.searchParams.set(`filters[${field}][${operator}]`, String(value));
+  options.filters?.forEach(({ operator, path, value }) => {
+    if (path.some((segment) => !/^[A-Za-z][A-Za-z0-9]*$/.test(segment))) {
+      throw new CmsError(
+        "CONFIGURATION",
+        "CMS filter paths must contain valid field names.",
+      );
+    }
+
+    const filterPath = path.map((segment) => `[${segment}]`).join("");
+    url.searchParams.set(`filters${filterPath}[${operator}]`, String(value));
   });
 
   if (options.status) {
@@ -505,6 +513,32 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(articles, slug, { status: "published" }),
+      listByCategory: (
+        categorySlug: string,
+        options?: CollectionOptions,
+      ) => {
+        const normalizedCategorySlug = categorySlug.trim();
+
+        if (!normalizedCategorySlug) {
+          throw new CmsError(
+            "CONFIGURATION",
+            "categorySlug must not be blank.",
+          );
+        }
+
+        return readCollection(articles, {
+          ...options,
+          filters: [
+            {
+              operator: "$eq",
+              path: ["category", "slug"],
+              value: normalizedCategorySlug,
+            },
+          ],
+          sort: ["publishedAt:desc"],
+          status: "published",
+        });
+      },
       latest: () => readLatest(articles, ["publishedAt:desc"]),
     },
     authors: {
@@ -534,10 +568,20 @@ export const createCmsClient = ({
 
         return readCollection(events, {
           filters: [
-            { field: "startDateTime", operator: "$gte", value: normalizedFrom },
+            {
+              operator: "$gte",
+              path: ["startDateTime"],
+              value: normalizedFrom,
+            },
             ...(featured === undefined
               ? []
-              : [{ field: "featured", operator: "$eq" as const, value: featured }]),
+              : [
+                  {
+                    operator: "$eq" as const,
+                    path: ["featured"] as const,
+                    value: featured,
+                  },
+                ]),
           ],
           pageSize,
           sort: ["startDateTime:asc"],

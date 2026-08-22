@@ -147,7 +147,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </Link>
             <p className="mt-8 font-label text-label font-bold uppercase text-secondary">
               <span className="sr-only">Category: </span>
-              {article.category.name}
+              <Link
+                className="rounded-small underline decoration-calm-foreground/30 underline-offset-4 transition-colors duration-fast ease-standard hover:text-primary motion-reduce:transition-none"
+                href={`/articles/category/${encodeURIComponent(
+                  article.category.slug,
+                )}`}
+              >
+                {article.category.name}
+              </Link>
             </p>
             <h1
               className="mt-5 text-balance font-display text-display font-extrabold"
