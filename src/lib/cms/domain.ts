@@ -1,6 +1,12 @@
 export type RichTextBlock = Readonly<Record<string, unknown>>;
 export type RichText = readonly RichTextBlock[];
 
+export type MediaVariant = Readonly<{
+  height: number;
+  url: string;
+  width: number;
+}>;
+
 export type MediaAsset = Readonly<{
   id: string;
   name: string;
@@ -10,6 +16,7 @@ export type MediaAsset = Readonly<{
   width: number | null;
   height: number | null;
   sizeInKilobytes: number;
+  variants: readonly MediaVariant[];
 }>;
 
 export type Seo = Readonly<{
@@ -186,5 +193,11 @@ export type CollectionResult<T> = Readonly<{
 
 export type CollectionOptions = Readonly<{
   page?: number;
+  pageSize?: number;
+}>;
+
+export type UpcomingEventOptions = Readonly<{
+  featured?: boolean;
+  from: string;
   pageSize?: number;
 }>;

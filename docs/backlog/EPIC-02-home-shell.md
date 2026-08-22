@@ -12,6 +12,8 @@ Acceptance criteria:
 - no unnecessary client JS outside interactive menu
 
 ## HOME-002 Production footer
+Status: Implemented
+
 Acceptance criteria:
 - key navigation
 - contact/social links
@@ -19,6 +21,8 @@ Acceptance criteria:
 - responsive, semantic, CMS/config-driven where appropriate
 
 ## HOME-003 Homepage
+Status: Implemented
+
 Acceptance criteria:
 - hero with one primary action
 - next/featured event

@@ -5,6 +5,7 @@ const toneClasses = {
   calm: "bg-calm text-calm-foreground",
   secondary: "bg-secondary text-secondary-foreground",
   surface: "bg-surface text-foreground",
+  white: "bg-primary-foreground text-foreground",
 } as const;
 
 const spacingClasses = {

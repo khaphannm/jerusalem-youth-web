@@ -16,6 +16,7 @@ import type {
   SiteSettings,
   SocialLinks,
   Story,
+  UpcomingEventOptions,
 } from "./domain";
 import {
   cmsCacheTags,
@@ -80,6 +81,16 @@ type CachePolicy = Readonly<{
   revalidate: number | false;
   tags: readonly CmsCacheTag[];
 }>;
+
+type CollectionQuery = CollectionOptions &
+  Readonly<{
+    filters?: readonly Readonly<{
+      field: string;
+      operator: "$eq" | "$gte";
+      value: boolean | string;
+    }>[];
+    sort?: readonly string[];
+  }>;
 
 const defaultTimeoutMs = 8_000;
 
@@ -170,7 +181,10 @@ export const normalizeCmsBaseUrl = (
 };
 
 const validateCollectionOptions = (options: CollectionOptions) => {
-  for (const [name, value] of Object.entries(options)) {
+  for (const [name, value] of [
+    ["page", options.page],
+    ["pageSize", options.pageSize],
+  ] as const) {
     if (value !== undefined && (!Number.isInteger(value) || value <= 0)) {
       throw new CmsError(
         "CONFIGURATION",
@@ -184,7 +198,7 @@ const buildUrl = (
   baseUrl: string,
   endpoint: string,
   populatePaths: readonly string[],
-  options: CollectionOptions = {},
+  options: CollectionQuery = {},
   slug?: string,
 ) => {
   validateCollectionOptions(options);
@@ -201,6 +215,14 @@ const buildUrl = (
   if (options.pageSize !== undefined) {
     url.searchParams.set("pagination[pageSize]", String(options.pageSize));
   }
+
+  options.sort?.forEach((sort, index) => {
+    url.searchParams.set(`sort[${index}]`, sort);
+  });
+
+  options.filters?.forEach(({ field, operator, value }) => {
+    url.searchParams.set(`filters[${field}][${operator}]`, String(value));
+  });
 
   if (slug !== undefined) {
     const normalizedSlug = slug.trim();
@@ -296,7 +318,7 @@ export const createCmsClient = ({
 
   const readCollection = async <Raw, Domain>(
     definition: CollectionDefinition<Raw, Domain>,
-    options: CollectionOptions = {},
+    options: CollectionQuery = {},
   ): Promise<CollectionResult<Domain>> => {
     const payload = await request(
       buildUrl(baseUrl, definition.endpoint, definition.populate, options),
@@ -338,6 +360,15 @@ export const createCmsClient = ({
 
     const item = result.data.data[0];
     return item ? definition.map(item, baseUrl) : null;
+  };
+
+  const readLatest = async <Raw, Domain>(
+    definition: CollectionDefinition<Raw, Domain>,
+    sort: readonly string[],
+  ): Promise<Domain | null> => {
+    const result = await readCollection(definition, { pageSize: 1, sort });
+
+    return result.items[0] ?? null;
   };
 
   const readSingle = async <Raw, Domain>(
@@ -447,6 +478,7 @@ export const createCmsClient = ({
     articles: {
       list: (options?: CollectionOptions) => readCollection(articles, options),
       findBySlug: (slug: string) => findBySlug(articles, slug),
+      latest: () => readLatest(articles, ["publishedAt:desc"]),
     },
     authors: {
       list: (options?: CollectionOptions) => readCollection(authors, options),
@@ -459,6 +491,31 @@ export const createCmsClient = ({
     events: {
       list: (options?: CollectionOptions) => readCollection(events, options),
       findBySlug: (slug: string) => findBySlug(events, slug),
+      upcoming: ({
+        featured,
+        from,
+        pageSize = 4,
+      }: UpcomingEventOptions) => {
+        const normalizedFrom = from.trim();
+
+        if (!normalizedFrom || !Number.isFinite(Date.parse(normalizedFrom))) {
+          throw new CmsError(
+            "CONFIGURATION",
+            "Upcoming event start date must be a valid date-time.",
+          );
+        }
+
+        return readCollection(events, {
+          filters: [
+            { field: "startDateTime", operator: "$gte", value: normalizedFrom },
+            ...(featured === undefined
+              ? []
+              : [{ field: "featured", operator: "$eq" as const, value: featured }]),
+          ],
+          pageSize,
+          sort: ["startDateTime:asc"],
+        });
+      },
     },
     resources: {
       list: (options?: CollectionOptions) => readCollection(resources, options),
@@ -472,10 +529,16 @@ export const createCmsClient = ({
     sermons: {
       list: (options?: CollectionOptions) => readCollection(sermons, options),
       findBySlug: (slug: string) => findBySlug(sermons, slug),
+      latest: () => readLatest(sermons, ["date:desc", "publishedAt:desc"]),
     },
     stories: {
       list: (options?: CollectionOptions) => readCollection(stories, options),
       findBySlug: (slug: string) => findBySlug(stories, slug),
+      latest: (options: Pick<CollectionOptions, "pageSize"> = {}) =>
+        readCollection(stories, {
+          ...options,
+          sort: ["publishedAt:desc"],
+        }),
     },
     navigation: () =>
       readSingle({

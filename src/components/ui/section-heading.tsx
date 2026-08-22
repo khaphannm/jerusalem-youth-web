@@ -27,6 +27,11 @@ const toneClasses = {
     eyebrow: "text-primary",
     title: "text-foreground",
   },
+  white: {
+    description: "text-muted",
+    eyebrow: "text-primary",
+    title: "text-foreground",
+  },
 } as const;
 
 export type SectionHeadingProps = {

@@ -38,6 +38,13 @@ export const mapMedia = (media: RawMedia, cmsBaseUrl: string): MediaAsset => ({
   width: media.width ?? null,
   height: media.height ?? null,
   sizeInKilobytes: media.size,
+  variants: Object.values(media.formats ?? {})
+    .map((format) => ({
+      height: format.height,
+      url: new URL(format.url, `${cmsBaseUrl}/`).toString(),
+      width: format.width,
+    }))
+    .sort((left, right) => left.width - right.width),
 });
 
 const mapOptionalMedia = (

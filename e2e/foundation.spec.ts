@@ -1,13 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("the accessible application shell loads", async ({ page }) => {
+test("the accessible homepage and application shell load", async ({ page }) => {
   await page.goto("/");
 
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: "Modern Editorial UI foundation",
-    }),
+    page.getByRole("heading", { level: 2, name: "Upcoming events" }),
   ).toBeVisible();
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
@@ -19,13 +17,16 @@ test("the accessible application shell loads", async ({ page }) => {
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
-test("the foundation is usable without horizontal overflow on mobile", async ({
+test("the homepage is usable without horizontal overflow on mobile", async ({
   page,
 }) => {
   await page.setViewportSize({ height: 844, width: 390 });
   await page.goto("/");
 
-  const primaryAction = page.getByRole("button", { name: "Primary action" });
+  const primaryAction = page
+    .locator("main > section")
+    .first()
+    .getByRole("link");
 
   await expect(primaryAction).toBeVisible();
   await expect(primaryAction).toHaveCSS("background-color", "rgb(54, 87, 245)");

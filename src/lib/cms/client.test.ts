@@ -12,6 +12,15 @@ const mediaFixture = {
   width: 1600,
   height: 900,
   size: 245.5,
+  formats: {
+    small: {
+      name: "small_retreat.jpg",
+      url: "/uploads/small_retreat.jpg",
+      width: 500,
+      height: 281,
+      size: 48.2,
+    },
+  },
 };
 
 const articleFixture = {
@@ -62,6 +71,35 @@ const navigationFixture = {
   publishedAt: "2026-08-21T03:00:00.000Z",
 };
 
+const socialLinksFixture = {
+  documentId: "social-links-1",
+  links: [
+    {
+      platform: "YouTube",
+      url: "https://youtube.example.test/youth",
+      displayOrder: 2,
+    },
+    {
+      platform: "Instagram",
+      url: "https://instagram.example.test/youth",
+      displayOrder: 1,
+    },
+  ],
+  publishedAt: "2026-08-21T03:00:00.000Z",
+};
+
+const siteSettingsFixture = {
+  documentId: "site-settings-1",
+  siteName: "Jerusalem Youth",
+  siteDescription: "A community growing in faith.",
+  defaultSeo: null,
+  defaultSocialImage: null,
+  organizationContact: null,
+  primaryCta: { label: "Plan your visit", url: "/join" },
+  footerContent: null,
+  publishedAt: "2026-08-21T03:00:00.000Z",
+};
+
 const collectionPayload = (data: unknown[], pageSize = 25) => ({
   data,
   meta: {
@@ -107,6 +145,13 @@ describe("CMS client", () => {
       featuredImage: {
         id: "image-1",
         url: "https://cms.example.test/uploads/retreat.jpg",
+        variants: [
+          {
+            height: 281,
+            url: "https://cms.example.test/uploads/small_retreat.jpg",
+            width: 500,
+          },
+        ],
       },
       author: { id: "author-1", displayName: "Ministry Team" },
       category: { id: "category-1", name: "Community" },
@@ -150,6 +195,46 @@ describe("CMS client", () => {
     });
   });
 
+  it("builds curated homepage sort and event filter queries", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockImplementation(async () =>
+      jsonResponse(collectionPayload([])),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.events.upcoming({
+      featured: true,
+      from: "2026-08-22T00:00:00.000Z",
+      pageSize: 4,
+    });
+    await client.articles.latest();
+    await client.sermons.latest();
+    await client.stories.latest({ pageSize: 3 });
+
+    const eventUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(eventUrl.searchParams.get("filters[startDateTime][$gte]")).toBe(
+      "2026-08-22T00:00:00.000Z",
+    );
+    expect(eventUrl.searchParams.get("filters[featured][$eq]")).toBe("true");
+    expect(eventUrl.searchParams.get("sort[0]")).toBe("startDateTime:asc");
+    expect(eventUrl.searchParams.get("pagination[pageSize]")).toBe("4");
+
+    const articleUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
+    expect(articleUrl.searchParams.get("sort[0]")).toBe("publishedAt:desc");
+    expect(articleUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+
+    const sermonUrl = new URL(String(fetchMock.mock.calls[2]?.[0]));
+    expect(sermonUrl.searchParams.getAll("sort[0]")).toEqual(["date:desc"]);
+    expect(sermonUrl.searchParams.get("sort[1]")).toBe("publishedAt:desc");
+
+    const storyUrl = new URL(String(fetchMock.mock.calls[3]?.[0]));
+    expect(storyUrl.searchParams.get("sort[0]")).toBe("publishedAt:desc");
+    expect(storyUrl.searchParams.get("pagination[pageSize]")).toBe("3");
+  });
+
   it("rejects malformed CMS payloads with a normalized error", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     const malformedArticle = { ...articleFixture, featuredImage: null };
@@ -191,6 +276,40 @@ describe("CMS client", () => {
     });
 
     await expect(client.siteSettings()).resolves.toBeNull();
+  });
+
+  it("maps a safe site-wide primary action", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse({ data: siteSettingsFixture }));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.siteSettings()).resolves.toMatchObject({
+      primaryCallToAction: { label: "Plan your visit", url: "/join" },
+    });
+  });
+
+  it("rejects an unsafe site-wide primary action URL", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: {
+          ...siteSettingsFixture,
+          primaryCta: { label: "Unsafe", url: "javascript:alert(1)" },
+        },
+      }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.siteSettings()).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid site-setting payload.",
+    });
   });
 
   it("maps safe internal and external navigation URLs", async () => {
@@ -241,6 +360,59 @@ describe("CMS client", () => {
     await expect(client.navigation()).rejects.toMatchObject({
       code: "INVALID_RESPONSE",
       message: "CMS returned an invalid navigation payload.",
+    });
+  });
+
+  it("maps safe social links in display order", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse({ data: socialLinksFixture }));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.socialLinks()).resolves.toMatchObject({
+      links: [
+        {
+          platform: "Instagram",
+          url: "https://instagram.example.test/youth",
+        },
+        {
+          platform: "YouTube",
+          url: "https://youtube.example.test/youth",
+        },
+      ],
+    });
+  });
+
+  it.each([
+    "javascript:alert(1)",
+    "ftp://social.example.test/youth",
+    "https://user:secret@social.example.test/youth",
+  ])("rejects unsafe social URL %s", async (unsafeUrl) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: {
+          ...socialLinksFixture,
+          links: [
+            {
+              platform: "Unsafe",
+              url: unsafeUrl,
+              displayOrder: 1,
+            },
+          ],
+        },
+      }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.socialLinks()).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid social-links payload.",
     });
   });
 

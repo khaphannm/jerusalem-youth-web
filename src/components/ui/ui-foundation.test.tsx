@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { LinkButton } from "@/components/ui/link-button";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -19,6 +20,18 @@ describe("UI foundation", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("name", "join");
     expect(button).toHaveAttribute("type", "submit");
+  });
+
+  it("renders link actions with the shared button styles", () => {
+    render(<LinkButton href="/join">Join us</LinkButton>);
+
+    expect(screen.getByRole("link", { name: "Join us" })).toMatchObject({
+      href: expect.stringContaining("/join"),
+    });
+    expect(screen.getByRole("link", { name: "Join us" })).toHaveClass(
+      "bg-primary",
+      "min-h-11",
+    );
   });
 
   it("renders composable semantic layout primitives", () => {

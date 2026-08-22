@@ -3,6 +3,21 @@ import { z } from "zod";
 const requiredString = z.string().trim().min(1);
 const nullableString = requiredString.nullable().optional();
 const nullableUrl = z.url().nullable().optional();
+const nullableHttpUrl = requiredString
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return (
+        ["http:", "https:"].includes(url.protocol) &&
+        !url.username &&
+        !url.password
+      );
+    } catch {
+      return false;
+    }
+  }, "URL must be an absolute HTTP URL.")
+  .nullable()
+  .optional();
 const dateTime = z.iso.datetime({ offset: true });
 const richTextSchema = z.array(z.record(z.string(), z.unknown()));
 const mediaUrl = requiredString.refine((value) => {
@@ -18,6 +33,12 @@ const documentSchema = z.object({
   documentId: requiredString,
 });
 
+const mediaVariantSchema = z.object({
+  height: z.number().int().positive(),
+  url: mediaUrl,
+  width: z.number().int().positive(),
+});
+
 export const mediaSchema = documentSchema.extend({
   name: requiredString,
   url: mediaUrl,
@@ -26,12 +47,16 @@ export const mediaSchema = documentSchema.extend({
   width: z.number().int().positive().nullable().optional(),
   height: z.number().int().positive().nullable().optional(),
   size: z.number().nonnegative(),
+  formats: z
+    .record(z.string(), mediaVariantSchema)
+    .nullable()
+    .optional(),
 });
 
 export const seoSchema = z.object({
   metaTitle: nullableString,
   metaDescription: nullableString,
-  canonical: nullableString,
+  canonical: nullableHttpUrl,
   socialImage: mediaSchema.nullable().optional(),
   noIndex: z.boolean(),
 });
@@ -189,7 +214,18 @@ export const navigationSchema = publishedDocumentSchema.extend({
 
 const socialLinkSchema = z.object({
   platform: requiredString,
-  url: z.url(),
+  url: requiredString.refine((value) => {
+    try {
+      const url = new URL(value);
+      return (
+        ["http:", "https:"].includes(url.protocol) &&
+        !url.username &&
+        !url.password
+      );
+    } catch {
+      return false;
+    }
+  }, "Social URL must be an HTTP URL."),
   displayOrder: z.number().int(),
 });
 
@@ -205,7 +241,7 @@ const contactSchema = z.object({
 
 const callToActionSchema = z.object({
   label: requiredString,
-  url: requiredString,
+  url: navigationUrl,
 });
 
 export const siteSettingsSchema = publishedDocumentSchema.extend({

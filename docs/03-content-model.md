@@ -24,6 +24,9 @@ CMS-002 implements reusable component contracts as follows:
 - `contact`: `email`, `phone`, `address`
 - `cta`: required `label`, required `url`
 
+CTA URLs must be either root-relative site paths or absolute HTTP(S) URLs.
+The frontend rejects unsupported schemes at the CMS boundary.
+
 ## Article
 
 Required:
@@ -168,6 +171,9 @@ URLs. The frontend rejects unsupported URL schemes at the CMS boundary.
 ### Social Links
 - `links`, a repeatable `socialLink` component
 
+Social-link URLs must be absolute HTTP(S) URLs. The frontend rejects
+unsupported schemes and embedded credentials at the CMS boundary.
+
 ## SEO component
 
 Reusable component:
@@ -176,6 +182,8 @@ Reusable component:
 - canonical optional
 - socialImage optional
 - noIndex boolean default false
+
+Canonical URLs, when supplied, must be absolute HTTP(S) URLs.
 
 ## Frontend contract
 
@@ -187,3 +195,5 @@ The frontend must map CMS payloads into domain models such as:
 - `Resource`
 
 UI components receive domain models, not raw Strapi payloads.
+When Strapi supplies responsive media formats, the frontend maps and uses them
+as width-based image candidates while retaining the original asset as fallback.

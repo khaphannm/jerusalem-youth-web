@@ -17,10 +17,28 @@ const sizeClasses = {
   large: "min-h-12 px-6 py-3",
 } as const;
 
-export type ButtonProps = ComponentPropsWithoutRef<"button"> & {
+export type ButtonStyleProps = {
+  className?: string;
   size?: keyof typeof sizeClasses;
   variant?: keyof typeof variantClasses;
 };
+
+export type ButtonProps = ComponentPropsWithoutRef<"button"> & ButtonStyleProps;
+
+export function getButtonClasses({
+  className,
+  size = "medium",
+  variant = "primary",
+}: ButtonStyleProps = {}) {
+  return [
+    "inline-flex items-center justify-center gap-2 rounded-small border font-label text-label font-semibold transition-colors duration-fast ease-standard motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50",
+    sizeClasses[size],
+    variantClasses[variant],
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 export function Button({
   className,
@@ -29,14 +47,7 @@ export function Button({
   variant = "primary",
   ...props
 }: ButtonProps) {
-  const classes = [
-    "inline-flex items-center justify-center gap-2 rounded-small border font-label text-label font-semibold transition-colors duration-fast ease-standard motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50",
-    sizeClasses[size],
-    variantClasses[variant],
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const classes = getButtonClasses({ className, size, variant });
 
   return <button className={classes} type={type} {...props} />;
 }
