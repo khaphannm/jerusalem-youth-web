@@ -156,9 +156,28 @@ export const resourceSchema = publishedDocumentSchema
     }
   });
 
+const navigationUrl = requiredString.refine((value) => {
+  try {
+    const siteOrigin = "https://site.example.invalid";
+    const url = new URL(value, siteOrigin);
+
+    if (value.startsWith("/")) {
+      return url.origin === siteOrigin;
+    }
+
+    return (
+      ["http:", "https:"].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+    );
+  } catch {
+    return false;
+  }
+}, "Navigation URL must be a root-relative path or an HTTP URL.");
+
 const navigationItemSchema = z.object({
   label: requiredString,
-  url: requiredString,
+  url: navigationUrl,
   openInNewTab: z.boolean(),
 });
 

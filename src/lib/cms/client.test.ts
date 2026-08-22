@@ -47,6 +47,21 @@ const articleFixture = {
   publishedAt: "2026-08-21T03:00:00.000Z",
 };
 
+const navigationFixture = {
+  documentId: "navigation-1",
+  primaryItems: [
+    { label: "About", url: "/about", openInNewTab: false },
+    {
+      label: "Partner",
+      url: "https://partner.example.test",
+      openInNewTab: true,
+    },
+  ],
+  utilityItems: [],
+  footerItems: [],
+  publishedAt: "2026-08-21T03:00:00.000Z",
+};
+
 const collectionPayload = (data: unknown[], pageSize = 25) => ({
   data,
   meta: {
@@ -176,6 +191,57 @@ describe("CMS client", () => {
     });
 
     await expect(client.siteSettings()).resolves.toBeNull();
+  });
+
+  it("maps safe internal and external navigation URLs", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse({ data: navigationFixture }));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.navigation()).resolves.toMatchObject({
+      primaryItems: [
+        { label: "About", url: "/about", openInNewTab: false },
+        {
+          label: "Partner",
+          url: "https://partner.example.test",
+          openInNewTab: true,
+        },
+      ],
+    });
+  });
+
+  it.each([
+    "javascript:alert(1)",
+    "//malicious.example.test",
+    "/\\malicious.example.test",
+  ])("rejects unsafe navigation URL %s", async (unsafeUrl) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: {
+          ...navigationFixture,
+          primaryItems: [
+            {
+              label: "Unsafe",
+              url: unsafeUrl,
+              openInNewTab: false,
+            },
+          ],
+        },
+      }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.navigation()).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid navigation payload.",
+    });
   });
 
   it("normalizes HTTP errors without exposing the response body", async () => {

@@ -162,6 +162,9 @@ Optional:
 
 Each field is a repeatable `navigationItem` component.
 
+Navigation URLs must be either root-relative site paths or absolute HTTP(S)
+URLs. The frontend rejects unsupported URL schemes at the CMS boundary.
+
 ### Social Links
 - `links`, a repeatable `socialLink` component
 

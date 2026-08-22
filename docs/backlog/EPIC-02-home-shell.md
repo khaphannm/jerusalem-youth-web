@@ -1,6 +1,8 @@
 # EPIC-02 — Home and Site Shell
 
 ## HOME-001 Production header/navigation
+Status: Implemented
+
 Acceptance criteria:
 - desktop and mobile navigation
 - keyboard operable
