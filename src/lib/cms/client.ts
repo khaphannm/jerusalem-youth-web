@@ -550,7 +550,12 @@ export const createCmsClient = ({
       findBySlug: (slug: string) => findBySlug(categories, slug),
     },
     events: {
-      list: (options?: CollectionOptions) => readCollection(events, options),
+      list: (options?: CollectionOptions) =>
+        readCollection(events, {
+          ...options,
+          sort: ["startDateTime:asc"],
+          status: "published",
+        }),
       findBySlug: (slug: string) => findBySlug(events, slug),
       upcoming: ({
         featured,
@@ -585,6 +590,7 @@ export const createCmsClient = ({
           ],
           pageSize,
           sort: ["startDateTime:asc"],
+          status: "published",
         });
       },
     },

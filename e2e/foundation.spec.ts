@@ -107,6 +107,54 @@ test("the article listing remains useful when CMS content is empty or unavailabl
   ).toBe(true);
 });
 
+test("the event listing separates upcoming and past events on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/events");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Events worth showing up for",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Upcoming events" }),
+  ).toBeVisible();
+
+  const unavailableState = page.getByRole("heading", {
+    level: 3,
+    name: "Events are temporarily unavailable",
+  });
+
+  if (await unavailableState.count()) {
+    await expect(unavailableState).toBeVisible();
+    await expect(page.getByRole("link", { name: "Try again" })).toHaveAttribute(
+      "href",
+      "/events",
+    );
+  } else {
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Past events" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("heading", { level: 2, name: "Upcoming events" })
+        .locator("xpath=ancestor::section")
+        .getByRole("article")
+        .or(page.getByRole("heading", { name: "The next event is on the way" }))
+        .first(),
+    ).toBeVisible();
+  }
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("an invalid article slug returns a useful mobile not-found page", async ({
   page,
 }) => {

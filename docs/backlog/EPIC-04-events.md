@@ -1,6 +1,8 @@
 # EPIC-04 — Events
 
 ## EVT-001 Events listing
+Status: Implemented
+
 Acceptance criteria:
 - route `/events`
 - upcoming events ordered chronologically

@@ -216,6 +216,11 @@ describe("CMS client", () => {
 
     await client.events.list();
 
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe(
+      "startDateTime:asc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       cache: "force-cache",
       next: {
@@ -251,6 +256,7 @@ describe("CMS client", () => {
     expect(eventUrl.searchParams.get("filters[featured][$eq]")).toBe("true");
     expect(eventUrl.searchParams.get("sort[0]")).toBe("startDateTime:asc");
     expect(eventUrl.searchParams.get("pagination[pageSize]")).toBe("4");
+    expect(eventUrl.searchParams.get("status")).toBe("published");
 
     const articleUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
     expect(articleUrl.searchParams.get("sort[0]")).toBe("publishedAt:desc");

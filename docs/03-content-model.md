@@ -107,6 +107,14 @@ Derived behavior:
 - omitting `endDateTime` represents a single-time event; otherwise it cannot precede `startDateTime`.
 - date-times require an explicit ISO 8601 offset and represent UTC instants consistently.
 
+Listing behavior:
+- `/events` requests published entries explicitly and retrieves every CMS page.
+- An event remains upcoming through its `endDateTime`; a single-time event uses
+  `startDateTime` as its effective end.
+- Upcoming events are ordered by `startDateTime` ascending. Past events are
+  separated and ordered by `startDateTime` descending.
+- Public event date-times are formatted consistently in UTC.
+
 ## Sermon
 
 Required:
