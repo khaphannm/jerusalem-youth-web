@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getEventStatus } from "@/features/events/dates";
 import { getCmsClient } from "@/lib/cms";
 import type { Event, SiteSettings } from "@/lib/cms/domain";
 
@@ -12,6 +13,11 @@ export type EventGroups = Readonly<{
 
 export type EventListingData =
   | Readonly<{ groups: EventGroups; status: "ready" }>
+  | Readonly<{ status: "error" }>;
+
+export type EventDetailData =
+  | Readonly<{ event: Event; status: "found" }>
+  | Readonly<{ status: "not-found" }>
   | Readonly<{ status: "error" }>;
 
 function logEventDataError(source: string, error: unknown) {
@@ -27,13 +33,11 @@ export function groupEventsByDate(
   events: readonly Event[],
   now: Date,
 ): EventGroups {
-  const referenceTime = now.getTime();
   const upcoming: Event[] = [];
   const past: Event[] = [];
 
   for (const event of events) {
-    const effectiveEnd = Date.parse(event.endDateTime ?? event.startDateTime);
-    (effectiveEnd >= referenceTime ? upcoming : past).push(event);
+    (getEventStatus(event, now) === "upcoming" ? upcoming : past).push(event);
   }
 
   return {
@@ -82,5 +86,23 @@ export async function loadEventSiteSettings(): Promise<SiteSettings | null> {
   } catch (error) {
     logEventDataError("metadata", error);
     return null;
+  }
+}
+
+export const isValidEventSlug = (slug: string) =>
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+
+export async function loadEventDetail(slug: string): Promise<EventDetailData> {
+  if (!isValidEventSlug(slug)) {
+    return { status: "not-found" };
+  }
+
+  try {
+    const event = await getCmsClient().events.findBySlug(slug);
+
+    return event ? { event, status: "found" } : { status: "not-found" };
+  } catch (error) {
+    logEventDataError("detail", error);
+    return { status: "error" };
   }
 }

@@ -1,4 +1,5 @@
 import type { Article } from "@/lib/cms/domain";
+export { serializeStructuredData } from "@/lib/seo/structured-data";
 
 export const buildArticleStructuredData = (article: Article) => ({
   "@context": "https://schema.org",
@@ -16,6 +17,3 @@ export const buildArticleStructuredData = (article: Article) => ({
       }
     : {}),
 });
-
-export const serializeStructuredData = (value: unknown) =>
-  JSON.stringify(value).replaceAll("<", "\\u003c");

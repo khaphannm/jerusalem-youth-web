@@ -20,11 +20,18 @@ export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
           aria-hidden="true"
           className="flex min-h-52 items-end bg-secondary p-6 text-heading-3 font-bold text-secondary-foreground"
         >
-          Watch the latest message
+          Watch the message
         </div>
       )}
       <div className="flex flex-col justify-center p-6 sm:p-10">
         <p className="font-label text-label font-bold uppercase text-primary">
+          {sermon.series ? (
+            <>
+              <span className="sr-only">Series: </span>
+              {sermon.series.name}
+              <span aria-hidden="true"> · </span>
+            </>
+          ) : null}
           <time dateTime={sermon.date}>
             {formatPublicationDate(sermon.date)}
           </time>
@@ -38,6 +45,7 @@ export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
           </Link>
         </h3>
         <p className="mt-2 font-label text-label font-semibold text-secondary">
+          <span className="sr-only">Speaker: </span>
           {sermon.speaker}
         </p>
         <p className="mt-4 text-muted">{sermon.summary}</p>

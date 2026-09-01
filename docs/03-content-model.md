@@ -106,6 +106,15 @@ Derived behavior:
 - upcoming/past is derived from dates, not manually duplicated when practical.
 - omitting `endDateTime` represents a single-time event; otherwise it cannot precede `startDateTime`.
 - date-times require an explicit ISO 8601 offset and represent UTC instants consistently.
+- The shared event-status domain function treats an event as upcoming through
+  its exact effective end instant and as past only afterward. Explicit offsets
+  are compared as UTC instants.
+- Homepage upcoming-event queries mirror the domain rule: a multi-time event is
+  included while `endDateTime` has not passed, while a single-time event uses
+  `startDateTime`.
+- Event cards and event details display labels from the shared domain status;
+  registration closure also consumes that status instead of reimplementing
+  past-event logic.
 
 Listing behavior:
 - `/events` requests published entries explicitly and retrieves every CMS page.
@@ -114,6 +123,21 @@ Listing behavior:
 - Upcoming events are ordered by `startDateTime` ascending. Past events are
   separated and ordered by `startDateTime` descending.
 - Public event date-times are formatted consistently in UTC.
+
+Detail behavior:
+- `/events/[slug]` accepts lowercase, hyphen-separated public slugs and requests
+  an exact match with `status=published`; invalid and empty results resolve
+  through the route's not-found boundary.
+- `mapURL` and `registrationURL` must be credential-free absolute HTTP(S)
+  URLs. `contactLink` supports safe site-relative, HTTP(S), email, and telephone
+  links. Unsafe values reject the event payload at the CMS boundary.
+- Registration is open only while the event has not ended, its optional
+  deadline has not passed, and a validated `registrationURL` is configured.
+  Closed and unavailable states remain visible without a registration CTA.
+- Event metadata uses optional SEO overrides when supplied, otherwise the event
+  title, summary, and banner. JSON-LD contains only facts supported by the event
+  contract and does not infer attendance mode, schedule status, or ticket
+  offers.
 
 ## Sermon
 
@@ -132,6 +156,29 @@ Optional:
 - thumbnail
 - notes/resource link
 - seo
+
+Listing behavior:
+- `/sermons` requests published entries explicitly and orders them by sermon
+  `date` descending, with `publishedAt` descending as a stable tie-breaker.
+- The public listing uses six-entry server-rendered pages selected by a
+  validated `page` query parameter.
+- Sermon cards display the title, speaker, sermon date, optional thumbnail, and
+  optional series. Missing thumbnails use a stable text fallback without
+  fabricating media.
+
+Detail behavior:
+- `/sermons/[slug]` accepts lowercase, hyphen-separated public slugs and
+  requests an exact match with `status=published`; invalid and empty results
+  resolve through the route's not-found boundary.
+- Sermon video, audio, and notes URLs must be credential-free absolute HTTP(S)
+  URLs. Unsafe values reject the sermon payload at the CMS boundary.
+- YouTube and Vimeo URLs receive an embedded player. The third-party iframe is
+  not mounted until the visitor presses Play; supported YouTube URLs use the
+  privacy-enhanced `youtube-nocookie.com` origin. Other validated providers use
+  a normal external link instead of an untrusted embed.
+- Optional Bible passage, series, audio, notes, and thumbnail fields are shown
+  only when configured. Sermon metadata uses optional SEO overrides and falls
+  back to the sermon title, summary, and thumbnail.
 
 ## Testimony / Story
 

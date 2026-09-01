@@ -155,6 +155,42 @@ test("the event listing separates upcoming and past events on mobile", async ({
   ).toBe(true);
 });
 
+test("the sermon listing remains useful when CMS content is empty or unavailable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/sermons");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Messages for growing faith",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Explore the sermons" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:New sermons are coming|Sermons are temporarily unavailable)$/,
+    }),
+  ).toBeVisible();
+
+  const retryAction = page.getByRole("link", { name: "Try again" });
+  if (await retryAction.count()) {
+    await expect(retryAction).toHaveAttribute("href", "/sermons");
+    expect((await retryAction.boundingBox())?.height).toBeGreaterThanOrEqual(
+      44,
+    );
+  }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("an invalid article slug returns a useful mobile not-found page", async ({
   page,
 }) => {
@@ -167,6 +203,46 @@ test("an invalid article slug returns a useful mobile not-found page", async ({
   ).toBeVisible();
   const returnAction = page.getByRole("link", { name: "Browse all articles" });
   await expect(returnAction).toHaveAttribute("href", "/articles");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("an invalid event slug returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto("/events/not_a_public_slug");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Event not found" }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all events" });
+  await expect(returnAction).toHaveAttribute("href", "/events");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("an invalid sermon slug returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto("/sermons/not_a_public_slug");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Sermon not found" }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all sermons" });
+  await expect(returnAction).toHaveAttribute("href", "/sermons");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
     await page.evaluate(

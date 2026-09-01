@@ -109,7 +109,7 @@ export default async function Home() {
           />
           <div className="mt-10">
             {featuredEvent ? (
-              <EventCard event={featuredEvent} featured />
+              <EventCard event={featuredEvent} featured status="upcoming" />
             ) : (
               <EmptyState
                 description="We are preparing the next gathering. Please check back soon for the details."
@@ -133,7 +133,7 @@ export default async function Home() {
             {upcomingEvents.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {upcomingEvents.map((event) => (
-                  <EventCard event={event} key={event.id} />
+                  <EventCard event={event} key={event.id} status="upcoming" />
                 ))}
               </div>
             ) : (

@@ -85,13 +85,16 @@ type CachePolicy = Readonly<{
   tags: readonly CmsCacheTag[];
 }>;
 
+type CollectionFilter = Readonly<{
+  operator: "$eq" | "$gte" | "$null";
+  path: readonly [string, ...string[]];
+  value: boolean | string;
+}>;
+
 type CollectionQuery = CollectionOptions &
   Readonly<{
-    filters?: readonly Readonly<{
-      operator: "$eq" | "$gte";
-      path: readonly [string, ...string[]];
-      value: boolean | string;
-    }>[];
+    filters?: readonly CollectionFilter[];
+    orFilterBranches?: readonly (readonly CollectionFilter[])[];
     sort?: readonly string[];
     status?: "published";
   }>;
@@ -225,7 +228,10 @@ const buildUrl = (
     url.searchParams.set(`sort[${index}]`, sort);
   });
 
-  options.filters?.forEach(({ operator, path, value }) => {
+  const setFilter = (
+    prefix: string,
+    { operator, path, value }: CollectionFilter,
+  ) => {
     if (path.some((segment) => !/^[A-Za-z][A-Za-z0-9]*$/.test(segment))) {
       throw new CmsError(
         "CONFIGURATION",
@@ -234,7 +240,17 @@ const buildUrl = (
     }
 
     const filterPath = path.map((segment) => `[${segment}]`).join("");
-    url.searchParams.set(`filters${filterPath}[${operator}]`, String(value));
+    url.searchParams.set(`${prefix}${filterPath}[${operator}]`, String(value));
+  };
+
+  options.filters?.forEach((filter) => {
+    setFilter("filters", filter);
+  });
+
+  options.orFilterBranches?.forEach((branch, branchIndex) => {
+    branch.forEach((filter) => {
+      setFilter(`filters[$or][${branchIndex}]`, filter);
+    });
   });
 
   if (options.status) {
@@ -556,7 +572,8 @@ export const createCmsClient = ({
           sort: ["startDateTime:asc"],
           status: "published",
         }),
-      findBySlug: (slug: string) => findBySlug(events, slug),
+      findBySlug: (slug: string) =>
+        findBySlug(events, slug, { status: "published" }),
       upcoming: ({
         featured,
         from,
@@ -573,11 +590,6 @@ export const createCmsClient = ({
 
         return readCollection(events, {
           filters: [
-            {
-              operator: "$gte",
-              path: ["startDateTime"],
-              value: normalizedFrom,
-            },
             ...(featured === undefined
               ? []
               : [
@@ -587,6 +599,27 @@ export const createCmsClient = ({
                     value: featured,
                   },
                 ]),
+          ],
+          orFilterBranches: [
+            [
+              {
+                operator: "$gte",
+                path: ["endDateTime"],
+                value: normalizedFrom,
+              },
+            ],
+            [
+              {
+                operator: "$null",
+                path: ["endDateTime"],
+                value: true,
+              },
+              {
+                operator: "$gte",
+                path: ["startDateTime"],
+                value: normalizedFrom,
+              },
+            ],
           ],
           pageSize,
           sort: ["startDateTime:asc"],
@@ -604,8 +637,14 @@ export const createCmsClient = ({
       findBySlug: (slug: string) => findBySlug(sermonSeries, slug),
     },
     sermons: {
-      list: (options?: CollectionOptions) => readCollection(sermons, options),
-      findBySlug: (slug: string) => findBySlug(sermons, slug),
+      list: (options?: CollectionOptions) =>
+        readCollection(sermons, {
+          ...options,
+          sort: ["date:desc", "publishedAt:desc"],
+          status: "published",
+        }),
+      findBySlug: (slug: string) =>
+        findBySlug(sermons, slug, { status: "published" }),
       latest: () => readLatest(sermons, ["date:desc", "publishedAt:desc"]),
     },
     stories: {

@@ -193,6 +193,7 @@ describe("Home", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "Friday Youth Night" }),
     ).toBeInTheDocument();
+    expect(screen.getAllByText("Upcoming")).toHaveLength(2);
 
     const upcomingSection = screen.getByRole("region", {
       name: "Upcoming events",

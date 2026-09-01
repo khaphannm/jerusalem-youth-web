@@ -1,15 +1,18 @@
 import Link from "next/link";
 
 import { ContentImage } from "@/components/ui/content-image";
+import { EventStatusBadge } from "@/features/events/event-status-badge";
+import type { EventStatus } from "@/features/events/dates";
 import type { Event } from "@/lib/cms/domain";
 import { formatEventDateTime } from "@/lib/format-date";
 
 type EventCardProps = Readonly<{
   event: Event;
   featured?: boolean;
+  status: EventStatus;
 }>;
 
-export function EventCard({ event, featured = false }: EventCardProps) {
+export function EventCard({ event, featured = false, status }: EventCardProps) {
   const href = `/events/${encodeURIComponent(event.slug)}`;
   const articleClasses = featured
     ? "overflow-hidden rounded-large border border-primary-foreground/20 bg-secondary text-secondary-foreground lg:grid lg:grid-cols-2"
@@ -28,11 +31,16 @@ export function EventCard({ event, featured = false }: EventCardProps) {
       <div
         className={featured ? "flex flex-col justify-center p-6 sm:p-10" : "flex flex-1 flex-col p-5"}
       >
-        <p className="w-fit rounded-small bg-accent px-2 py-1 font-label text-label font-bold uppercase text-accent-foreground">
-          <time dateTime={event.startDateTime}>
-            {formatEventDateTime(event.startDateTime)}
-          </time>
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <EventStatusBadge status={status} />
+          <p
+            className={`font-label text-label font-bold uppercase ${featured ? "text-secondary-foreground" : "text-secondary"}`}
+          >
+            <time dateTime={event.startDateTime}>
+              {formatEventDateTime(event.startDateTime)}
+            </time>
+          </p>
+        </div>
         <h3
           className={`${featured ? "mt-4 text-heading-3" : "mt-3 text-body-large"} font-heading font-bold`}
         >

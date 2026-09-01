@@ -3,7 +3,7 @@ import { z } from "zod";
 const requiredString = z.string().trim().min(1);
 const nullableString = requiredString.nullable().optional();
 const nullableUrl = z.url().nullable().optional();
-const nullableHttpUrl = requiredString
+const httpUrl = requiredString
   .refine((value) => {
     try {
       const url = new URL(value);
@@ -15,9 +15,8 @@ const nullableHttpUrl = requiredString
     } catch {
       return false;
     }
-  }, "URL must be an absolute HTTP URL.")
-  .nullable()
-  .optional();
+  }, "URL must be an absolute HTTP URL.");
+const nullableHttpUrl = httpUrl.nullable().optional();
 const dateTime = z.iso.datetime({ offset: true });
 const mediaUrl = requiredString.refine((value) => {
   try {
@@ -224,11 +223,11 @@ export const eventSchema = publishedDocumentSchema
     endDateTime: dateTime.nullable().optional(),
     locationName: requiredString,
     address: nullableString,
-    mapURL: nullableUrl,
-    registrationURL: nullableUrl,
+    mapURL: nullableHttpUrl,
+    registrationURL: nullableHttpUrl,
     registrationDeadline: dateTime.nullable().optional(),
     contactName: nullableString,
-    contactLink: nullableString,
+    contactLink: contentLinkUrl.nullable().optional(),
     gallery: z.array(mediaSchema),
     featured: z.boolean(),
     seo: seoSchema.nullable().optional(),
@@ -252,12 +251,12 @@ export const sermonSchema = publishedDocumentSchema.extend({
   speaker: requiredString,
   date: z.iso.date(),
   summary: requiredString,
-  videoURL: z.url(),
+  videoURL: httpUrl,
   series: sermonSeriesSchema.nullable().optional(),
   biblePassage: nullableString,
-  audioURL: nullableUrl,
+  audioURL: nullableHttpUrl,
   thumbnail: mediaSchema.nullable().optional(),
-  notesURL: nullableUrl,
+  notesURL: nullableHttpUrl,
   seo: seoSchema.nullable().optional(),
 });
 

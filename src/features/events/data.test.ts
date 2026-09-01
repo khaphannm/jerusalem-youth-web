@@ -3,17 +3,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   eventListingPageSize,
   groupEventsByDate,
+  isValidEventSlug,
+  loadEventDetail,
   loadEventListing,
 } from "@/features/events/data";
 import type { Event, MediaAsset } from "@/lib/cms/domain";
 
-const { eventsListMock } = vi.hoisted(() => ({
+const { eventsFindBySlugMock, eventsListMock } = vi.hoisted(() => ({
+  eventsFindBySlugMock: vi.fn(),
   eventsListMock: vi.fn(),
 }));
 
 vi.mock("@/lib/cms", () => ({
   getCmsClient: () => ({
-    events: { list: eventsListMock },
+    events: {
+      findBySlug: eventsFindBySlugMock,
+      list: eventsListMock,
+    },
     siteSettings: vi.fn(),
   }),
 }));
@@ -63,6 +69,7 @@ const createEvent = (
 
 describe("event data", () => {
   beforeEach(() => {
+    eventsFindBySlugMock.mockReset();
     eventsListMock.mockReset();
   });
 
@@ -159,6 +166,52 @@ describe("event data", () => {
     await expect(loadEventListing()).resolves.toEqual({ status: "error" });
     expect(errorSpy).toHaveBeenCalledWith(
       "Events listing could not be loaded: Events offline",
+    );
+  });
+
+  it("loads a detail only for a valid public slug", async () => {
+    const event = createEvent("gathering", "2026-09-01T12:00:00.000Z");
+    eventsFindBySlugMock.mockResolvedValue(event);
+
+    expect(isValidEventSlug("friday-gathering")).toBe(true);
+    await expect(loadEventDetail("friday-gathering")).resolves.toEqual({
+      event,
+      status: "found",
+    });
+    expect(eventsFindBySlugMock).toHaveBeenCalledExactlyOnceWith(
+      "friday-gathering",
+    );
+  });
+
+  it.each(["", "Friday-gathering", "friday gathering", "../draft"])(
+    "rejects invalid detail slug %j without calling the CMS",
+    async (slug) => {
+      await expect(loadEventDetail(slug)).resolves.toEqual({
+        status: "not-found",
+      });
+      expect(eventsFindBySlugMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("returns not-found when no published event matches the slug", async () => {
+    eventsFindBySlugMock.mockResolvedValue(null);
+
+    await expect(loadEventDetail("missing-event")).resolves.toEqual({
+      status: "not-found",
+    });
+  });
+
+  it("returns a controlled detail error when the CMS read fails", async () => {
+    eventsFindBySlugMock.mockRejectedValue(new Error("Events offline"));
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    await expect(loadEventDetail("friday-gathering")).resolves.toEqual({
+      status: "error",
+    });
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Events detail could not be loaded: Events offline",
     );
   });
 });

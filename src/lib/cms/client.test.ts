@@ -56,6 +56,56 @@ const articleFixture = {
   publishedAt: "2026-08-21T03:00:00.000Z",
 };
 
+const eventFixture = {
+  documentId: "event-1",
+  title: "Friday night gathering",
+  slug: "friday-night-gathering",
+  summary: "An evening of worship and friendship.",
+  description: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Come and join us." }],
+    },
+  ],
+  banner: mediaFixture,
+  startDateTime: "2026-09-04T11:30:00.000Z",
+  endDateTime: "2026-09-04T13:30:00.000Z",
+  locationName: "Youth Hall",
+  address: "123 Community Street",
+  mapURL: "https://maps.example.test/youth-hall",
+  registrationURL: "https://register.example.test/friday-night",
+  registrationDeadline: "2026-09-03T11:30:00.000Z",
+  contactName: "Youth Team",
+  contactLink: "mailto:youth@example.test",
+  gallery: [],
+  featured: true,
+  seo: null,
+  publishedAt: "2026-08-21T03:00:00.000Z",
+};
+
+const sermonFixture = {
+  documentId: "sermon-1",
+  title: "Hope that holds",
+  slug: "hope-that-holds",
+  speaker: "Ministry Team",
+  date: "2026-08-30",
+  summary: "Discover a hope that remains steady.",
+  videoURL: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  series: {
+    documentId: "series-1",
+    name: "Rooted",
+    slug: "rooted",
+    description: null,
+    coverImage: null,
+  },
+  biblePassage: "Hebrews 6:19",
+  audioURL: "https://media.example.test/audio/hope.mp3",
+  thumbnail: mediaFixture,
+  notesURL: "https://media.example.test/notes/hope.pdf",
+  seo: null,
+  publishedAt: "2026-08-31T00:00:00.000Z",
+};
+
 const navigationFixture = {
   documentId: "navigation-1",
   primaryItems: [
@@ -230,6 +280,138 @@ describe("CMS client", () => {
     });
   });
 
+  it("loads only published sermons in newest-first pages", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse(collectionPayload([], 6)));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.sermons.list({ page: 2, pageSize: 6 });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/sermons");
+    expect(requestedUrl.searchParams.get("pagination[page]")).toBe("2");
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("6");
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe("date:desc");
+    expect(requestedUrl.searchParams.get("sort[1]")).toBe(
+      "publishedAt:desc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+    expect(requestedUrl.searchParams.getAll("populate")).toEqual(
+      expect.arrayContaining(["series.coverImage", "thumbnail"]),
+    );
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: {
+        revalidate: false,
+        tags: [cmsCacheTags.sermons, cmsCacheTags.sermonSeries],
+      },
+    });
+  });
+
+  it("loads only a published sermon matching the requested slug", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([sermonFixture], 1)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.sermons.findBySlug("hope-that-holds")).resolves
+      .toMatchObject({
+        audioUrl: sermonFixture.audioURL,
+        id: "sermon-1",
+        notesUrl: sermonFixture.notesURL,
+        series: { name: "Rooted" },
+        slug: "hope-that-holds",
+        videoUrl: sermonFixture.videoURL,
+      });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[slug][$eq]")).toBe(
+      "hope-that-holds",
+    );
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it.each([
+    ["videoURL", "javascript:alert(1)"],
+    ["audioURL", "ftp://media.example.test/audio/hope.mp3"],
+    ["notesURL", "https://user:password@media.example.test/notes/hope.pdf"],
+  ])("rejects a sermon with an unsafe %s", async (field, value) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        collectionPayload([{ ...sermonFixture, [field]: value }], 1),
+      ),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.sermons.findBySlug("hope-that-holds")).rejects
+      .toMatchObject({
+        code: "INVALID_RESPONSE",
+        message: "CMS returned an invalid sermons detail payload.",
+      });
+  });
+
+  it("loads only a published event matching the requested slug", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([eventFixture], 1)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.events.findBySlug("friday-night-gathering"),
+    ).resolves.toMatchObject({
+      id: "event-1",
+      mapUrl: eventFixture.mapURL,
+      registrationUrl: eventFixture.registrationURL,
+      slug: "friday-night-gathering",
+    });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[slug][$eq]")).toBe(
+      "friday-night-gathering",
+    );
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it.each([
+    ["registrationURL", "javascript:alert(1)"],
+    ["mapURL", "ftp://maps.example.test/youth-hall"],
+    ["contactLink", "javascript:alert(1)"],
+  ])("rejects an event with unsafe %s", async (field, value) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        collectionPayload([{ ...eventFixture, [field]: value }], 1),
+      ),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.events.findBySlug("friday-night-gathering")).rejects
+      .toMatchObject({
+        code: "INVALID_RESPONSE",
+        message: "CMS returned an invalid events detail payload.",
+      });
+  });
+
   it("builds curated homepage sort and event filter queries", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockImplementation(async () =>
@@ -250,8 +432,25 @@ describe("CMS client", () => {
     await client.stories.latest({ pageSize: 3 });
 
     const eventUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
-    expect(eventUrl.searchParams.get("filters[startDateTime][$gte]")).toBe(
+    expect(
+      eventUrl.searchParams.get(
+        "filters[$or][0][endDateTime][$gte]",
+      ),
+    ).toBe("2026-08-22T00:00:00.000Z");
+    expect(
+      eventUrl.searchParams.get(
+        "filters[$or][1][endDateTime][$null]",
+      ),
+    ).toBe("true");
+    expect(
+      eventUrl.searchParams.get(
+        "filters[$or][1][startDateTime][$gte]",
+      ),
+    ).toBe(
       "2026-08-22T00:00:00.000Z",
+    );
+    expect(eventUrl.searchParams.has("filters[startDateTime][$gte]")).toBe(
+      false,
     );
     expect(eventUrl.searchParams.get("filters[featured][$eq]")).toBe("true");
     expect(eventUrl.searchParams.get("sort[0]")).toBe("startDateTime:asc");

@@ -1,6 +1,8 @@
 # EPIC-05 — Sermons
 
 ## SER-001 Sermons listing
+Status: Implemented
+
 Acceptance criteria:
 - published sermons ordered newest-first
 - display title, speaker, date, thumbnail, series when available
@@ -9,6 +11,8 @@ Acceptance criteria:
 - scalable pagination strategy
 
 ## SER-002 Sermon detail
+Status: Implemented
+
 Acceptance criteria:
 - route `/sermons/[slug]`
 - title, speaker, date, Bible passage, series, summary

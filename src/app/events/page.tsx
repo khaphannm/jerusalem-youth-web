@@ -11,6 +11,7 @@ import {
   loadEventListing,
   loadEventSiteSettings,
 } from "@/features/events/data";
+import type { EventStatus } from "@/features/events/dates";
 import type { Event } from "@/lib/cms/domain";
 
 const listingDescription =
@@ -53,12 +54,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function EventGrid({ events }: Readonly<{ events: readonly Event[] }>) {
+function EventGrid({
+  events,
+  status,
+}: Readonly<{ events: readonly Event[]; status: EventStatus }>) {
   return (
     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((event) => (
         <li className="h-full" key={event.id}>
-          <EventCard event={event} />
+          <EventCard event={event} status={status} />
         </li>
       ))}
     </ul>
@@ -113,7 +117,7 @@ export default async function EventsPage() {
                 title="Events are temporarily unavailable"
               />
             ) : listing.groups.upcoming.length > 0 ? (
-              <EventGrid events={listing.groups.upcoming} />
+              <EventGrid events={listing.groups.upcoming} status="upcoming" />
             ) : (
               <EmptyState
                 description="There are no upcoming dates to share right now. New gatherings will appear here when they are published."
@@ -138,7 +142,7 @@ export default async function EventsPage() {
             />
             <div className="mt-10">
               {listing.groups.past.length > 0 ? (
-                <EventGrid events={listing.groups.past} />
+                <EventGrid events={listing.groups.past} status="past" />
               ) : (
                 <EmptyState
                   description="Past gatherings will collect here after their dates have passed."

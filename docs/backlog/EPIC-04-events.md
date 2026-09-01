@@ -12,6 +12,8 @@ Acceptance criteria:
 - empty states
 
 ## EVT-002 Event detail
+Status: Implemented
+
 Acceptance criteria:
 - route `/events/[slug]`
 - event details from CMS
@@ -22,6 +24,8 @@ Acceptance criteria:
 - social metadata
 
 ## EVT-003 Event date/status logic
+Status: Implemented
+
 Acceptance criteria:
 - domain function determines upcoming/past consistently
 - edge cases around end time/timezone are tested

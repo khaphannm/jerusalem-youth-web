@@ -30,9 +30,14 @@ cd cms
 cp .env.example .env
 ```
 
-Set the local server values (`HOST=0.0.0.0`, `PORT=1337`), PostgreSQL connection values matching your database, and `DATABASE_CLIENT=postgres`. `DATABASE_URL` can replace the discrete host, port, database, username, and password settings.
+The example is ready for isolated local development and matches the PostgreSQL
+container values above. `DATABASE_URL` can replace the discrete host, port,
+database, username, and password settings.
 
-Generate independent random values for every secret. `APP_KEYS` requires four comma-separated values; the remaining secret variables, including `JWT_SECRET`, require one value each:
+Before using the CMS in a shared or deployed environment, generate independent
+random values for every development-only secret. `APP_KEYS` requires four
+comma-separated values; the remaining secret variables, including `JWT_SECRET`,
+require one value each:
 
 ```bash
 openssl rand -base64 32

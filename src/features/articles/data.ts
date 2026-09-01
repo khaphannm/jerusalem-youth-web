@@ -7,6 +7,7 @@ import type {
   CollectionResult,
   SiteSettings,
 } from "@/lib/cms/domain";
+import { parsePageParameter } from "@/lib/pagination";
 
 export const articlesPageSize = 6;
 
@@ -32,18 +33,7 @@ function logArticleDataError(source: string, error: unknown) {
   console.error(`Articles ${source} could not be loaded: ${reason}`);
 }
 
-export function parseArticlePage(
-  value: string | readonly string[] | undefined,
-) {
-  const candidate = Array.isArray(value) ? value[0] : value;
-
-  if (!candidate || !/^[1-9]\d*$/.test(candidate)) {
-    return 1;
-  }
-
-  const page = Number(candidate);
-  return Number.isSafeInteger(page) ? page : 1;
-}
+export const parseArticlePage = parsePageParameter;
 
 export async function loadArticleListing(
   page: number,

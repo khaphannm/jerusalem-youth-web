@@ -120,6 +120,7 @@ describe("EventsPage", () => {
     expect(
       within(upcomingSection!).getByRole("link", { name: "Summer gathering" }),
     ).toHaveAttribute("href", "/events/summer-gathering");
+    expect(within(upcomingSection!).getByText("Upcoming")).toBeInTheDocument();
     expect(within(upcomingSection!).getByText("Youth Hall")).toBeInTheDocument();
     expect(within(upcomingSection!).getByRole("img")).toHaveAttribute(
       "alt",
@@ -132,6 +133,7 @@ describe("EventsPage", () => {
     expect(
       within(pastSection!).getByRole("link", { name: "Service day" }),
     ).toBeInTheDocument();
+    expect(within(pastSection!).getByText("Past event")).toBeInTheDocument();
   });
 
   it("renders useful empty states for both event groups", async () => {
