@@ -1,4 +1,4 @@
-export type SermonVideoEmbed = Readonly<{
+export type ExternalVideoEmbed = Readonly<{
   embedUrl: string;
   provider: "Vimeo" | "YouTube";
 }>;
@@ -42,9 +42,9 @@ const getVimeoId = (url: URL) =>
     .filter(Boolean)
     .findLast((segment) => vimeoIdPattern.test(segment)) ?? null;
 
-export function getSermonVideoEmbed(
+export function getExternalVideoEmbed(
   value: string,
-): SermonVideoEmbed | null {
+): ExternalVideoEmbed | null {
   let url: URL;
 
   try {
@@ -53,11 +53,7 @@ export function getSermonVideoEmbed(
     return null;
   }
 
-  if (
-    url.protocol !== "https:" ||
-    url.username ||
-    url.password
-  ) {
+  if (url.protocol !== "https:" || url.username || url.password) {
     return null;
   }
 

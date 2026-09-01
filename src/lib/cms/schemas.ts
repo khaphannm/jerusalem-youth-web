@@ -267,7 +267,7 @@ export const storySchema = publishedDocumentSchema.extend({
   body: richTextSchema.min(1),
   featuredImage: mediaSchema,
   personDisplayName: nullableString,
-  videoURL: nullableUrl,
+  videoURL: nullableHttpUrl,
   featured: z.boolean(),
   seo: seoSchema.nullable().optional(),
 });

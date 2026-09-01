@@ -198,6 +198,33 @@ Optional:
 
 Privacy rule: never publish sensitive personal information merely because it exists in submitted source material.
 
+Listing behavior:
+- `/stories` requests published entries explicitly and orders them by
+  `publishedAt` descending.
+- The public listing uses six-entry server-rendered pages selected by a
+  validated `page` query parameter.
+- Every card displays the story image, title, and summary. The first story on
+  each page receives a wider responsive editorial treatment while the remaining
+  stories use a compact grid.
+
+Detail behavior:
+- `/stories/[slug]` accepts only normalized public slugs and requests an exact
+  published entry. Invalid, missing, draft, and unpublished stories resolve to
+  the not-found boundary.
+- Story body Blocks are validated at the CMS boundary and rendered through the
+  shared rich-content renderer. Unsafe links and unsupported blocks reject the
+  CMS response instead of reaching the page.
+- The optional person display name is rendered exactly as approved in the CMS
+  and omitted entirely when absent. The page does not infer or expose any
+  additional identity, contact, or attribution details.
+- Optional video URLs must be credential-free absolute HTTP(S) URLs. YouTube
+  and Vimeo use the shared click-to-load player, including YouTube's
+  privacy-enhanced origin; other validated providers use an external link. No
+  video section is rendered when the field is absent.
+- Social metadata uses optional SEO overrides and falls back to the story title,
+  summary, featured image, and publication time. Missing and failed detail
+  states are not indexable.
+
 ## Resource
 
 Required:

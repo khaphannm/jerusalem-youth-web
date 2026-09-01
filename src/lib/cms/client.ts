@@ -648,8 +648,14 @@ export const createCmsClient = ({
       latest: () => readLatest(sermons, ["date:desc", "publishedAt:desc"]),
     },
     stories: {
-      list: (options?: CollectionOptions) => readCollection(stories, options),
-      findBySlug: (slug: string) => findBySlug(stories, slug),
+      list: (options?: CollectionOptions) =>
+        readCollection(stories, {
+          ...options,
+          sort: ["publishedAt:desc"],
+          status: "published",
+        }),
+      findBySlug: (slug: string) =>
+        findBySlug(stories, slug, { status: "published" }),
       latest: (options: Pick<CollectionOptions, "pageSize"> = {}) =>
         readCollection(stories, {
           ...options,

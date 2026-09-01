@@ -191,6 +191,42 @@ test("the sermon listing remains useful when CMS content is empty or unavailable
   ).toBe(true);
 });
 
+test("the stories listing remains useful when CMS content is empty or unavailable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/stories");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Stories of faith and belonging",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Explore the stories" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:Community stories are coming|Stories are temporarily unavailable)$/,
+    }),
+  ).toBeVisible();
+
+  const retryAction = page.getByRole("link", { name: "Try again" });
+  if (await retryAction.count()) {
+    await expect(retryAction).toHaveAttribute("href", "/stories");
+    expect((await retryAction.boundingBox())?.height).toBeGreaterThanOrEqual(
+      44,
+    );
+  }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("an invalid article slug returns a useful mobile not-found page", async ({
   page,
 }) => {
@@ -243,6 +279,26 @@ test("an invalid sermon slug returns a useful mobile not-found page", async ({
   ).toBeVisible();
   const returnAction = page.getByRole("link", { name: "Browse all sermons" });
   await expect(returnAction).toHaveAttribute("href", "/sermons");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("an invalid story slug returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto("/stories/not_a_public_slug");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Story not found" }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all stories" });
+  await expect(returnAction).toHaveAttribute("href", "/stories");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
     await page.evaluate(

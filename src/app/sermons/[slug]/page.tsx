@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DeferredVideoPlayer } from "@/components/content/deferred-video-player";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/link-button";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadSermonDetail } from "@/features/sermons/data";
-import { getSermonVideoEmbed } from "@/features/sermons/video";
-import { SermonVideoPlayer } from "@/features/sermons/video-player";
 import type { Sermon } from "@/lib/cms/domain";
 import { formatPublicationDate } from "@/lib/format-date";
+import { getExternalVideoEmbed } from "@/lib/video";
 
 type SermonPageProps = Readonly<{
   params: Promise<{ slug: string }>;
@@ -120,7 +120,7 @@ export default async function SermonPage({ params }: SermonPageProps) {
   }
 
   const { sermon } = result;
-  const videoEmbed = getSermonVideoEmbed(sermon.videoUrl);
+  const videoEmbed = getExternalVideoEmbed(sermon.videoUrl);
 
   return (
     <main className="flex-1" id="main-content" tabIndex={-1}>
@@ -176,9 +176,10 @@ export default async function SermonPage({ params }: SermonPageProps) {
                 </h2>
                 <div className="mt-8 overflow-hidden rounded-large border border-border bg-surface">
                   {videoEmbed ? (
-                    <SermonVideoPlayer
+                    <DeferredVideoPlayer
+                      contentTitle={sermon.title}
                       embed={videoEmbed}
-                      sermonTitle={sermon.title}
+                      playLabel="Play sermon"
                       thumbnail={sermon.thumbnail}
                     />
                   ) : (

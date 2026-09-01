@@ -106,6 +106,25 @@ const sermonFixture = {
   publishedAt: "2026-08-31T00:00:00.000Z",
 };
 
+const storyFixture = {
+  documentId: "story-1",
+  title: "Finding a place to belong",
+  slug: "finding-a-place-to-belong",
+  summary: "A story about finding faith and friendship in community.",
+  body: [
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "There was room for me here." }],
+    },
+  ],
+  featuredImage: mediaFixture,
+  personDisplayName: "Jordan",
+  videoURL: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  featured: true,
+  seo: null,
+  publishedAt: "2026-08-31T00:00:00.000Z",
+};
+
 const navigationFixture = {
   documentId: "navigation-1",
   primaryItems: [
@@ -311,6 +330,36 @@ describe("CMS client", () => {
     });
   });
 
+  it("loads only published stories in newest-first pages", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse(collectionPayload([], 6)));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.stories.list({ page: 2, pageSize: 6 });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/stories");
+    expect(requestedUrl.searchParams.get("pagination[page]")).toBe("2");
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("6");
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe(
+      "publishedAt:desc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+    expect(requestedUrl.searchParams.getAll("populate")).toEqual(
+      expect.arrayContaining(["featuredImage", "seo.socialImage"]),
+    );
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: {
+        revalidate: false,
+        tags: [cmsCacheTags.stories],
+      },
+    });
+  });
+
   it("loads only a published sermon matching the requested slug", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(
@@ -337,6 +386,74 @@ describe("CMS client", () => {
     );
     expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
     expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it("loads only a published story matching the requested slug", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([storyFixture], 1)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.stories.findBySlug("finding-a-place-to-belong"),
+    ).resolves.toMatchObject({
+      id: "story-1",
+      personDisplayName: storyFixture.personDisplayName,
+      slug: "finding-a-place-to-belong",
+      videoUrl: storyFixture.videoURL,
+    });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[slug][$eq]")).toBe(
+      "finding-a-place-to-belong",
+    );
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it.each([
+    ["an unsafe video URL", { videoURL: "javascript:alert(1)" }],
+    [
+      "a credential-bearing video URL",
+      { videoURL: "https://user:password@video.example.test/story" },
+    ],
+    [
+      "an unsafe rich-text link",
+      {
+        body: [
+          {
+            type: "paragraph",
+            children: [
+              {
+                type: "link",
+                url: "javascript:alert(1)",
+                children: [{ type: "text", text: "Unsafe" }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  ])("rejects a story containing %s", async (_name, override) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([{ ...storyFixture, ...override }], 1)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.stories.findBySlug("finding-a-place-to-belong"),
+    ).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid stories detail payload.",
+    });
   });
 
   it.each([
