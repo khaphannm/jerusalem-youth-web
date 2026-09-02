@@ -1,6 +1,8 @@
 # EPIC-07 — Media and Resources
 
 ## MED-001 Media page
+Status: Implemented
+
 Acceptance criteria:
 - route `/media`
 - approved image/video content only
@@ -10,6 +12,8 @@ Acceptance criteria:
 - useful empty state
 
 ## RES-001 Resources listing
+Status: Implemented
+
 Acceptance criteria:
 - route `/resources`
 - published resources
@@ -18,6 +22,8 @@ Acceptance criteria:
 - no unsafe file assumptions
 
 ## RES-002 Resource detail
+Status: Implemented
+
 Acceptance criteria:
 - route `/resources/[slug]`
 - description and source/download link

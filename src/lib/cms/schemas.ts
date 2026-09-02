@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const requiredString = z.string().trim().min(1);
 const nullableString = requiredString.nullable().optional();
-const nullableUrl = z.url().nullable().optional();
 const httpUrl = requiredString
   .refine((value) => {
     try {
@@ -279,7 +278,7 @@ export const resourceSchema = publishedDocumentSchema
     description: requiredString,
     category: categorySchema,
     file: mediaSchema.nullable().optional(),
-    externalURL: nullableUrl,
+    externalURL: nullableHttpUrl,
     author: authorSchema.nullable().optional(),
     thumbnail: mediaSchema.nullable().optional(),
     seo: seoSchema.nullable().optional(),

@@ -5,6 +5,7 @@ import type { MediaAsset } from "@/lib/cms/domain";
 type ContentImageProps = Readonly<{
   asset: MediaAsset;
   className?: string;
+  loading?: "eager" | "lazy";
   sizes: string;
 }>;
 
@@ -14,6 +15,7 @@ const fallbackHeight = 900;
 export function ContentImage({
   asset,
   className,
+  loading,
   sizes,
 }: ContentImageProps) {
   const responsiveSources = [
@@ -39,6 +41,7 @@ export function ContentImage({
         className={className}
         decoding="async"
         height={asset.height ?? fallbackHeight}
+        loading={loading}
         sizes={sizes}
         src={asset.url}
         unoptimized

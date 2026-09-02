@@ -225,6 +225,24 @@ Detail behavior:
   summary, featured image, and publication time. Missing and failed detail
   states are not indexable.
 
+## Media page
+
+Media behavior:
+- `/media` is derived from images and video URLs attached to published Events,
+  Sermons, and Stories. Publication is the editorial approval boundary; the
+  frontend does not expose the raw Media Library or draft content.
+- Public media images must be validated image assets with non-empty alternative
+  text. Event banners and galleries, Story featured images, and Sermon/Story
+  video thumbnails are eligible. Duplicate image and video sources are removed.
+- Media requests are bounded per source, combined newest-first, and rendered as
+  a responsive server-rendered grid. A failure in one source does not hide
+  available approved media from the others.
+- Images use explicit responsive `sizes`, mapped Strapi width variants capped
+  at 1600 pixels, stable dimensions, and lazy loading. An oversized original
+  without a bounded variant is omitted. Video iframes are never mounted until
+  the visitor presses Play; unsupported but validated providers remain normal
+  external links.
+
 ## Resource
 
 Required:
@@ -244,6 +262,27 @@ Optional:
 - author
 - thumbnail
 - seo
+
+Listing behavior:
+- `/resources` requests published entries explicitly, orders them by
+  `publishedAt` descending, and uses nine-entry server-rendered pagination.
+- Each card shows category, title, description, and a type derived from the
+  validated source contract. It links both to the site detail page and directly
+  to the configured source with a specific accessible action label.
+
+Detail behavior:
+- `/resources/[slug]` accepts lowercase, hyphen-separated public slugs and
+  requests an exact match with `status=published`; invalid, missing, draft, and
+  unpublished resources resolve through the route's not-found boundary.
+- External destinations must be credential-free absolute HTTP(S) URLs. File
+  URLs pass through the shared media URL boundary, and the UI derives type and
+  action language from the validated MIME type rather than the filename.
+- Resource links do not force a download, new tab, or inline viewer. The
+  visitor's browser decides how a file opens or saves, avoiding assumptions
+  about provider headers and file support.
+- Detail metadata uses optional SEO overrides and falls back to title,
+  description, and thumbnail. An image file may serve as the fallback share
+  image when no thumbnail exists. Missing and failed states are not indexable.
 
 ## Taxonomy/supporting types
 

@@ -125,6 +125,35 @@ const storyFixture = {
   publishedAt: "2026-08-31T00:00:00.000Z",
 };
 
+const resourceFixture = {
+  documentId: "resource-1",
+  title: "Small group guide",
+  slug: "small-group-guide",
+  description: "A practical guide for conversations about faith.",
+  category: {
+    documentId: "category-2",
+    name: "Guides",
+    slug: "guides",
+    description: null,
+  },
+  file: {
+    ...mediaFixture,
+    documentId: "resource-file-1",
+    name: "small-group-guide.pdf",
+    url: "/uploads/small-group-guide.pdf",
+    alternativeText: null,
+    mime: "application/pdf",
+    width: null,
+    height: null,
+    formats: null,
+  },
+  externalURL: null,
+  author: null,
+  thumbnail: mediaFixture,
+  seo: null,
+  publishedAt: "2026-08-31T00:00:00.000Z",
+};
+
 const navigationFixture = {
   documentId: "navigation-1",
   primaryItems: [
@@ -360,6 +389,29 @@ describe("CMS client", () => {
     });
   });
 
+  it("loads only published resources in newest-first pages", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse(collectionPayload([], 6)));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.resources.list({ page: 2, pageSize: 6 });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/resources");
+    expect(requestedUrl.searchParams.get("pagination[page]")).toBe("2");
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("6");
+    expect(requestedUrl.searchParams.get("sort[0]")).toBe(
+      "publishedAt:desc",
+    );
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+    expect(requestedUrl.searchParams.getAll("populate")).toEqual(
+      expect.arrayContaining(["category", "file", "thumbnail"]),
+    );
+  });
+
   it("loads only a published sermon matching the requested slug", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(
@@ -413,6 +465,71 @@ describe("CMS client", () => {
     );
     expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
     expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it("loads only a published resource matching the requested slug", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(collectionPayload([resourceFixture], 1)),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.resources.findBySlug("small-group-guide"),
+    ).resolves.toMatchObject({
+      id: "resource-1",
+      slug: "small-group-guide",
+      source: {
+        asset: {
+          mimeType: "application/pdf",
+          url: "https://cms.example.test/uploads/small-group-guide.pdf",
+        },
+        kind: "file",
+      },
+    });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.searchParams.get("filters[slug][$eq]")).toBe(
+      "small-group-guide",
+    );
+    expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("1");
+    expect(requestedUrl.searchParams.get("status")).toBe("published");
+  });
+
+  it.each([
+    ["javascript:alert(1)"],
+    ["ftp://resources.example.test/guide"],
+    ["https://user:password@resources.example.test/guide"],
+  ])("rejects an unsafe external resource URL %s", async (externalURL) => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        collectionPayload(
+          [
+            {
+              ...resourceFixture,
+              externalURL,
+              file: null,
+            },
+          ],
+          1,
+        ),
+      ),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.resources.findBySlug("small-group-guide"),
+    ).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: "CMS returned an invalid resources detail payload.",
+    });
   });
 
   it.each([

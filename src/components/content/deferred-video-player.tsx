@@ -46,6 +46,7 @@ export function DeferredVideoPlayer({
         <ContentImage
           asset={thumbnail}
           className="h-full w-full object-cover"
+          loading="lazy"
           sizes="(min-width: 1024px) 70vw, 100vw"
         />
       ) : (

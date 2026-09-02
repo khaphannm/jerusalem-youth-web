@@ -628,8 +628,14 @@ export const createCmsClient = ({
       },
     },
     resources: {
-      list: (options?: CollectionOptions) => readCollection(resources, options),
-      findBySlug: (slug: string) => findBySlug(resources, slug),
+      list: (options?: CollectionOptions) =>
+        readCollection(resources, {
+          ...options,
+          sort: ["publishedAt:desc"],
+          status: "published",
+        }),
+      findBySlug: (slug: string) =>
+        findBySlug(resources, slug, { status: "published" }),
     },
     sermonSeries: {
       list: (options?: CollectionOptions) =>

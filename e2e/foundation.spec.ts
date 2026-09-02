@@ -227,6 +227,64 @@ test("the stories listing remains useful when CMS content is empty or unavailabl
   ).toBe(true);
 });
 
+test("the media page remains useful when published media is empty or unavailable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/media");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Moments from our community",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Explore the media" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:Media moments are coming|Media is temporarily unavailable)$/,
+    }),
+  ).toBeVisible();
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("the resources listing remains useful when content is empty or unavailable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/resources");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Resources for everyday faith",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Explore the resources" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:New resources are coming|Resources are temporarily unavailable)$/,
+    }),
+  ).toBeVisible();
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("an invalid article slug returns a useful mobile not-found page", async ({
   page,
 }) => {
@@ -299,6 +357,26 @@ test("an invalid story slug returns a useful mobile not-found page", async ({
   ).toBeVisible();
   const returnAction = page.getByRole("link", { name: "Browse all stories" });
   await expect(returnAction).toHaveAttribute("href", "/stories");
+  expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("an invalid resource slug returns a useful mobile not-found page", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  const response = await page.goto("/resources/not_a_public_slug");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Resource not found" }),
+  ).toBeVisible();
+  const returnAction = page.getByRole("link", { name: "Browse all resources" });
+  await expect(returnAction).toHaveAttribute("href", "/resources");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
     await page.evaluate(
