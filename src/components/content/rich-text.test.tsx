@@ -108,4 +108,39 @@ describe("RichText", () => {
     expect(container.querySelector("script")).not.toBeInTheDocument();
     expect(screen.getByText("<script>alert('unsafe')</script>")).toBeVisible();
   });
+
+  it("uses shared safe rendering for external and malformed links", () => {
+    render(
+      <RichText
+        content={[
+          {
+            type: "paragraph",
+            children: [
+              {
+                type: "link",
+                url: "https://example.test/resource",
+                children: [{ type: "text", text: "Trusted resource" }],
+              },
+              {
+                type: "link",
+                url: "javascript:alert(1)",
+                children: [{ type: "text", text: "Malformed resource" }],
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    const trustedLink = screen.getByRole("link", { name: "Trusted resource" });
+    expect(trustedLink).toHaveAttribute(
+      "href",
+      "https://example.test/resource",
+    );
+    expect(trustedLink).not.toHaveAttribute("target");
+    expect(
+      screen.queryByRole("link", { name: "Malformed resource" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Malformed resource")).toBeInTheDocument();
+  });
 });

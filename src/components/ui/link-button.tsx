@@ -1,18 +1,14 @@
-import Link from "next/link";
-import type { ComponentPropsWithoutRef } from "react";
-
 import {
   getButtonClasses,
   type ButtonStyleProps,
 } from "@/components/ui/button";
+import { SafeLink, type SafeLinkProps } from "@/components/ui/safe-link";
 
 export type LinkButtonProps = Omit<
-  ComponentPropsWithoutRef<"a">,
-  "className" | "href"
+  SafeLinkProps,
+  "className"
 > &
-  ButtonStyleProps & {
-    href: string;
-  };
+  ButtonStyleProps;
 
 export function LinkButton({
   children,
@@ -24,17 +20,9 @@ export function LinkButton({
 }: LinkButtonProps) {
   const classes = getButtonClasses({ className, size, variant });
 
-  if (href.startsWith("/")) {
-    return (
-      <Link className={classes} href={href} {...props}>
-        {children}
-      </Link>
-    );
-  }
-
   return (
-    <a className={classes} href={href} {...props}>
+    <SafeLink className={classes} href={href} {...props}>
       {children}
-    </a>
+    </SafeLink>
   );
 }

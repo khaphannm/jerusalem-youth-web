@@ -28,6 +28,24 @@ CMS-002 implements reusable component contracts as follows:
 CTA URLs must be either root-relative site paths or absolute HTTP(S) URLs.
 The frontend rejects unsupported schemes at the CMS boundary.
 
+### External link rendering
+
+- All CMS-driven destinations pass through the shared safe-link renderer after
+  their content-specific schema validation. This final rendering boundary
+  supports root-relative site paths, page fragments, credential-free HTTP(S),
+  email, and telephone links without broadening any CMS field contract.
+- Internal site paths use framework navigation. Other supported destinations
+  use standard anchors and stay in the current tab unless the content contract
+  explicitly requests a new tab.
+- A requested new tab always adds `target="_blank"` with
+  `rel="noopener noreferrer"`; existing safe relationship values are
+  preserved and an unsafe `opener` token is removed.
+- Empty, malformed, protocol-relative, credentialed, and unsupported-scheme
+  destinations render no interactive control. The CMS validation boundary
+  remains responsible for rejecting malformed source documents. Rich content
+  preserves the link label as non-interactive text if this final guard rejects
+  a destination.
+
 ## Article
 
 Required:
@@ -315,6 +333,42 @@ The published About Page single type is the editorial source of truth for the
 ministry's vision, mission, values, and About-page action. Site Settings remains
 the source for the ministry name and concise identity description used in the
 About-page hero.
+
+### Join Page behavior
+
+- `/join` is a server-rendered guidance page and does not introduce a new CMS
+  content type. It presents stable next steps into Events, Stories, and
+  Resources using existing public routes.
+- Site Settings `primaryCta` supplies the visually primary action when present.
+  Its existing CMS boundary permits only a root-relative path or a
+  credential-free absolute HTTP(S) URL. A CTA pointing back to `/join` is
+  replaced with the Events fallback to avoid a navigation loop.
+- Social Links supplies optional official external community destinations.
+  Invalid or empty URLs are rejected by the existing CMS validator; unavailable
+  links produce a useful Events fallback instead of an empty control.
+- The page contains no registration or contact form and stores no visitor data.
+  Registration, community, and contact activity remains on the approved linked
+  destination for V1.
+- Metadata uses Site Settings for the ministry name, default social image, and
+  indexing preference while preserving safe fallbacks during CMS outages.
+
+### Contact Page behavior
+
+- `/contact` is a server-rendered directory of approved organization-level
+  contact details and does not introduce a new CMS content type.
+- Site Settings `organizationContact` supplies the official email, phone, and
+  postal address. The page does not consume event contacts, author profiles, or
+  other staff-level details.
+- Email and phone values render as labeled `mailto:` and `tel:` links. The
+  address remains plain text because the Contact contract has no approved map
+  URL field.
+- Social Links supplies optional official public community destinations. Empty
+  or invalid social URLs are handled by the existing CMS boundary and missing
+  channels produce a useful Join-page fallback.
+- V1 uses direct organization contact and public channel links instead of a
+  native or external form, so the page collects and stores no visitor data.
+- Metadata uses Site Settings for the ministry name, default social image, and
+  indexing preference while preserving safe fallbacks during CMS outages.
 
 ### Site Settings
 - siteName

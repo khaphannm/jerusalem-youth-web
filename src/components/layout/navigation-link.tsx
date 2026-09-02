@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { MouseEventHandler } from "react";
 
+import { SafeLink } from "@/components/ui/safe-link";
 import type { NavigationItem } from "@/lib/cms/domain";
 
 type NavigationLinkProps = Readonly<{
@@ -23,26 +23,14 @@ export function NavigationLink({
   onClick,
   tone = "default",
 }: NavigationLinkProps) {
-  const newTabProps = item.openInNewTab
-    ? { rel: "noopener noreferrer", target: "_blank" }
-    : {};
-  const props = {
-    ...newTabProps,
-    className: `${baseClasses} ${toneClasses[tone]}`,
-    onClick,
-  };
-
-  if (item.url.startsWith("/") && !item.url.startsWith("//")) {
-    return (
-      <Link href={item.url} {...props}>
-        {item.label}
-      </Link>
-    );
-  }
-
   return (
-    <a href={item.url} {...props}>
+    <SafeLink
+      className={`${baseClasses} ${toneClasses[tone]}`}
+      href={item.url}
+      onClick={onClick}
+      openInNewTab={item.openInNewTab}
+    >
       {item.label}
-    </a>
+    </SafeLink>
   );
 }

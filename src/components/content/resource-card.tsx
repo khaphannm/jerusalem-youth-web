@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContentImage } from "@/components/ui/content-image";
+import { SafeLink } from "@/components/ui/safe-link";
 import { getResourcePresentation } from "@/features/resources/source";
 import type { Resource } from "@/lib/cms/domain";
 
@@ -49,14 +50,14 @@ export function ResourceCard({ resource }: Readonly<{ resource: Resource }>) {
             View details
             <span aria-hidden="true">→</span>
           </Link>
-          <a
+          <SafeLink
             aria-label={`${source.actionLabel}: ${resource.title}`}
             className="inline-flex min-h-11 items-center rounded-small py-2 font-label text-label font-bold text-secondary transition-colors duration-fast ease-standard hover:text-primary motion-reduce:transition-none"
             href={source.destination}
           >
             {source.actionLabel}
             <span aria-hidden="true">↗</span>
-          </a>
+          </SafeLink>
         </div>
       </div>
     </article>

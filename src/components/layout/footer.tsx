@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { NavigationLink } from "@/components/layout/navigation-link";
 import { Container } from "@/components/ui/container";
+import { SafeLink } from "@/components/ui/safe-link";
 import { siteConfig } from "@/config/site";
 import { getCmsClient } from "@/lib/cms";
 import type {
@@ -127,17 +128,20 @@ export async function Footer() {
               </h2>
               <address className="mt-4 flex flex-col items-start not-italic text-body-small text-primary-foreground/70">
                 {contact?.email ? (
-                  <a
+                  <SafeLink
                     className={footerLinkClasses}
                     href={`mailto:${contact.email}`}
                   >
                     {contact.email}
-                  </a>
+                  </SafeLink>
                 ) : null}
                 {contact?.phone ? (
-                  <a className={footerLinkClasses} href={`tel:${contact.phone}`}>
+                  <SafeLink
+                    className={footerLinkClasses}
+                    href={`tel:${contact.phone}`}
+                  >
                     {contact.phone}
-                  </a>
+                  </SafeLink>
                 ) : null}
                 {contact?.address ? (
                   <p className="whitespace-pre-line py-2">{contact.address}</p>
@@ -157,9 +161,9 @@ export async function Footer() {
               <ul className="mt-4">
                 {socialItems.map((item, index) => (
                   <li key={`${item.platform}-${item.url}-${index}`}>
-                    <a className={footerLinkClasses} href={item.url}>
+                    <SafeLink className={footerLinkClasses} href={item.url}>
                       {item.platform}
-                    </a>
+                    </SafeLink>
                   </li>
                 ))}
               </ul>

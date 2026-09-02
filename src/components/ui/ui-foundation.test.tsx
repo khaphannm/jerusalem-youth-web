@@ -34,6 +34,27 @@ describe("UI foundation", () => {
     );
   });
 
+  it("applies shared external-link safety to link actions", () => {
+    render(
+      <>
+        <LinkButton href="https://example.test/register" openInNewTab>
+          Register externally
+        </LinkButton>
+        <LinkButton href="javascript:alert(1)">Invalid action</LinkButton>
+      </>,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Register externally" }),
+    ).toMatchObject({
+      rel: "noopener noreferrer",
+      target: "_blank",
+    });
+    expect(
+      screen.queryByRole("link", { name: "Invalid action" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders composable semantic layout primitives", () => {
     render(
       <Section aria-labelledby="section-title" tone="surface">

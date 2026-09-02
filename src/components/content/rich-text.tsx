@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 
 import { ContentImage } from "@/components/ui/content-image";
+import { SafeLink } from "@/components/ui/safe-link";
 import type {
   RichText as RichTextContent,
   RichTextBlock,
@@ -51,16 +52,19 @@ const renderInline = (node: RichTextInline, key: string): ReactNode => {
     return renderText(node, key);
   }
 
+  const children = node.children.map((child, index) =>
+    renderText(child, `${key}-text-${index}`),
+  );
+
   return (
-    <a
+    <SafeLink
       className="rounded-small font-semibold text-primary underline decoration-border underline-offset-4 transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none"
+      fallback={children}
       href={node.url}
       key={key}
     >
-      {node.children.map((child, index) =>
-        renderText(child, `${key}-text-${index}`),
-      )}
-    </a>
+      {children}
+    </SafeLink>
   );
 };
 

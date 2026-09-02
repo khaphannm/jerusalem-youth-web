@@ -1,6 +1,8 @@
 # EPIC-08 — Join and Contact
 
 ## JOIN-001 Join Us page
+Status: Implemented
+
 Acceptance criteria:
 - route `/join`
 - explains clear next steps
@@ -9,6 +11,8 @@ Acceptance criteria:
 - mobile-first CTA hierarchy
 
 ## CON-001 Contact page
+Status: Implemented
+
 Acceptance criteria:
 - route `/contact`
 - official contact channels
@@ -17,6 +21,8 @@ Acceptance criteria:
 - accessible labels/links
 
 ## CON-002 External link safety
+Status: Implemented
+
 Acceptance criteria:
 - external destinations are consistently rendered
 - safe `target`/`rel` behavior where new tabs are used

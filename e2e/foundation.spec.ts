@@ -285,6 +285,83 @@ test("the resources listing remains useful when content is empty or unavailable"
   ).toBe(true);
 });
 
+test("the Join page presents mobile-first next steps without collecting data", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/join");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: /^Find your next step with /,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Start where you are" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Connect without another form",
+    }),
+  ).toBeVisible();
+
+  const primaryAction = page
+    .locator("main > section")
+    .first()
+    .getByRole("link")
+    .first();
+  await expect(primaryAction).toBeVisible();
+  expect((await primaryAction.boundingBox())?.height).toBeGreaterThanOrEqual(48);
+  await expect(page.getByRole("form")).toHaveCount(0);
+  await expect(page.getByRole("textbox")).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("the Contact page exposes accessible official channels without collecting data", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/contact");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: /^Contact /,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Official contact channels",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Connect through an official channel",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: "Contact details are being updated",
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("form")).toHaveCount(0);
+  await expect(page.getByRole("textbox")).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("an invalid article slug returns a useful mobile not-found page", async ({
   page,
 }) => {
