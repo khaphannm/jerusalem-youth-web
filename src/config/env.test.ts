@@ -10,7 +10,7 @@ const requiredEnvironment = {
 describe("validateEnvironment", () => {
   it("requires the server-only CMS configuration", () => {
     expect(environmentDefinition).toEqual({
-      server: ["CMS_BASE_URL", "CMS_REVALIDATION_SECRET"],
+      server: ["CMS_BASE_URL", "CMS_REVALIDATION_SECRET", "SITE_URL"],
       public: [],
     });
   });

@@ -321,6 +321,31 @@ Detail behavior:
 - description optional
 - cover image optional
 
+## Site search behavior
+
+- `/search` uses the server-rendered `q` query parameter and searches only the
+  published Article, Event, Sermon, Story, and Resource collections.
+- Search fields are deliberately limited for V1: Article title/excerpt; Event
+  title/summary/location; Sermon title/summary/speaker/Bible passage; Story
+  title/summary; and Resource title/description. Rich bodies and private or
+  administrative content are not searched.
+- Query parsing takes only the first repeated `q` value, applies Unicode NFKC
+  normalization, replaces control characters and repeated whitespace, and
+  limits input to 80 Unicode code points. Empty queries show guidance and
+  queries shorter than two characters do not reach the CMS.
+- Each CMS request explicitly uses published status, case-insensitive contains
+  filters on controlled field paths, a five-result-per-type limit, and
+  `cache: "no-store"` so arbitrary query variants do not accumulate in the
+  persistent data cache.
+- Results are grouped and labeled by content type. Each group exposes its CMS
+  total while rendering at most five items; V1 does not add cross-type ranking,
+  search pagination, or a dedicated search service.
+- Collection searches run concurrently. A failed content type is identified
+  without discarding available groups; failure of every source produces a
+  controlled unavailable state.
+- Search result pages are marked `noindex,follow` to avoid indexing arbitrary
+  query combinations while allowing result links to be crawled.
+
 ## Single types
 
 ### About Page
@@ -405,6 +430,45 @@ Reusable component:
 - noIndex boolean default false
 
 Canonical URLs, when supplied, must be absolute HTTP(S) URLs.
+
+### Global metadata policy
+
+- Site Settings supplies the global site name, description, default SEO title
+  and description, indexing preference, and default social image. Checked-in
+  site configuration remains the controlled fallback when the CMS is
+  unavailable.
+- `SITE_URL` is the server-only web origin used as the metadata base. It must be
+  origin-only. Production requires HTTPS and rejects local hostnames so relative
+  canonical and social URLs cannot resolve to a development deployment.
+- Every indexable route emits a self-referencing canonical. A validated CMS SEO
+  canonical overrides that route canonical for the homepage and content detail
+  pages. Paginated listings and categories preserve `?page=N` for pages after
+  the first; the first page uses the clean route.
+- Search result pages are `noindex,follow` and intentionally omit a canonical
+  because arbitrary query combinations are not indexable pages.
+- Page-specific social images override the global image. Pages without a
+  content image preserve the parent default rather than replacing it with an
+  empty Open Graph or Twitter image field.
+
+### Structured-data policy
+
+- The approved V1 Organization baseline is emitted site-wide. Its name and
+  description come from Site Settings with checked-in identity fallbacks; its
+  optional email, telephone, and address come only from the approved
+  organization-level Contact component; and `sameAs` contains only validated
+  Social Links. `SITE_URL` supplies its stable URL and identifier.
+- No logo, legal name, founding date, staff identity, or other Organization
+  property is inferred when the content model does not provide it.
+- Article JSON-LD appears only on published Article detail pages and uses the
+  title, excerpt, category, featured image, tags, publication timestamp, and
+  optional validated canonical supplied by that Article contract. It does not
+  infer an author type, publisher, or modified timestamp.
+- Event JSON-LD appears only on published Event detail pages and uses the title,
+  summary, banner, dates, location, optional address, and optional validated
+  canonical supplied by that Event contract. It does not infer attendance
+  mode, schedule status, organizer, tickets, prices, or offers.
+- All JSON-LD is serialized through the shared escaping boundary before it is
+  inserted into a native `application/ld+json` script.
 
 ## Frontend contract
 

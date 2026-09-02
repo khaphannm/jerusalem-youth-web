@@ -55,10 +55,11 @@ export async function generateMetadata({
   const title = story.seo?.metaTitle ?? story.title;
   const description = story.seo?.metaDescription ?? story.summary;
   const image = metadataImage(story, title);
-  const canonical = story.seo?.canonical ?? undefined;
+  const canonical =
+    story.seo?.canonical ?? `/stories/${encodeURIComponent(story.slug)}`;
 
   return {
-    alternates: canonical ? { canonical } : undefined,
+    alternates: { canonical },
     description,
     openGraph: {
       description,

@@ -16,6 +16,7 @@ Required for visible UI changes.
 - [ ] build
 - [ ] relevant E2E
 - [ ] accessibility/manual checks as applicable
+- [ ] structured data checked with external validators when changed
 
 ## Risks / follow-ups
 

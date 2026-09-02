@@ -8,6 +8,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { siteConfig } from "@/config/site";
+import { canonicalPath } from "@/features/seo/canonical";
 import {
   loadSermonListing,
   loadSermonSiteSettings,
@@ -34,6 +35,7 @@ export async function generateMetadata({
   const siteName = settings?.siteName ?? siteConfig.name;
   const title = page > 1 ? `Sermons — Page ${page}` : "Sermons";
   const socialTitle = `${title} | ${siteName}`;
+  const canonical = canonicalPath("/sermons", page);
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -46,6 +48,7 @@ export async function generateMetadata({
     : undefined;
 
   return {
+    alternates: { canonical },
     description: listingDescription,
     openGraph: {
       description: listingDescription,
@@ -53,6 +56,7 @@ export async function generateMetadata({
       siteName,
       title: socialTitle,
       type: "website",
+      url: canonical,
     },
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }

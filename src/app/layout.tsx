@@ -4,7 +4,14 @@ import type { ReactNode } from "react";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { siteConfig } from "@/config/site";
+import { getSiteUrl } from "@/config/site-url";
+import {
+  loadGlobalSiteSettings,
+  loadOrganizationData,
+} from "@/features/seo/data";
+import { buildGlobalMetadata } from "@/features/seo/metadata";
+import { buildOrganizationStructuredData } from "@/features/seo/organization";
+import { serializeStructuredData } from "@/lib/seo/structured-data";
 
 import "./globals.css";
 
@@ -15,19 +22,30 @@ const beVietnamPro = Be_Vietnam_Pro({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  applicationName: siteConfig.name,
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await loadGlobalSiteSettings();
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  return buildGlobalMetadata(settings, getSiteUrl());
+}
+
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
+  const organizationData = await loadOrganizationData();
+  const structuredData = buildOrganizationStructuredData(
+    organizationData,
+    getSiteUrl(),
+  );
+
   return (
     <html className={beVietnamPro.variable} lang="en">
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: serializeStructuredData(structuredData),
+          }}
+          type="application/ld+json"
+        />
         <a
           className="fixed left-gutter top-gutter z-50 -translate-y-24 rounded-small bg-primary px-4 py-3 font-label text-label font-semibold text-primary-foreground transition-transform duration-fast ease-standard focus:translate-y-0 motion-reduce:transition-none"
           href="#main-content"

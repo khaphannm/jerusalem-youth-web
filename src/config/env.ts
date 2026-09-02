@@ -4,7 +4,7 @@ export type EnvironmentDefinition = Readonly<{
 }>;
 
 export const environmentDefinition = {
-  server: ["CMS_BASE_URL", "CMS_REVALIDATION_SECRET"],
+  server: ["CMS_BASE_URL", "CMS_REVALIDATION_SECRET", "SITE_URL"],
   public: [],
 } as const satisfies EnvironmentDefinition;
 

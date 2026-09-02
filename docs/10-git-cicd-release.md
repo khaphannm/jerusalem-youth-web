@@ -60,6 +60,8 @@ Before production:
 - Definition of Done
 - release-readiness prompt
 - content review
+- structured-data validation recorded for the homepage and representative
+  published Article and Event URLs
 - backup verification
 - redirects
 - analytics/error monitoring

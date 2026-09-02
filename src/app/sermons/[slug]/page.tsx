@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -31,7 +31,7 @@ const metadataImage = (sermon: Sermon, title: string) => {
 
 export async function generateMetadata({
   params,
-}: SermonPageProps): Promise<Metadata> {
+}: SermonPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const result = await loadSermonDetail(slug);
 
@@ -55,14 +55,22 @@ export async function generateMetadata({
   const title = sermon.seo?.metaTitle ?? sermon.title;
   const description = sermon.seo?.metaDescription ?? sermon.summary;
   const image = metadataImage(sermon, title);
-  const canonical = sermon.seo?.canonical ?? undefined;
+  const canonical =
+    sermon.seo?.canonical ?? `/sermons/${encodeURIComponent(sermon.slug)}`;
+  const parentMetadata = !image ? await parent : undefined;
+  const openGraphImages = image
+    ? [image]
+    : parentMetadata?.openGraph?.images;
+  const twitterImages = image
+    ? [image.url]
+    : parentMetadata?.twitter?.images;
 
   return {
-    alternates: canonical ? { canonical } : undefined,
+    alternates: { canonical },
     description,
     openGraph: {
       description,
-      images: image ? [image] : undefined,
+      images: openGraphImages,
       title,
       type: "website",
       url: canonical,
@@ -72,9 +80,9 @@ export async function generateMetadata({
       : undefined,
     title,
     twitter: {
-      card: image ? "summary_large_image" : "summary",
+      card: twitterImages?.length ? "summary_large_image" : "summary",
       description,
-      images: image ? [image.url] : undefined,
+      images: twitterImages,
       title,
     },
   };

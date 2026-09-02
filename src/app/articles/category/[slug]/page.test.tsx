@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import type { ResolvingMetadata } from "next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import ArticleCategoryNotFound from "@/app/articles/category/[slug]/not-found";
@@ -6,6 +7,8 @@ import ArticleCategoryPage, {
   generateMetadata,
 } from "@/app/articles/category/[slug]/page";
 import type { Article, Category, MediaAsset } from "@/lib/cms/domain";
+
+const parentMetadata = Promise.resolve({}) as ResolvingMetadata;
 
 const { loadArticleCategoryMock, notFoundMock } = vi.hoisted(() => ({
   loadArticleCategoryMock: vi.fn(),
@@ -171,7 +174,9 @@ describe("ArticleCategoryPage", () => {
       status: "found",
     });
 
-    await expect(generateMetadata(pageProps("2"))).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps("2"), parentMetadata),
+    ).resolves.toMatchObject({
       description: category.description,
       openGraph: {
         description: category.description,
@@ -227,13 +232,17 @@ describe("ArticleCategoryPage", () => {
 
   it("prevents missing and failed category states from being indexed", async () => {
     loadArticleCategoryMock.mockResolvedValueOnce({ status: "not-found" });
-    await expect(generateMetadata(pageProps())).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps(), parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Article category not found",
     });
 
     loadArticleCategoryMock.mockResolvedValueOnce({ status: "error" });
-    await expect(generateMetadata(pageProps())).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps(), parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Article category",
     });

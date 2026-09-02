@@ -1,6 +1,8 @@
 # EPIC-09 — Search and SEO
 
 ## SEA-001 Site search
+Status: Implemented
+
 Acceptance criteria:
 - route `/search`
 - searches approved public content types
@@ -13,6 +15,8 @@ Acceptance criteria:
 Start with a CMS-backed or server-side search suitable for current content scale. Do not introduce a dedicated search cluster without measured need.
 
 ## SEO-001 Global metadata
+Status: Implemented
+
 Acceptance criteria:
 - site defaults
 - title template
@@ -21,12 +25,16 @@ Acceptance criteria:
 - environment-safe production URL
 
 ## SEO-002 Sitemap and robots
+Status: Implemented
+
 Acceptance criteria:
 - sitemap includes intended indexable published routes
 - excludes drafts/private routes
 - robots behavior differs safely for non-production if required
 
 ## SEO-003 Structured data
+Status: Implemented
+
 Acceptance criteria:
 - Organization baseline if approved
 - Article/Event schema only on relevant pages

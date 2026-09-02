@@ -29,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     : undefined;
 
   return {
+    alternates: { canonical: "/about" },
     description,
     openGraph: {
       description,
@@ -36,6 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName,
       title: `About ${siteName}`,
       type: "website",
+      url: "/about",
     },
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }

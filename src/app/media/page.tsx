@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 
 import { MediaCard } from "@/components/content/media-card";
 import { Container } from "@/components/ui/container";
@@ -12,20 +12,33 @@ import { loadMediaListing } from "@/features/media/data";
 const mediaDescription =
   "See approved photos and videos from the gatherings, stories, and teaching of Jerusalem Youth.";
 
-export const metadata: Metadata = {
-  description: mediaDescription,
-  openGraph: {
+export async function generateMetadata(
+  _props: object,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const parentMetadata = await parent;
+  const openGraphImages = parentMetadata?.openGraph?.images;
+  const twitterImages = parentMetadata?.twitter?.images;
+
+  return {
+    alternates: { canonical: "/media" },
     description: mediaDescription,
-    title: `Media | ${siteConfig.name}`,
-    type: "website",
-  },
-  title: "Media",
-  twitter: {
-    card: "summary",
-    description: mediaDescription,
-    title: `Media | ${siteConfig.name}`,
-  },
-};
+    openGraph: {
+      description: mediaDescription,
+      images: openGraphImages,
+      title: `Media | ${siteConfig.name}`,
+      type: "website",
+      url: "/media",
+    },
+    title: "Media",
+    twitter: {
+      card: twitterImages?.length ? "summary_large_image" : "summary",
+      description: mediaDescription,
+      images: twitterImages,
+      title: `Media | ${siteConfig.name}`,
+    },
+  };
+}
 
 export default async function MediaPage() {
   const listing = await loadMediaListing();

@@ -13,6 +13,7 @@ import {
   loadArticleSiteSettings,
   parseArticlePage,
 } from "@/features/articles/data";
+import { canonicalPath } from "@/features/seo/canonical";
 
 type ArticlesPageProps = Readonly<{
   searchParams: Promise<{
@@ -34,6 +35,7 @@ export async function generateMetadata({
   const siteName = settings?.siteName ?? siteConfig.name;
   const title = page > 1 ? `Articles — Page ${page}` : "Articles";
   const socialTitle = `${title} | ${siteName}`;
+  const canonical = canonicalPath("/articles", page);
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -46,6 +48,7 @@ export async function generateMetadata({
     : undefined;
 
   return {
+    alternates: { canonical },
     description: listingDescription,
     openGraph: {
       description: listingDescription,
@@ -53,6 +56,7 @@ export async function generateMetadata({
       siteName,
       title: socialTitle,
       type: "website",
+      url: canonical,
     },
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }

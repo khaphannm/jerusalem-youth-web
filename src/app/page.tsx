@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
     settings?.siteDescription ??
     siteConfig.description;
   const socialImage = seo?.socialImage ?? settings?.defaultSocialImage;
+  const canonical = seo?.canonical ?? "/";
   const image = socialImage
     ? {
         alt: socialImage.alternativeText ?? title,
@@ -34,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     : undefined;
 
   return {
-    alternates: seo?.canonical ? { canonical: seo.canonical } : undefined,
+    alternates: { canonical },
     description,
     openGraph: {
       description,
@@ -42,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: settings?.siteName ?? siteConfig.name,
       title,
       type: "website",
-      url: seo?.canonical ?? undefined,
+      url: canonical,
     },
     robots: seo?.noIndex ? { follow: true, index: false } : undefined,
     title: { absolute: title },

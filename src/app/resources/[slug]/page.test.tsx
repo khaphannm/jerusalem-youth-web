@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import type { ResolvingMetadata } from "next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import ResourceNotFound from "@/app/resources/[slug]/not-found";
@@ -6,6 +7,8 @@ import ResourcePage, {
   generateMetadata,
 } from "@/app/resources/[slug]/page";
 import type { MediaAsset, Resource } from "@/lib/cms/domain";
+
+const parentMetadata = Promise.resolve({}) as ResolvingMetadata;
 
 const { loadResourceDetailMock, notFoundMock } = vi.hoisted(() => ({
   loadResourceDetailMock: vi.fn(),
@@ -154,7 +157,9 @@ describe("ResourcePage", () => {
   it("builds social metadata from SEO and thumbnail fields", async () => {
     loadResourceDetailMock.mockResolvedValue({ resource, status: "found" });
 
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       alternates: { canonical: resource.seo.canonical },
       description: resource.seo.metaDescription,
       openGraph: {
@@ -197,13 +202,17 @@ describe("ResourcePage", () => {
     ).toBeInTheDocument();
 
     loadResourceDetailMock.mockResolvedValueOnce({ status: "not-found" });
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Resource not found",
     });
 
     loadResourceDetailMock.mockResolvedValueOnce({ status: "error" });
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Resource",
     });

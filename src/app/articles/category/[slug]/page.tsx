@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -14,6 +14,7 @@ import {
   loadArticleCategory,
   parseArticlePage,
 } from "@/features/articles/data";
+import { canonicalPath } from "@/features/seo/canonical";
 import type { Category } from "@/lib/cms/domain";
 
 type ArticleCategoryPageProps = Readonly<{
@@ -28,7 +29,7 @@ const categoryDescription = (category: Category) =>
 export async function generateMetadata({
   params,
   searchParams,
-}: ArticleCategoryPageProps): Promise<Metadata> {
+}: ArticleCategoryPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const page = parseArticlePage(query.page);
   const result = await loadArticleCategory(slug, page);
@@ -56,6 +57,10 @@ export async function generateMetadata({
       : `${category.name} articles`;
   const socialTitle = `${title} | ${siteConfig.name}`;
   const description = categoryDescription(category);
+  const canonical = canonicalPath(
+    `/articles/category/${encodeURIComponent(category.slug)}`,
+    page,
+  );
   const socialImage = listing.items[0]?.featuredImage;
   const image = socialImage
     ? {
@@ -63,22 +68,31 @@ export async function generateMetadata({
         height: socialImage.height ?? undefined,
         url: socialImage.url,
         width: socialImage.width ?? undefined,
-      }
+    }
     : undefined;
+  const parentMetadata = !image ? await parent : undefined;
+  const openGraphImages = image
+    ? [image]
+    : parentMetadata?.openGraph?.images;
+  const twitterImages = image
+    ? [image.url]
+    : parentMetadata?.twitter?.images;
 
   return {
+    alternates: { canonical },
     description,
     openGraph: {
       description,
-      images: image ? [image] : undefined,
+      images: openGraphImages,
       title: socialTitle,
       type: "website",
+      url: canonical,
     },
     title,
     twitter: {
-      card: image ? "summary_large_image" : "summary",
+      card: twitterImages?.length ? "summary_large_image" : "summary",
       description,
-      images: image ? [image.url] : undefined,
+      images: twitterImages,
       title: socialTitle,
     },
   };

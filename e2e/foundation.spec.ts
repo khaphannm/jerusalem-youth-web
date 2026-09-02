@@ -1,5 +1,24 @@
 import { expect, test } from "@playwright/test";
 
+test("the sitemap and robots routes expose safe crawler policy", async ({
+  request,
+}) => {
+  const sitemapResponse = await request.get("/sitemap.xml");
+  const sitemap = await sitemapResponse.text();
+
+  expect(sitemapResponse.ok()).toBe(true);
+  expect(sitemap).toContain(`${process.env.SITE_URL}/about`);
+  expect(sitemap).not.toContain("/search");
+  expect(sitemap).not.toContain("/api/");
+
+  const robotsResponse = await request.get("/robots.txt");
+  const robots = await robotsResponse.text();
+
+  expect(robotsResponse.ok()).toBe(true);
+  expect(robots).toContain("User-Agent: *");
+  expect(robots).toContain(process.env.CI ? "Allow: /" : "Disallow: /");
+});
+
 test("the accessible homepage and application shell load", async ({ page }) => {
   await page.goto("/");
 
@@ -9,6 +28,23 @@ test("the accessible homepage and application shell load", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    process.env.SITE_URL ?? "",
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    "content",
+    /.+/,
+  );
+  const structuredDataTypes = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((scripts) =>
+      scripts.map((script) => JSON.parse(script.textContent ?? "{}")["@type"]),
+    );
+
+  expect(structuredDataTypes).toContain("Organization");
+  expect(structuredDataTypes).not.toContain("Article");
+  expect(structuredDataTypes).not.toContain("Event");
 
   const skipLink = page.getByRole("link", { name: "Skip to main content" });
   await skipLink.focus();
@@ -355,6 +391,47 @@ test("the Contact page exposes accessible official channels without collecting d
   ).toBeVisible();
   await expect(page.getByRole("form")).toHaveCount(0);
   await expect(page.getByRole("textbox")).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("the site search handles empty, short, and submitted mobile queries", async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto("/search");
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Search the site" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 3, name: "Start with a search" }),
+  ).toBeVisible();
+
+  await page.goto("/search?q=a");
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: "Search needs at least two characters",
+    }),
+  ).toBeVisible();
+
+  const searchInput = page.getByRole("searchbox", {
+    name: "What are you looking for?",
+  });
+  await searchInput.fill("faith");
+  await page.getByRole("button", { name: "Search" }).click();
+  await expect(page).toHaveURL(/\/search\?q=faith$/);
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: /^(?:Search is temporarily unavailable|No results for “faith”)$/,
+    }),
+  ).toBeVisible();
+  expect((await searchInput.boundingBox())?.height).toBeGreaterThanOrEqual(48);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

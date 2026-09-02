@@ -16,6 +16,7 @@ jobs:
     env:
       CMS_BASE_URL: https://cms.example.invalid
       CMS_REVALIDATION_SECRET: ci-only-revalidation-secret-at-least-32-characters
+      SITE_URL: https://youth.example.invalid
 
     steps:
       - name: Check out repository

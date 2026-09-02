@@ -1,9 +1,12 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { ResolvingMetadata } from "next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import SermonNotFound from "@/app/sermons/[slug]/not-found";
 import SermonPage, { generateMetadata } from "@/app/sermons/[slug]/page";
 import type { MediaAsset, Sermon } from "@/lib/cms/domain";
+
+const parentMetadata = Promise.resolve({}) as ResolvingMetadata;
 
 const { loadSermonDetailMock, notFoundMock } = vi.hoisted(() => ({
   loadSermonDetailMock: vi.fn(),
@@ -155,7 +158,9 @@ describe("SermonPage", () => {
   it("builds sermon social metadata from validated SEO fields", async () => {
     loadSermonDetailMock.mockResolvedValue({ sermon, status: "found" });
 
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       alternates: { canonical: sermon.seo.canonical },
       description: sermon.seo.metaDescription,
       openGraph: {
@@ -207,13 +212,17 @@ describe("SermonPage", () => {
 
   it("prevents missing and failed detail states from being indexed", async () => {
     loadSermonDetailMock.mockResolvedValueOnce({ status: "not-found" });
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Sermon not found",
     });
 
     loadSermonDetailMock.mockResolvedValueOnce({ status: "error" });
-    await expect(generateMetadata(pageProps)).resolves.toMatchObject({
+    await expect(
+      generateMetadata(pageProps, parentMetadata),
+    ).resolves.toMatchObject({
       robots: { follow: false, index: false },
       title: "Sermon",
     });

@@ -412,6 +412,84 @@ describe("CMS client", () => {
     );
   });
 
+  it("searches approved fields on published collections without persistently caching queries", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(collectionPayload([articleFixture], 5)))
+      .mockResolvedValueOnce(jsonResponse(collectionPayload([eventFixture], 5)))
+      .mockResolvedValueOnce(jsonResponse(collectionPayload([sermonFixture], 5)))
+      .mockResolvedValueOnce(jsonResponse(collectionPayload([storyFixture], 5)))
+      .mockResolvedValueOnce(jsonResponse(collectionPayload([resourceFixture], 5)));
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await client.articles.search("  faith\njourney  ");
+    await client.events.search("faith journey");
+    await client.sermons.search("faith journey");
+    await client.stories.search("faith journey");
+    await client.resources.search("faith journey");
+
+    const searches = [
+      {
+        fields: ["title", "excerpt"],
+        path: "/api/articles",
+      },
+      {
+        fields: ["title", "summary", "locationName"],
+        path: "/api/events",
+      },
+      {
+        fields: ["title", "summary", "speaker", "biblePassage"],
+        path: "/api/sermons",
+      },
+      {
+        fields: ["title", "summary"],
+        path: "/api/stories",
+      },
+      {
+        fields: ["title", "description"],
+        path: "/api/resources",
+      },
+    ];
+
+    searches.forEach(({ fields, path }, requestIndex) => {
+      const requestedUrl = new URL(
+        String(fetchMock.mock.calls[requestIndex]?.[0]),
+      );
+      expect(requestedUrl.pathname).toBe(path);
+      expect(requestedUrl.searchParams.get("status")).toBe("published");
+      expect(requestedUrl.searchParams.get("pagination[page]")).toBe("1");
+      expect(requestedUrl.searchParams.get("pagination[pageSize]")).toBe("5");
+      fields.forEach((field, fieldIndex) => {
+        expect(
+          requestedUrl.searchParams.get(
+            `filters[$or][${fieldIndex}][${field}][$containsi]`,
+          ),
+        ).toBe("faith journey");
+      });
+      expect(fetchMock.mock.calls[requestIndex]?.[1]).toMatchObject({
+        cache: "no-store",
+      });
+      expect(fetchMock.mock.calls[requestIndex]?.[1]).not.toHaveProperty("next");
+    });
+  });
+
+  it("rejects a short search before making a CMS request", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.articles.search(" a ")).rejects.toMatchObject({
+      code: "CONFIGURATION",
+      message: "Search query must contain at least 2 characters.",
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("loads only a published sermon matching the requested slug", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(

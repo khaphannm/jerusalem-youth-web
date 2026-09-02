@@ -55,6 +55,10 @@ import {
   socialLinksSchema,
   storySchema,
 } from "./schemas";
+import {
+  minimumSearchQueryLength,
+  normalizeSearchQuery,
+} from "../search-query";
 
 type Fetch = typeof fetch;
 
@@ -86,13 +90,14 @@ type CachePolicy = Readonly<{
 }>;
 
 type CollectionFilter = Readonly<{
-  operator: "$eq" | "$gte" | "$null";
+  operator: "$containsi" | "$eq" | "$gte" | "$null";
   path: readonly [string, ...string[]];
   value: boolean | string;
 }>;
 
 type CollectionQuery = CollectionOptions &
   Readonly<{
+    cacheMode?: "no-store";
     filters?: readonly CollectionFilter[];
     orFilterBranches?: readonly (readonly CollectionFilter[])[];
     sort?: readonly string[];
@@ -292,6 +297,7 @@ export const createCmsClient = ({
     url: URL,
     options: Readonly<{
       cache: CachePolicy;
+      noStore?: boolean;
       notFoundAsNull?: boolean;
     }>,
   ): Promise<unknown> => {
@@ -300,12 +306,16 @@ export const createCmsClient = ({
 
     try {
       const response = await fetchImplementation(url, {
-        cache: "force-cache",
+        ...(options.noStore
+          ? { cache: "no-store" as const }
+          : {
+              cache: "force-cache" as const,
+              next: {
+                revalidate: options.cache.revalidate,
+                tags: [...options.cache.tags],
+              },
+            }),
         headers: { Accept: "application/json" },
-        next: {
-          revalidate: options.cache.revalidate,
-          tags: [...options.cache.tags],
-        },
         signal: controller.signal,
       });
 
@@ -355,7 +365,10 @@ export const createCmsClient = ({
   ): Promise<CollectionResult<Domain>> => {
     const payload = await request(
       buildUrl(baseUrl, definition.endpoint, definition.populate, options),
-      { cache: definition.cache },
+      {
+        cache: definition.cache,
+        noStore: options.cacheMode === "no-store",
+      },
     );
     const result = collectionEnvelopeSchema(definition.schema).safeParse(payload);
 
@@ -508,6 +521,38 @@ export const createCmsClient = ({
     map: mapStory,
   } satisfies CollectionDefinition<z.infer<typeof storySchema>, Story>;
 
+  const searchCollection = async <Raw, Domain>(
+    definition: CollectionDefinition<Raw, Domain>,
+    query: string,
+    paths: readonly CollectionFilter["path"][],
+    sort: readonly string[],
+    options: CollectionOptions = {},
+  ) => {
+    const normalizedQuery = normalizeSearchQuery(query);
+
+    if ([...normalizedQuery].length < minimumSearchQueryLength) {
+      throw new CmsError(
+        "CONFIGURATION",
+        `Search query must contain at least ${minimumSearchQueryLength} characters.`,
+      );
+    }
+
+    return readCollection(definition, {
+      cacheMode: "no-store",
+      orFilterBranches: paths.map((path) => [
+        {
+          operator: "$containsi",
+          path,
+          value: normalizedQuery,
+        },
+      ]),
+      page: options.page ?? 1,
+      pageSize: options.pageSize ?? 5,
+      sort,
+      status: "published",
+    });
+  };
+
   return {
     aboutPage: () =>
       readSingle({
@@ -529,6 +574,14 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(articles, slug, { status: "published" }),
+      search: (query: string, options?: CollectionOptions) =>
+        searchCollection(
+          articles,
+          query,
+          [["title"], ["excerpt"]],
+          ["publishedAt:desc"],
+          options,
+        ),
       listByCategory: (
         categorySlug: string,
         options?: CollectionOptions,
@@ -574,6 +627,14 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(events, slug, { status: "published" }),
+      search: (query: string, options?: CollectionOptions) =>
+        searchCollection(
+          events,
+          query,
+          [["title"], ["summary"], ["locationName"]],
+          ["startDateTime:asc"],
+          options,
+        ),
       upcoming: ({
         featured,
         from,
@@ -636,6 +697,14 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(resources, slug, { status: "published" }),
+      search: (query: string, options?: CollectionOptions) =>
+        searchCollection(
+          resources,
+          query,
+          [["title"], ["description"]],
+          ["publishedAt:desc"],
+          options,
+        ),
     },
     sermonSeries: {
       list: (options?: CollectionOptions) =>
@@ -651,6 +720,14 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(sermons, slug, { status: "published" }),
+      search: (query: string, options?: CollectionOptions) =>
+        searchCollection(
+          sermons,
+          query,
+          [["title"], ["summary"], ["speaker"], ["biblePassage"]],
+          ["date:desc", "publishedAt:desc"],
+          options,
+        ),
       latest: () => readLatest(sermons, ["date:desc", "publishedAt:desc"]),
     },
     stories: {
@@ -662,6 +739,14 @@ export const createCmsClient = ({
         }),
       findBySlug: (slug: string) =>
         findBySlug(stories, slug, { status: "published" }),
+      search: (query: string, options?: CollectionOptions) =>
+        searchCollection(
+          stories,
+          query,
+          [["title"], ["summary"]],
+          ["publishedAt:desc"],
+          options,
+        ),
       latest: (options: Pick<CollectionOptions, "pageSize"> = {}) =>
         readCollection(stories, {
           ...options,

@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { ResolvingMetadata } from "next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import MediaPage from "@/app/media/page";
+import MediaPage, { generateMetadata } from "@/app/media/page";
 import type { MediaItem } from "@/features/media/data";
 import type { MediaAsset } from "@/lib/cms/domain";
 
@@ -122,5 +123,18 @@ describe("MediaPage", () => {
       "href",
       "/media",
     );
+  });
+
+  it("preserves the global social image in page-specific metadata", async () => {
+    const parent = Promise.resolve({
+      openGraph: { images: [{ url: image.url }] },
+      twitter: { images: [image.url] },
+    }) as unknown as ResolvingMetadata;
+
+    await expect(generateMetadata({}, parent)).resolves.toMatchObject({
+      alternates: { canonical: "/media" },
+      openGraph: { images: [{ url: image.url }], url: "/media" },
+      twitter: { card: "summary_large_image", images: [image.url] },
+    });
   });
 });
