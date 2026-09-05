@@ -304,6 +304,23 @@ describe("CMS client", () => {
     });
   });
 
+  it("bypasses the persistent CMS cache during local development", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse(collectionPayload([])));
+    const client = createCmsClient({
+      baseUrl: "http://localhost:1337",
+      environment: "development",
+      fetch: fetchMock,
+    });
+
+    await client.articles.list({ page: 1, pageSize: 6 });
+
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "no-store",
+    });
+    expect(fetchMock.mock.calls[0]?.[1]).not.toHaveProperty("next");
+  });
+
   it("uses a five-minute fallback refresh for event reads", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(jsonResponse(collectionPayload([])));

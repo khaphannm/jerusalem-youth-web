@@ -62,6 +62,21 @@ npm test
 npm run build
 ```
 
+## Launch review seed
+
+An explicit, non-production seed command creates review-labeled launch drafts
+without overwriting existing records. Read the facts, assumptions, editorial
+workflow, and rollback steps before running it:
+
+- [`docs/launch-content-seed-guide.md`](../docs/launch-content-seed-guide.md)
+- [`seed/assets/README.md`](seed/assets/README.md)
+
+From the repository root:
+
+```bash
+npm run seed:launch -- --confirm-review-seed
+```
+
 ## Core content schemas
 
 CMS-002 defines these collection types:

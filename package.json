@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "seed:launch": "npm --prefix cms run seed:launch --",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

@@ -9,6 +9,8 @@
   "include": [
     "config/utils/**/*.ts",
     "src/permissions/**/*.ts",
+    "src/seed/launch-content.ts",
+    "src/seed/**/*.test.ts",
     "src/validation/**/*.ts"
   ],
   "exclude": ["node_modules", "build", "dist"]

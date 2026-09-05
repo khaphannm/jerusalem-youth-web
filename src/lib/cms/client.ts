@@ -61,9 +61,11 @@ import {
 } from "../search-query";
 
 type Fetch = typeof fetch;
+type RuntimeEnvironment = "development" | "production" | "test";
 
 type ClientConfiguration = Readonly<{
   baseUrl: string;
+  environment?: RuntimeEnvironment;
   fetch?: Fetch;
   timeoutMs?: number;
 }>;
@@ -281,10 +283,12 @@ const isAbortError = (error: unknown) =>
 
 export const createCmsClient = ({
   baseUrl: unvalidatedBaseUrl,
+  environment = process.env.NODE_ENV,
   fetch: fetchImplementation = fetch,
   timeoutMs = defaultTimeoutMs,
 }: ClientConfiguration) => {
-  const baseUrl = normalizeCmsBaseUrl(unvalidatedBaseUrl);
+  const baseUrl = normalizeCmsBaseUrl(unvalidatedBaseUrl, environment);
+  const bypassPersistentCache = environment === "development";
 
   if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) {
     throw new CmsError(
@@ -306,7 +310,7 @@ export const createCmsClient = ({
 
     try {
       const response = await fetchImplementation(url, {
-        ...(options.noStore
+        ...(options.noStore || bypassPersistentCache
           ? { cache: "no-store" as const }
           : {
               cache: "force-cache" as const,

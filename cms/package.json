@@ -9,9 +9,10 @@
     "deploy": "strapi deploy",
     "dev": "strapi develop",
     "develop": "strapi develop",
+    "seed:launch": "node scripts/seed-launch.mjs",
     "start": "strapi start",
     "strapi": "strapi",
-    "test": "tsc --project tsconfig.test.json && node --test .tmp/tests/config/utils/media.test.js .tmp/tests/src/permissions/public-read.test.js .tmp/tests/src/validation/content-rules.test.js",
+    "test": "tsc --project tsconfig.test.json && node --test .tmp/tests/config/utils/media.test.js .tmp/tests/src/permissions/public-read.test.js .tmp/tests/src/seed/launch-content.test.js .tmp/tests/src/seed/launch.test.js .tmp/tests/src/validation/content-rules.test.js",
     "typecheck": "tsc --noEmit",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"

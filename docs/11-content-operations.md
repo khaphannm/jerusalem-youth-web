@@ -90,3 +90,9 @@ Recommended minimum:
 - 3–5 stories/testimonies
 - initial resources
 - approved photography
+
+The repository includes an idempotent, non-production review seed that meets
+the recommended content volume without presenting fictional copy as approved
+launch content. See [`docs/launch-content-seed-guide.md`](launch-content-seed-guide.md)
+for the seed command, known review blockers, generated-image provenance, manual
+content-entry steps, publication checklist, and safe removal procedure.

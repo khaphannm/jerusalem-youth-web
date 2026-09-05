@@ -12,6 +12,9 @@ provide a cache tag or site path to invalidate.
 
 ## Cache policy
 
+- Local development CMS reads use `cache: "no-store"` so editors can see
+  Strapi changes without carrying an indefinite data-cache entry across dev
+  server restarts. Production keeps the tagged cache policy below.
 - Stable content uses `cache: "force-cache"` and remains cached until its tag is
   expired by a valid webhook.
 - Event reads also use tagged caching but have a 300-second fallback lifetime.
