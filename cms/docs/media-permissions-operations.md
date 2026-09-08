@@ -15,10 +15,16 @@ Optional provider settings:
 - `AWS_ENDPOINT`: S3-compatible API endpoint; omit for AWS S3
 - `AWS_FORCE_PATH_STYLE`: enable only when the provider requires path-style URLs
 - `AWS_ACCESS_KEY_ID` and `AWS_ACCESS_SECRET`: configure both or neither; when omitted, the AWS SDK credential chain is used
-- `AWS_ACL`: omit when the provider disables ACLs or access is controlled by bucket/CDN policy
+- `AWS_ACL`: provider-specific; for the installed provider with AWS S3 Bucket
+  owner enforced, use `bucket-owner-full-control`. Omitting this value currently
+  lets the provider default to `public-read`, which can fail on ACL-disabled
+  buckets. Do not assume omission disables ACL headers on other S3 vendors.
 - `CDN_ROOT_PATH`: prefix all CMS-managed objects, for example `production`
 
 Use a dedicated identity with access limited to the configured bucket and prefix. It needs only the equivalent list, read, create, replace, and delete object operations required by the Media Library. CDN visitors receive read-only asset access and never receive the CMS storage credentials.
+
+For the AWS S3/CloudFront setup and the verified ACL compatibility caveat, follow
+the [production deployment guide](../../docs/production-deployment-guide.md).
 
 Configure bucket CORS to allow `GET` from the deployed Strapi admin origin. The CMS Content Security Policy automatically adds the configured `CDN_URL` origin for image and media previews. Use HTTPS for the CDN and production S3 endpoint.
 

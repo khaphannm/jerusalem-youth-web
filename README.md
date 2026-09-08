@@ -34,6 +34,11 @@ tests, follow [`docs/cms-boundary-verification.md`](docs/cms-boundary-verificati
 
 ## How to use this kit
 
+For a production launch with a free provider subdomain, follow the
+[production deployment guide](docs/production-deployment-guide.md). It covers
+the web, CMS, database, media, environment settings, publishing, and rollback;
+a free web address does not mean every backend service is free.
+
 1. Copy the entire kit into the root of the Git repository.
 2. Keep `AGENTS.md` at repository root.
 3. Treat `/docs` as the system of record.

@@ -56,6 +56,10 @@ Never share privileged production credentials with preview environments.
 
 ## Release
 
+Provider setup and launch instructions are in the
+[production deployment guide](production-deployment-guide.md), including a
+free provider subdomain option and explicit backend cost/availability limits.
+
 Before production:
 - Definition of Done
 - release-readiness prompt
