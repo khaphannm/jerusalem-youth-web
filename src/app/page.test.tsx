@@ -176,6 +176,27 @@ describe("Home", () => {
     loadHomeSiteSettingsMock.mockReset();
   });
 
+  it("adds the CMS gallery without replacing the welcome or downstream sections", async () => {
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      siteSettings: {
+        ...siteSettings,
+        heroSlides: [{ image: media, label: "Community", caption: "Gather together" }],
+      },
+    });
+
+    render(await Home());
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    const gallery = screen.getByRole("region", { name: "Life at Jerusalem Youth" });
+    expect(within(gallery).getByRole("img")).toHaveAttribute("fetchpriority", "high");
+    expect(within(gallery).queryByRole("button")).not.toBeInTheDocument();
+    for (const action of screen.getAllByRole("link", { name: "Plan your visit" })) {
+      expect(action).toHaveAttribute("href", "/join");
+    }
+    expect(screen.getByRole("heading", { name: "Next gathering" })).toBeInTheDocument();
+  });
+
   it("renders the CMS-driven homepage hierarchy and primary actions", async () => {
     loadHomePageDataMock.mockResolvedValue(fullPageData);
 

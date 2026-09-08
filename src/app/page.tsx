@@ -10,6 +10,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { siteConfig } from "@/config/site";
+import { HeroGallery } from "@/features/home/hero-gallery";
 import {
   loadHomePageData,
   loadHomeSiteSettings,
@@ -66,6 +67,7 @@ export default async function Home() {
     upcomingEvents,
   } = await loadHomePageData();
   const siteName = siteSettings?.siteName ?? siteConfig.name;
+  const heroSlides = siteSettings?.heroSlides ?? [];
   const siteDescription =
     siteSettings?.siteDescription ?? siteConfig.description;
   const primaryCallToAction = siteSettings?.primaryCallToAction ?? {
@@ -77,24 +79,42 @@ export default async function Home() {
     <main className="flex-1" id="main-content" tabIndex={-1}>
       <Section aria-labelledby="home-title">
         <Container size="wide">
-          <div className="max-w-reading">
-            <p className="font-label text-label font-bold uppercase text-primary">
-              Youth ministry
-            </p>
-            <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
-              id="home-title"
-            >
-              {siteName}
-            </h1>
-            <p className="mt-6 text-pretty text-body-large text-muted">
-              {siteDescription}
-            </p>
-            <div className="mt-8">
-              <LinkButton href={primaryCallToAction.url} size="large">
-                {primaryCallToAction.label}
-              </LinkButton>
+          <div
+            className={heroSlides.length
+              ? "grid items-center gap-8 lg:grid-cols-5 lg:gap-12"
+              : "max-w-reading"}
+          >
+            <div className={heroSlides.length ? "lg:col-span-2" : undefined}>
+              <p className="font-label text-label font-bold uppercase text-primary">
+                Youth ministry
+              </p>
+              <h1
+                className="mt-5 text-balance font-display text-display font-extrabold"
+                id="home-title"
+              >
+                {siteName}
+              </h1>
+              <p className="mt-6 text-pretty text-body-large text-muted">
+                {siteDescription}
+              </p>
+              <div className={heroSlides.length ? "mt-8 hidden lg:block" : "mt-8"}>
+                <LinkButton href={primaryCallToAction.url} size="large">
+                  {primaryCallToAction.label}
+                </LinkButton>
+              </div>
             </div>
+            {heroSlides.length ? (
+              <>
+                <div className="min-w-0 lg:col-span-3">
+                  <HeroGallery slides={heroSlides} />
+                </div>
+                <div className="lg:hidden">
+                  <LinkButton href={primaryCallToAction.url} size="large">
+                    {primaryCallToAction.label}
+                  </LinkButton>
+                </div>
+              </>
+            ) : null}
           </div>
         </Container>
       </Section>

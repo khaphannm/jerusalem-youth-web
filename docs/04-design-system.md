@@ -319,6 +319,17 @@ Secondary:
 
 Accent is not a default button variant.
 
+## Homepage photographic hero
+
+The approved homepage exception to the carousel guidance is a manual,
+photo-led gallery: fixed welcome copy occupies two desktop grid columns out of
+five and imagery occupies three. On mobile, show copy, gallery, then the CTA.
+Use a stable 4:3 image stage, the large radius, a secondary/navy caption strip,
+white caption text, and an accent/coral slide number. Controls use existing
+primary/outline buttons, visible focus, and an underline for selection.
+Use the normal-duration opacity transition and disable it for reduced motion.
+No autoplay, decorative gradients, or additional carousel dependencies.
+
 ## Dark mode
 
 Dark mode is not in V1 scope.

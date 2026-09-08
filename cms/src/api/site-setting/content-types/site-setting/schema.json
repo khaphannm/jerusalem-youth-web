@@ -10,6 +10,12 @@
     "draftAndPublish": true
   },
   "attributes": {
+    "heroSlides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.hero-slide",
+      "max": 5
+    },
     "siteName": {
       "type": "string",
       "required": true

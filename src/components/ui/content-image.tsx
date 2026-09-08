@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ImageProps } from "next/image";
 
 import type { MediaAsset } from "@/lib/cms/domain";
 
@@ -6,6 +7,8 @@ type ContentImageProps = Readonly<{
   asset: MediaAsset;
   className?: string;
   loading?: "eager" | "lazy";
+  fetchPriority?: ImageProps["fetchPriority"];
+  onError?: ImageProps["onError"];
   sizes: string;
 }>;
 
@@ -16,6 +19,8 @@ export function ContentImage({
   asset,
   className,
   loading,
+  fetchPriority,
+  onError,
   sizes,
 }: ContentImageProps) {
   const responsiveSources = [
@@ -42,6 +47,8 @@ export function ContentImage({
         decoding="async"
         height={asset.height ?? fallbackHeight}
         loading={loading}
+        fetchPriority={fetchPriority}
+        onError={onError}
         sizes={sizes}
         src={asset.url}
         unoptimized

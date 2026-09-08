@@ -368,7 +368,14 @@ export const aboutPageSchema = publishedDocumentSchema.extend({
   vision: requiredString,
 });
 
+export const heroSlideSchema = z.object({
+  image: mediaSchema.refine((image) => image.mime.startsWith("image/"), "Hero media must be an image."),
+  label: requiredString.max(40),
+  caption: z.string().trim().max(160).nullable().optional(),
+});
+
 export const siteSettingsSchema = publishedDocumentSchema.extend({
+  heroSlides: z.array(heroSlideSchema).max(5).nullable().optional(),
   siteName: requiredString,
   siteDescription: requiredString,
   defaultSeo: seoSchema.nullable().optional(),

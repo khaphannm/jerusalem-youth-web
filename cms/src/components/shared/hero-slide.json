@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_shared_hero_slides",
+  "info": { "displayName": "Hero Slide" },
+  "options": {},
+  "attributes": {
+    "image": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "label": { "type": "string", "required": true, "maxLength": 40 },
+    "caption": { "type": "string", "maxLength": 160 }
+  }
+}

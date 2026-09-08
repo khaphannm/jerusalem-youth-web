@@ -787,6 +787,13 @@ export interface ApiSiteSettingSiteSetting extends Struct.SingleTypeSchema {
     defaultSeo: Schema.Attribute.Component<'shared.seo', false>;
     defaultSocialImage: Schema.Attribute.Media<'images'>;
     footerContent: Schema.Attribute.Blocks;
+    heroSlides: Schema.Attribute.Component<'shared.hero-slide', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+        },
+        number
+      >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

@@ -33,6 +33,25 @@ export interface SharedCta extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedHeroSlide extends Struct.ComponentSchema {
+  collectionName: 'components_shared_hero_slides';
+  info: {
+    displayName: 'Hero Slide';
+  };
+  attributes: {
+    caption: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    label: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+  };
+}
+
 export interface SharedMinistryValue extends Struct.ComponentSchema {
   collectionName: 'components_shared_ministry_values';
   info: {
@@ -103,6 +122,7 @@ declare module '@strapi/strapi' {
       'shared.bible-reference': SharedBibleReference;
       'shared.contact': SharedContact;
       'shared.cta': SharedCta;
+      'shared.hero-slide': SharedHeroSlide;
       'shared.ministry-value': SharedMinistryValue;
       'shared.navigation-item': SharedNavigationItem;
       'shared.seo': SharedSeo;

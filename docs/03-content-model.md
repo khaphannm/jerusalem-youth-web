@@ -403,6 +403,12 @@ About-page hero.
 - organizationContact using the `contact` component
 - primaryCta using the `cta` component
 - footerContent as rich content
+- `heroSlides`: optional ordered repeatable `shared.hero-slide` component (maximum 5)
+
+Each hero slide has a required image-only `image`, a required `label` (maximum
+40 characters), and an optional `caption` (maximum 160 characters). Image alt
+text and dimensions come from the media library. Component order determines
+display order; absent or empty slides preserve the text-only homepage hero.
 
 ### Navigation
 - `primaryItems`

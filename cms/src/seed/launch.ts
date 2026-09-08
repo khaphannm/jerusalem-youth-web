@@ -295,6 +295,11 @@ export const seedLaunchReviewContent = async (
       data: {
         ...launchSingles.siteSetting,
         defaultSocialImage: media.communityGathering.id,
+        heroSlides: [
+          { image: media.worshipGathering.id, label: 'Worship', caption: 'Review illustration — worship together.' },
+          { image: media.communityGathering.id, label: 'Community', caption: 'Review illustration — find your community.' },
+          { image: media.carePackages.id, label: 'Serving', caption: 'Review illustration — serve together.' },
+        ],
       },
     },
     {

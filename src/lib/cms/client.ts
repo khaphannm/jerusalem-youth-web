@@ -131,6 +131,7 @@ const populate = {
   sermon: ["series.coverImage", "thumbnail", "seo.socialImage"],
   sermonSeries: ["coverImage"],
   siteSettings: [
+    "heroSlides.image",
     "defaultSeo.socialImage",
     "defaultSocialImage",
     "organizationContact",

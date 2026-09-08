@@ -1024,9 +1024,38 @@ describe("CMS client", () => {
     });
 
     await expect(client.siteSettings()).resolves.toMatchObject({
+      heroSlides: [],
       primaryCallToAction: { label: "Plan your visit", url: "/join" },
     });
   });
+
+  it("maps ordered hero slides and uses the Site Settings publication tag", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(jsonResponse({ data: {
+      ...siteSettingsFixture,
+      heroSlides: [
+        { label: "Worship", image: mediaFixture },
+        { label: "Community", caption: "Together", image: mediaFixture },
+      ],
+    } }));
+    const client = createCmsClient({ baseUrl: "https://cms.example.test", fetch: fetchMock });
+    const settings = await client.siteSettings();
+    expect(settings?.heroSlides).toMatchObject([
+      { label: "Worship", caption: null, image: { url: "https://cms.example.test/uploads/retreat.jpg" } },
+      { label: "Community", caption: "Together" },
+    ]);
+    expect(new URL(String(fetchMock.mock.calls[0]?.[0])).searchParams.getAll("populate")).toContain("heroSlides.image");
+    expect(fetchMock.mock.calls[0]?.[1]?.next?.tags).toContain(cmsCacheTags.siteSettings);
+  });
+
+  it.each([null, { ...mediaFixture, mime: "application/pdf" }, { ...mediaFixture, url: "javascript:alert(1)" }])(
+    "rejects malformed hero media: %j", async (image) => {
+      const fetchMock = vi.fn<typeof fetch>();
+      fetchMock.mockResolvedValue(jsonResponse({ data: { ...siteSettingsFixture, heroSlides: [{ label: "Worship", image }] } }));
+      const client = createCmsClient({ baseUrl: "https://cms.example.test", fetch: fetchMock });
+      await expect(client.siteSettings()).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+    },
+  );
 
   it("rejects an unsafe site-wide primary action URL", async () => {
     const fetchMock = vi.fn<typeof fetch>();

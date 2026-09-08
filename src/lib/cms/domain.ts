@@ -228,7 +228,14 @@ export type AboutPage = Readonly<{
   publishedAt: string;
 }>;
 
+export type HeroSlide = Readonly<{
+  image: MediaAsset;
+  label: string;
+  caption: string | null;
+}>;
+
 export type SiteSettings = Readonly<{
+  heroSlides?: readonly HeroSlide[];
   siteName: string;
   siteDescription: string;
   defaultSeo: Seo | null;

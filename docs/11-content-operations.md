@@ -79,6 +79,30 @@ changes should still be published immediately and the public result checked.
 See `docs/cms-publication-revalidation.md` for configuration, response codes,
 secret rotation, and multi-instance deployment requirements.
 
+## Homepage photographs
+
+1. Deploy/restart the CMS with the `shared.hero-slide` component and updated
+   Site Settings schema **before** deploying the web module that populates it.
+2. Upload approved ministry photographs to the Media Library. Confirm consent,
+   especially for minors, add descriptive alternative text, and use compressed
+   images with responsive variants. Keep lettering out of photographs.
+3. Open **Content Manager → Site Settings → heroSlides**. Add up to five
+   components; three is a good starting point: Worship, Community, Serving.
+4. Choose each image, enter a short label (up to 40 characters), optionally add
+   a caption (up to 160 characters), and drag components into the desired order.
+   The first photograph is the initial homepage image. Check its 4:3 crop.
+5. Save and publish Site Settings. Check the homepage on mobile and desktop,
+   test every control, and verify the existing primary CTA is correct. For
+   production, verify the publication webhook succeeds using the
+   [revalidation guide](cms-publication-revalidation.md).
+
+Zero slides keeps the text hero; one displays a static image. Navigation is
+manual and remaining images load only when selected. The launch seed adds three
+clearly labeled review illustrations only when creating new Site Settings;
+rerunning it does not overwrite existing settings. Existing installations must
+add slides manually. Replace review illustrations and captions with approved
+photography/copy before launch; do not present generated scenes as real events.
+
 ## Content seed for launch
 
 Recommended minimum:

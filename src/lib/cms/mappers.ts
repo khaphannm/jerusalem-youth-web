@@ -319,6 +319,11 @@ export const mapSiteSettings = (
   settings: RawSiteSettings,
   cmsBaseUrl: string,
 ): SiteSettings => ({
+  heroSlides: (settings.heroSlides ?? []).map((slide) => ({
+    image: mapMedia(slide.image, cmsBaseUrl),
+    label: slide.label,
+    caption: slide.caption || null,
+  })),
   siteName: settings.siteName,
   siteDescription: settings.siteDescription,
   defaultSeo: mapOptionalSeo(settings.defaultSeo, cmsBaseUrl),
