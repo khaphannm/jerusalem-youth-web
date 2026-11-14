@@ -308,6 +308,41 @@ describe("Home", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("leaves out sections switched off in the CMS and their jump links", async () => {
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      homePage: {
+        ...defaultHomePage,
+        visibleSections: {
+          ...defaultHomePage.visibleSections,
+          introduction: false,
+          stories: false,
+          newcomer: false,
+        },
+      },
+    } satisfies HomePageData);
+
+    const { container } = render(await Home());
+
+    expect(container.querySelectorAll("main > section")).toHaveLength(5);
+    expect(
+      screen.queryByRole("heading", { name: "Bắt đầu từ một lời chào." }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Finding a place to belong" }),
+    ).not.toBeInTheDocument();
+    const jump = screen.getByRole("navigation", {
+      name: "Khám phá Jerusalem Youth",
+    });
+    expect(within(jump).getAllByRole("link")).toHaveLength(1);
+    expect(
+      within(jump).getByRole("link", { name: "Buổi gặp gỡ" }),
+    ).toHaveAttribute("href", "#gap-go");
+    expect(
+      screen.queryByRole("link", { name: /Khám phá cộng đồng/ }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders useful empty states when homepage content is unavailable", async () => {
     loadHomePageDataMock.mockResolvedValue({
       aboutPage: null,

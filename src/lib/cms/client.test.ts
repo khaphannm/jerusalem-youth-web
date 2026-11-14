@@ -1023,6 +1023,8 @@ describe("CMS client", () => {
           newcomer: intro("First time?"),
           newcomerSteps: [{ title: "Ask", description: "Send a message." }],
           invitation: intro("Join us"),
+          showStories: false,
+          showTeaching: null,
           publishedAt: "2026-08-21T03:00:00.000Z",
         },
       }),
@@ -1043,6 +1045,15 @@ describe("CMS client", () => {
       community: { eyebrow: null, title: "Community", description: null },
       communityThemes: [{ title: "Worship", description: "We worship." }],
       newcomerSteps: [{ title: "Ask", description: "Send a message." }],
+      visibleSections: {
+        introduction: true,
+        community: true,
+        gathering: true,
+        stories: false,
+        teaching: true,
+        newcomer: true,
+        invitation: true,
+      },
     });
 
     const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));

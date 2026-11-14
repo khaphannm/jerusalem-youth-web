@@ -5,7 +5,7 @@
     "singularName": "home-page",
     "pluralName": "home-pages",
     "displayName": "Home Page",
-    "description": "Landing-page copy. Hero photographs are managed in Site Settings."
+    "description": "Landing-page copy and section visibility. Hero photographs are managed in Site Settings."
   },
   "options": {
     "draftAndPublish": true
@@ -27,11 +27,19 @@
       "required": true,
       "component": "shared.cta"
     },
+    "showIntroduction": {
+      "type": "boolean",
+      "default": true
+    },
     "introduction": {
       "type": "component",
       "repeatable": false,
       "required": true,
       "component": "shared.section-intro"
+    },
+    "showCommunity": {
+      "type": "boolean",
+      "default": true
     },
     "community": {
       "type": "component",
@@ -47,6 +55,10 @@
       "max": 6,
       "component": "shared.ministry-value"
     },
+    "showGathering": {
+      "type": "boolean",
+      "default": true
+    },
     "gathering": {
       "type": "component",
       "repeatable": false,
@@ -58,17 +70,29 @@
       "required": true,
       "maxLength": 400
     },
+    "showStories": {
+      "type": "boolean",
+      "default": true
+    },
     "stories": {
       "type": "component",
       "repeatable": false,
       "required": true,
       "component": "shared.section-intro"
     },
+    "showTeaching": {
+      "type": "boolean",
+      "default": true
+    },
     "teaching": {
       "type": "component",
       "repeatable": false,
       "required": true,
       "component": "shared.section-intro"
+    },
+    "showNewcomer": {
+      "type": "boolean",
+      "default": true
     },
     "newcomer": {
       "type": "component",
@@ -83,6 +107,10 @@
       "min": 1,
       "max": 4,
       "component": "shared.ministry-value"
+    },
+    "showInvitation": {
+      "type": "boolean",
+      "default": true
     },
     "invitation": {
       "type": "component",

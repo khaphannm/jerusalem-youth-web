@@ -124,6 +124,12 @@ export default async function Home() {
     upcomingEvents,
   } = await loadHomePageData();
   const content = homePage ?? defaultHomePage;
+  const show = content.visibleSections;
+  const jumpLinks = [
+    { href: "#gioi-thieu", label: "Về chúng mình", visible: show.introduction },
+    { href: "#gap-go", label: "Buổi gặp gỡ", visible: show.gathering },
+    { href: "#lan-dau", label: "Lần đầu tham gia", visible: show.newcomer },
+  ].filter((link) => link.visible);
   const siteName = siteSettings?.siteName ?? "Jerusalem Youth";
   const fallbackImage =
     featuredEvent?.banner ??
@@ -160,9 +166,11 @@ export default async function Home() {
             </p>
             <div className="motion-enter mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 [--motion-step:3]">
               <Invitation action={content.callToAction} />
-              <a className={textLink} href="#gioi-thieu">
-                Khám phá cộng đồng <Arrow direction="↓" />
-              </a>
+              {show.introduction ? (
+                <a className={textLink} href="#gioi-thieu">
+                  Khám phá cộng đồng <Arrow direction="↓" />
+                </a>
+              ) : null}
             </div>
           </div>
           {heroSlides.length ? (
@@ -170,131 +178,135 @@ export default async function Home() {
               <HeroGallery slides={heroSlides} locale="vi" />
             </div>
           ) : null}
-          <nav
-            aria-label="Khám phá Jerusalem Youth"
-            className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 border-t border-border pt-5"
-          >
-            <a className={textLink} href="#gioi-thieu">
-              Về chúng mình
-            </a>
-            <a className={textLink} href="#gap-go">
-              Buổi gặp gỡ
-            </a>
-            <a className={textLink} href="#lan-dau">
-              Lần đầu tham gia
-            </a>
-          </nav>
-        </Container>
-      </Section>
-
-      <Section
-        aria-labelledby="introduction-title"
-        className="scroll-mt-16"
-        id="gioi-thieu"
-        tone="white"
-      >
-        <Container size="wide">
-          <div className="motion-reveal">
-            <SectionHeading
-              className={centeredHeading}
-              eyebrow={content.introduction.eyebrow}
-              id="introduction-title"
-              title={content.introduction.title}
-              description={content.introduction.description}
-            />
-          </div>
-          {aboutPage ? (
-            <div className="motion-reveal mx-auto mt-12 max-w-content">
-              <div className="rounded-large bg-surface p-8 text-center sm:rounded-xlarge sm:p-14">
-                <p className="font-label text-label font-bold uppercase text-secondary">
-                  Sứ mệnh của chúng mình
-                </p>
-                <p className="mx-auto mt-5 max-w-reading whitespace-pre-line text-pretty font-heading text-heading-3 font-semibold">
-                  {aboutPage.mission}
-                </p>
-              </div>
-            </div>
+          {jumpLinks.length ? (
+            <nav
+              aria-label="Khám phá Jerusalem Youth"
+              className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 border-t border-border pt-5"
+            >
+              {jumpLinks.map((link) => (
+                <a className={textLink} href={link.href} key={link.href}>
+                  {link.label}
+                </a>
+              ))}
+            </nav>
           ) : null}
-          <div className="mt-8 text-center">
-            <Link className={textLink} href="/about">
-              Tìm hiểu về {siteName} <Arrow />
-            </Link>
-          </div>
         </Container>
       </Section>
 
-      <Section aria-labelledby="community-title" tone="surface">
-        <Container size="wide">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            <div className="lg:sticky lg:top-28 lg:self-start">
+      {show.introduction ? (
+        <Section
+          aria-labelledby="introduction-title"
+          className="scroll-mt-16"
+          id="gioi-thieu"
+          tone="white"
+        >
+          <Container size="wide">
+            <div className="motion-reveal">
               <SectionHeading
-                eyebrow={content.community.eyebrow}
-                id="community-title"
-                title={content.community.title}
-                description={content.community.description}
-                tone="surface"
+                className={centeredHeading}
+                eyebrow={content.introduction.eyebrow}
+                id="introduction-title"
+                title={content.introduction.title}
+                description={content.introduction.description}
               />
-              <Link className={`${textLink} mt-6`} href="/events">
-                Xem các buổi gặp gỡ <Arrow />
+            </div>
+            {aboutPage ? (
+              <div className="motion-reveal mx-auto mt-12 max-w-content">
+                <div className="rounded-large bg-surface p-8 text-center sm:rounded-xlarge sm:p-14">
+                  <p className="font-label text-label font-bold uppercase text-secondary">
+                    Sứ mệnh của chúng mình
+                  </p>
+                  <p className="mx-auto mt-5 max-w-reading whitespace-pre-line text-pretty font-heading text-heading-3 font-semibold">
+                    {aboutPage.mission}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+            <div className="mt-8 text-center">
+              <Link className={textLink} href="/about">
+                Tìm hiểu về {siteName} <Arrow />
               </Link>
             </div>
-            <NumberedTiles items={content.communityThemes} tone="white" />
-          </div>
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      ) : null}
 
-      <Section
-        aria-labelledby="gathering-title"
-        className="scroll-mt-16"
-        id="gap-go"
-        tone="secondary"
-      >
-        <Container size="wide">
-          <div className="motion-reveal">
-            <SectionHeading
-              className={centeredHeading}
-              eyebrow={content.gathering.eyebrow}
-              id="gathering-title"
-              title={content.gathering.title}
-              description={content.gathering.description}
-              tone="secondary"
-            />
-          </div>
-          {featuredEvent ? (
-            <div className="motion-reveal mt-12">
-              <EventCard
-                event={featuredEvent}
-                featured
-                status="upcoming"
-                locale="vi"
+      {show.community ? (
+        <Section aria-labelledby="community-title" tone="surface">
+          <Container size="wide">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <SectionHeading
+                  eyebrow={content.community.eyebrow}
+                  id="community-title"
+                  title={content.community.title}
+                  description={content.community.description}
+                  tone="surface"
+                />
+                <Link className={`${textLink} mt-6`} href="/events">
+                  Xem các buổi gặp gỡ <Arrow />
+                </Link>
+              </div>
+              <NumberedTiles items={content.communityThemes} tone="white" />
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {show.gathering ? (
+        <Section
+          aria-labelledby="gathering-title"
+          className="scroll-mt-16"
+          id="gap-go"
+          tone="secondary"
+        >
+          <Container size="wide">
+            <div className="motion-reveal">
+              <SectionHeading
+                className={centeredHeading}
+                eyebrow={content.gathering.eyebrow}
+                id="gathering-title"
+                title={content.gathering.title}
+                description={content.gathering.description}
+                tone="secondary"
               />
             </div>
-          ) : (
-            <div className="mx-auto mt-8 max-w-reading text-center">
-              <p>{content.gatheringEmptyMessage}</p>
-              <div className="mt-6">
-                <Invitation action={content.callToAction} />
+            {featuredEvent ? (
+              <div className="motion-reveal mt-12">
+                <EventCard
+                  event={featuredEvent}
+                  featured
+                  status="upcoming"
+                  locale="vi"
+                />
               </div>
-            </div>
-          )}
-          {upcomingEvents.length ? (
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              {upcomingEvents.map((event) => (
-                <div className="motion-reveal" key={event.id}>
-                  <EventCard event={event} status="upcoming" locale="vi" />
+            ) : (
+              <div className="mx-auto mt-8 max-w-reading text-center">
+                <p>{content.gatheringEmptyMessage}</p>
+                <div className="mt-6">
+                  <Invitation action={content.callToAction} />
                 </div>
-              ))}
+              </div>
+            )}
+            {upcomingEvents.length ? (
+              <div className="mt-6 grid gap-6 md:grid-cols-2">
+                {upcomingEvents.map((event) => (
+                  <div className="motion-reveal" key={event.id}>
+                    <EventCard event={event} status="upcoming" locale="vi" />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <div className="mt-10 text-center">
+              <LinkButton href="/events" variant="secondary">
+                Xem tất cả sự kiện
+              </LinkButton>
             </div>
-          ) : null}
-          <div className="mt-10 text-center">
-            <LinkButton href="/events" variant="secondary">
-              Xem tất cả sự kiện
-            </LinkButton>
-          </div>
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      ) : null}
 
-      {stories.length ? (
+      {show.stories && stories.length ? (
         <Section aria-labelledby="stories-title" tone="white">
           <Container size="wide">
             <div className="motion-reveal">
@@ -327,84 +339,90 @@ export default async function Home() {
         </Section>
       ) : null}
 
-      <Section aria-labelledby="grow-title" tone="calm">
-        <Container size="wide">
-          <div className="motion-reveal">
-            <SectionHeading
-              className={centeredHeading}
-              eyebrow={content.teaching.eyebrow}
-              id="grow-title"
-              title={content.teaching.title}
-              description={content.teaching.description}
-              tone="calm"
-            />
-          </div>
-          {hasTeaching ? (
-            <div className="mt-12 grid items-start gap-6 xl:grid-cols-2">
-              {latestSermon ? (
-                <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
-                  <SermonCard sermon={latestSermon} locale="vi" />
-                </div>
-              ) : null}
-              {latestArticle ? (
-                <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
-                  <ArticleCard article={latestArticle} locale="vi" />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-          <div className="mt-10 text-center">
-            <LinkButton href="/resources" variant="outline">
-              Khám phá tài liệu
-            </LinkButton>
-          </div>
-        </Container>
-      </Section>
-
-      <Section
-        aria-labelledby="visit-title"
-        className="scroll-mt-16"
-        id="lan-dau"
-        tone="white"
-      >
-        <Container size="wide">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            <div className="lg:sticky lg:top-28 lg:self-start">
+      {show.teaching ? (
+        <Section aria-labelledby="grow-title" tone="calm">
+          <Container size="wide">
+            <div className="motion-reveal">
               <SectionHeading
-                eyebrow={content.newcomer.eyebrow}
-                id="visit-title"
-                title={content.newcomer.title}
-                description={content.newcomer.description}
+                className={centeredHeading}
+                eyebrow={content.teaching.eyebrow}
+                id="grow-title"
+                title={content.teaching.title}
+                description={content.teaching.description}
+                tone="calm"
               />
-              <div className="mt-8">
+            </div>
+            {hasTeaching ? (
+              <div className="mt-12 grid items-start gap-6 xl:grid-cols-2">
+                {latestSermon ? (
+                  <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
+                    <SermonCard sermon={latestSermon} locale="vi" />
+                  </div>
+                ) : null}
+                {latestArticle ? (
+                  <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
+                    <ArticleCard article={latestArticle} locale="vi" />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+            <div className="mt-10 text-center">
+              <LinkButton href="/resources" variant="outline">
+                Khám phá tài liệu
+              </LinkButton>
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {show.newcomer ? (
+        <Section
+          aria-labelledby="visit-title"
+          className="scroll-mt-16"
+          id="lan-dau"
+          tone="white"
+        >
+          <Container size="wide">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <SectionHeading
+                  eyebrow={content.newcomer.eyebrow}
+                  id="visit-title"
+                  title={content.newcomer.title}
+                  description={content.newcomer.description}
+                />
+                <div className="mt-8">
+                  <Invitation action={content.callToAction} />
+                </div>
+                <Link className={`${textLink} mt-4`} href="/join">
+                  Tìm hiểu cách tham gia <Arrow />
+                </Link>
+              </div>
+              <NumberedTiles items={content.newcomerSteps} tone="surface" />
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {show.invitation ? (
+        <Section aria-labelledby="invitation-title" tone="secondary">
+          <Container size="content">
+            <div className="motion-reveal text-center">
+              <SectionHeading
+                className={centeredHeading}
+                eyebrow={content.invitation.eyebrow}
+                id="invitation-title"
+                title={content.invitation.title}
+                description={content.invitation.description}
+                tone="secondary"
+              />
+              <div className="mt-10">
                 <Invitation action={content.callToAction} />
               </div>
-              <Link className={`${textLink} mt-4`} href="/join">
-                Tìm hiểu cách tham gia <Arrow />
-              </Link>
             </div>
-            <NumberedTiles items={content.newcomerSteps} tone="surface" />
-          </div>
-        </Container>
-      </Section>
-
-      <Section aria-labelledby="invitation-title" tone="secondary">
-        <Container size="content">
-          <div className="motion-reveal text-center">
-            <SectionHeading
-              className={centeredHeading}
-              eyebrow={content.invitation.eyebrow}
-              id="invitation-title"
-              title={content.invitation.title}
-              description={content.invitation.description}
-              tone="secondary"
-            />
-            <div className="mt-10">
-              <Invitation action={content.callToAction} />
-            </div>
-          </div>
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      ) : null}
     </main>
   );
 }

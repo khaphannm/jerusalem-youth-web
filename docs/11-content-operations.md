@@ -98,7 +98,10 @@ secret rotation, and multi-instance deployment requirements.
    six) and newcomer steps (up to four) can be added, removed and reordered.
 4. The call to action sets the label and link of every invitation button on
    the homepage. Use a site path such as `/join` or a full `https://` address.
-5. Save and publish, then check the homepage on mobile and desktop. Keep
+5. To remove a section from the live homepage, switch off its **show…**
+   toggle; switch it back on to restore it. The wording stays saved either
+   way. The hero cannot be hidden.
+6. Save and publish, then check the homepage on mobile and desktop. Keep
    headings short: they are displayed very large.
 
 New installations get a draft Home Page with the current Vietnamese copy from

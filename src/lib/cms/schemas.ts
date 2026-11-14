@@ -374,6 +374,9 @@ const sectionIntroSchema = z.object({
   description: z.string().trim().max(400).nullable().optional(),
 });
 
+// Entries saved before the toggles existed return null: treat that as shown.
+const sectionToggle = z.boolean().nullable().optional();
+
 export const homePageSchema = publishedDocumentSchema.extend({
   heroHeadline: requiredString.max(80),
   heroDescription: requiredString.max(400),
@@ -388,6 +391,13 @@ export const homePageSchema = publishedDocumentSchema.extend({
   newcomer: sectionIntroSchema,
   newcomerSteps: z.array(ministryValueSchema).min(1).max(4),
   invitation: sectionIntroSchema,
+  showIntroduction: sectionToggle,
+  showCommunity: sectionToggle,
+  showGathering: sectionToggle,
+  showStories: sectionToggle,
+  showTeaching: sectionToggle,
+  showNewcomer: sectionToggle,
+  showInvitation: sectionToggle,
 });
 
 export const heroSlideSchema = z.object({

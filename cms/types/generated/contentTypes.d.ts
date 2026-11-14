@@ -632,7 +632,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
 export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   collectionName: 'home_pages';
   info: {
-    description: 'Landing-page copy. Hero photographs are managed in Site Settings.';
+    description: 'Landing-page copy and section visibility. Hero photographs are managed in Site Settings.';
     displayName: 'Home Page';
     pluralName: 'home-pages';
     singularName: 'home-page';
@@ -696,6 +696,14 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     primaryCta: Schema.Attribute.Component<'shared.cta', false> &
       Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    showCommunity: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showGathering: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showIntroduction: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    showInvitation: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showNewcomer: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showStories: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showTeaching: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     stories: Schema.Attribute.Component<'shared.section-intro', false> &
       Schema.Attribute.Required;
     teaching: Schema.Attribute.Component<'shared.section-intro', false> &

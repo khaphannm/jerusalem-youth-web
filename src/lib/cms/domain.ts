@@ -234,7 +234,17 @@ export type SectionIntro = Readonly<{
   description: string | null;
 }>;
 
+export type HomeSectionKey =
+  | "introduction"
+  | "community"
+  | "gathering"
+  | "stories"
+  | "teaching"
+  | "newcomer"
+  | "invitation";
+
 export type HomePage = Readonly<{
+  visibleSections: Readonly<Record<HomeSectionKey, boolean>>;
   heroHeadline: string;
   heroDescription: string;
   callToAction: CallToAction;

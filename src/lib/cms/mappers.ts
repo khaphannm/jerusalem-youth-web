@@ -64,6 +64,15 @@ const mapSectionIntro = (
 });
 
 export const mapHomePage = (homePage: RawHomePage): HomePage => ({
+  visibleSections: {
+    introduction: homePage.showIntroduction ?? true,
+    community: homePage.showCommunity ?? true,
+    gathering: homePage.showGathering ?? true,
+    stories: homePage.showStories ?? true,
+    teaching: homePage.showTeaching ?? true,
+    newcomer: homePage.showNewcomer ?? true,
+    invitation: homePage.showInvitation ?? true,
+  },
   heroHeadline: homePage.heroHeadline,
   heroDescription: homePage.heroDescription,
   callToAction: {

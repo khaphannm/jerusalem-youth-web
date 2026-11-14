@@ -398,7 +398,8 @@ About-page hero.
 ### Home Page
 
 Single type (`api::home-page.home-page`, draft/publish) holding the landing-page
-copy. Section order and layout are fixed in code; editors change wording only.
+copy. Section order and layout are fixed in code; editors change wording and
+switch sections on or off.
 
 | Field | Type | Rules |
 | --- | --- | --- |
@@ -415,6 +416,12 @@ copy. Section order and layout are fixed in code; editors change wording only.
 | newcomer | `shared.section-intro` | required |
 | newcomerSteps | `shared.ministry-value`, repeatable | 1–4 |
 | invitation | `shared.section-intro` | required |
+
+Each of the seven sections after the hero also has a boolean toggle
+(`showIntroduction`, `showCommunity`, `showGathering`, `showStories`,
+`showTeaching`, `showNewcomer`, `showInvitation`; default on, unset counts as
+on). Switching one off removes that section and any in-page link pointing to
+it; its copy is kept for when it is switched back on. The hero is always shown.
 
 `shared.section-intro`: `eyebrow` (string, optional, max 80), `title` (string,
 required, max 120), `description` (text, optional, max 400).

@@ -3,6 +3,15 @@ import type { HomePage } from "@/lib/cms/domain";
 // Fallback landing-page copy, used until the Home Page entry is published in
 // the CMS or when the CMS cannot be reached. English is a later phase.
 export const defaultHomePage: HomePage = {
+  visibleSections: {
+    introduction: true,
+    community: true,
+    gathering: true,
+    stories: true,
+    teaching: true,
+    newcomer: true,
+    invitation: true,
+  },
   heroHeadline: "Cùng lớn lên trong đức tin.",
   heroDescription:
     "Một nơi để người trẻ kết nối, cùng học Lời Chúa và khích lệ nhau bước đi với Chúa mỗi ngày. Cùng Jerusalem Youth khám phá đời sống đức tin qua những buổi gặp gỡ và những điều giản dị trong cuộc sống.",

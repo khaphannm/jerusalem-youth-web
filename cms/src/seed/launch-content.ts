@@ -180,6 +180,13 @@ export const launchSingles = {
     },
   },
   homePage: {
+    showIntroduction: true,
+    showCommunity: true,
+    showGathering: true,
+    showStories: true,
+    showTeaching: true,
+    showNewcomer: true,
+    showInvitation: true,
     heroHeadline: 'Cùng lớn lên trong đức tin.',
     heroDescription:
       'Một nơi để người trẻ kết nối, cùng học Lời Chúa và khích lệ nhau bước đi với Chúa mỗi ngày. Cùng Jerusalem Youth khám phá đời sống đức tin qua những buổi gặp gỡ và những điều giản dị trong cuộc sống.',
