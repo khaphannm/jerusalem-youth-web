@@ -25,6 +25,7 @@ export const defaultHomePage: HomePage = {
     description:
       "Jerusalem Youth mong muốn trở thành một cộng đồng nơi người trẻ cùng tìm hiểu Lời Chúa, chia sẻ những câu chuyện trong cuộc sống và khích lệ nhau trưởng thành trong đức tin.",
   },
+  introductionHighlight: "sự đồng hành",
   community: {
     eyebrow: "Đời sống cộng đồng",
     title: "Cùng nhau sống đức tin.",
@@ -53,6 +54,7 @@ export const defaultHomePage: HomePage = {
     description:
       "Xem chủ đề, thời gian và địa điểm để chuẩn bị cho buổi gặp gỡ cùng Jerusalem Youth.",
   },
+  weeklySchedule: [],
   gatheringEmptyMessage:
     "Thời gian cho buổi gặp gỡ tiếp theo sẽ được cập nhật tại đây. Bạn có thể nhắn tin qua Facebook để hỏi thêm thông tin.",
   stories: {

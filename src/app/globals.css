@@ -184,6 +184,85 @@ body {
   }
 }
 
+@keyframes statement-word {
+  from {
+    opacity: 0.18;
+  }
+}
+
+@keyframes statement-mark {
+  from {
+    background-size: 0% 34%;
+  }
+}
+
+/*
+ * Vision statement highlighter: a flat accent stroke under the lower third of
+ * the phrase. The gradient has a single colour; it is only the way to size a
+ * background behind wrapped inline text.
+ */
+.statement-mark {
+  --statement-mark-color: color-mix(in srgb, var(--accent) 45%, transparent);
+
+  margin-inline: -0.08em;
+  padding-inline: 0.08em;
+  background-image: linear-gradient(
+    var(--statement-mark-color),
+    var(--statement-mark-color)
+  );
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  background-size: 100% 34%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* On the dark tone a 55% stroke stays coral and keeps white text above 4.5:1. */
+.statement-dark .statement-mark {
+  --statement-mark-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* Words share the block's timeline so they light up in reading order. */
+    .statement {
+      --statement-from: 10%;
+      --statement-step: calc(30% / var(--words, 1));
+      --statement-end: calc(
+        var(--statement-from) + var(--words, 1) * var(--statement-step)
+      );
+
+      view-timeline-name: --statement;
+      view-timeline-axis: block;
+    }
+
+    .statement-word {
+      --statement-start: calc(
+        var(--statement-from) + var(--word, 0) * var(--statement-step)
+      );
+
+      animation: statement-word linear both;
+      animation-timeline: --statement;
+      animation-range: cover var(--statement-start) cover
+        calc(var(--statement-start) + 7%);
+    }
+
+    .statement-mark {
+      animation: statement-mark linear both;
+      animation-timeline: --statement;
+      animation-range: cover var(--statement-end) cover
+        calc(var(--statement-end) + 9%);
+    }
+
+    .statement-after {
+      animation: motion-rise linear both;
+      animation-timeline: --statement;
+      animation-range: cover calc(var(--statement-end) + 4%) cover
+        calc(var(--statement-end) + 14%);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .motion-enter {
     animation: motion-rise var(--motion-slow) var(--motion-ease-emphasized)

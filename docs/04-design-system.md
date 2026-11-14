@@ -203,18 +203,20 @@ New visible colors require an explicit design-system change.
 
 ## Section rhythm
 
-Recommended homepage rhythm:
+The homepage alternates dark and light sections automatically. The hero is
+Warm Ivory; the first section rendered after it is Deep Navy, the next light,
+and so on. The pattern follows the sections that are actually shown, so
+switching a section off in the CMS (or having no stories) never leaves two
+dark or two light sections touching.
 
-1. Hero — Warm Ivory
-2. Upcoming Events — White
-3. Featured / Next Gathering — Deep Navy
-4. Latest Sermon — Soft Sand
-5. Stories — White
-6. Devotional / Quiet content — Soft Sage
-7. Join CTA — Deep Navy
-8. Footer — Midnight
-
-Do not alternate colors mechanically. Use color to reinforce content mood and hierarchy.
+- Dark is always `secondary` (Deep Navy).
+- Light uses the section's own tone: white for the vision, gathering, stories
+  and newcomer sections, Soft Sand for the mission and closing invitation,
+  Soft Sage for teaching.
+- Each section must work in both tones: headings take the section tone, text
+  links are white on navy and blue on light, the highlighter stroke is 55%
+  on navy, and content cards set their own text colour so they never inherit
+  white from a dark section.
 
 ## Accent semantics
 
@@ -344,11 +346,25 @@ approved palette and typeface only.
 Layout:
 - Section headings are centred, except two-column sections, where the heading
   stays left and sticks below the header (`lg:sticky`) while its tiles scroll.
+- A set of short parallel items (the mission) uses a bento grid: one column on
+  mobile, two from `md`, and rows of three from `lg` with a short last row
+  widened to fill it (five items read 3 + 2). Each tile has a small muted
+  counter, a semibold title and small secondary copy.
+- Small `muted` text must sit on white or `background`, not on `surface`,
+  where it falls below AA contrast.
 - Tiles use `surface` on white sections and white on `surface` sections, the
   `large` radius on mobile and `xlarge` (28px) from `sm`, no border and no
-  shadow. `xlarge` is reserved for landing-page tiles and the hero stage.
+  shadow; white tiles may carry a `border/60` hairline. `xlarge` is reserved for landing-page tiles and the hero stage.
 - The site header is sticky and translucent (`background` at 85% with a
   backdrop blur). This is the only approved use of a blurred surface.
+
+Vision statement (`VisionStatement`, homepage introduction): the sentence is
+set at display size, centred, with a pill eyebrow. Words go from 18% opacity
+to full in reading order as the block scrolls towards mid-screen
+(`statement-word`); an optional phrase then gets a flat `accent` stroke at 45%
+under its lower third (`statement-mark`), and the description and link rise in
+last (`statement-after`). Screen readers get one plain sentence. Use it once
+per page, for one sentence.
 
 Motion tokens: `--motion-slow` (700ms) and `--motion-ease-emphasized`, exposed
 as `duration-slow` and `ease-emphasized`. Utilities in `globals.css`:

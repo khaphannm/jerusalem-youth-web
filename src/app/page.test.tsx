@@ -163,7 +163,6 @@ const siteSettings = {
 } satisfies SiteSettings;
 
 const fullPageData = {
-  aboutPage: null,
   homePage: null,
   featuredEvent,
   latestArticle,
@@ -281,6 +280,18 @@ describe("Home", () => {
           description: "Ba điều chúng mình cùng làm mỗi tuần.",
         },
         communityThemes: [{ title: "Phục vụ", description: "Cùng phục vụ." }],
+        weeklySchedule: [
+          {
+            title: "Giờ nhóm chính",
+            schedule: "Chúa Nhật hằng tuần · 14:30 – 16:30",
+            note: null,
+          },
+          {
+            title: "Lem English Speak Club",
+            schedule: "Thứ Ba hằng tuần · 19:00",
+            note: "Khai giảng 3 tháng một lần.",
+          },
+        ],
         gatheringEmptyMessage: "Lịch mới sẽ sớm được cập nhật.",
       },
     } satisfies HomePageData);
@@ -299,6 +310,16 @@ describe("Home", () => {
     expect(within(community).getAllByRole("listitem")).toHaveLength(1);
     expect(
       within(community).getByRole("heading", { level: 3, name: "Phục vụ" }),
+    ).toBeInTheDocument();
+    const schedule = screen.getByRole("list", {
+      name: "Lịch sinh hoạt hằng tuần",
+    });
+    expect(within(schedule).getAllByRole("listitem")).toHaveLength(2);
+    expect(
+      within(schedule).getByText("Chúa Nhật hằng tuần · 14:30 – 16:30"),
+    ).toBeInTheDocument();
+    expect(
+      within(schedule).getByText("Khai giảng 3 tháng một lần."),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Lịch mới sẽ sớm được cập nhật."),
@@ -343,9 +364,53 @@ describe("Home", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("alternates dark and light section backgrounds for whichever sections are shown", async () => {
+    const isDark = (container: HTMLElement) =>
+      [...container.querySelectorAll("main > section")].map((section) =>
+        section.classList.contains("bg-secondary"),
+      );
+
+    loadHomePageDataMock.mockResolvedValue(fullPageData);
+    const all = render(await Home());
+    expect(isDark(all.container)).toEqual([
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+    ]);
+    all.unmount();
+
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      stories: [],
+      homePage: {
+        ...defaultHomePage,
+        visibleSections: {
+          ...defaultHomePage.visibleSections,
+          introduction: false,
+        },
+      },
+    } satisfies HomePageData);
+    const some = render(await Home());
+    expect(isDark(some.container)).toEqual([
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+    ]);
+    expect(
+      screen.queryByRole("link", { name: "Xem tất cả sự kiện" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders useful empty states when homepage content is unavailable", async () => {
     loadHomePageDataMock.mockResolvedValue({
-      aboutPage: null,
       homePage: null,
       featuredEvent: null,
       latestArticle: null,

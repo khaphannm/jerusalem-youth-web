@@ -234,6 +234,12 @@ export type SectionIntro = Readonly<{
   description: string | null;
 }>;
 
+export type ScheduleItem = Readonly<{
+  title: string;
+  schedule: string;
+  note: string | null;
+}>;
+
 export type HomeSectionKey =
   | "introduction"
   | "community"
@@ -249,9 +255,11 @@ export type HomePage = Readonly<{
   heroDescription: string;
   callToAction: CallToAction;
   introduction: SectionIntro;
+  introductionHighlight: string | null;
   community: SectionIntro;
   communityThemes: readonly MinistryValue[];
   gathering: SectionIntro;
+  weeklySchedule: readonly ScheduleItem[];
   gatheringEmptyMessage: string;
   stories: SectionIntro;
   teaching: SectionIntro;

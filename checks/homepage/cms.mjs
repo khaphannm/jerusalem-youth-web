@@ -83,6 +83,7 @@ const singles = {
       "Đức tin được vun đắp trong sự đồng hành.",
       "Một cộng đồng nơi người trẻ cùng tìm hiểu Lời Chúa và khích lệ nhau.",
     ),
+    introductionHighlight: "sự đồng hành",
     community: intro("Đời sống cộng đồng", "Cùng nhau sống đức tin."),
     communityThemes: [
       ["Thờ phượng và cầu nguyện", "Dành thời gian hướng về Chúa."],
@@ -94,6 +95,17 @@ const singles = {
       "Buổi gặp gỡ sắp tới",
       "Xem chủ đề, thời gian và địa điểm của buổi gặp gỡ.",
     ),
+    weeklySchedule: [
+      {
+        title: "Giờ nhóm chính",
+        schedule: "Chúa Nhật hằng tuần · 14:30 – 16:30",
+      },
+      {
+        title: "Lem English Speak Club",
+        schedule: "Thứ Ba hằng tuần · 19:00",
+        note: "Khai giảng 3 tháng một lần.",
+      },
+    ],
     gatheringEmptyMessage: "Thời gian sẽ được cập nhật tại đây.",
     stories: intro(
       "Câu chuyện cộng đồng",

@@ -14,7 +14,6 @@ const {
   sermonsLatestMock,
   siteSettingsMock,
   storiesLatestMock,
-  aboutPageMock,
   homePageMock,
 } = vi.hoisted(() => ({
   articlesLatestMock: vi.fn(),
@@ -22,7 +21,6 @@ const {
   sermonsLatestMock: vi.fn(),
   siteSettingsMock: vi.fn(),
   storiesLatestMock: vi.fn(),
-  aboutPageMock: vi.fn(),
   homePageMock: vi.fn(),
 }));
 
@@ -33,7 +31,6 @@ vi.mock("@/lib/cms", () => ({
     sermons: { latest: sermonsLatestMock },
     siteSettings: siteSettingsMock,
     stories: { latest: storiesLatestMock },
-    aboutPage: aboutPageMock,
     homePage: homePageMock,
   }),
 }));
@@ -109,7 +106,6 @@ const collection = <T>(items: readonly T[]): CollectionResult<T> => ({
 describe("homepage data loading", () => {
   beforeEach(() => {
     articlesLatestMock.mockReset().mockResolvedValue(null);
-    aboutPageMock.mockReset().mockResolvedValue(null);
     homePageMock.mockReset().mockResolvedValue(null);
     eventsUpcomingMock.mockReset();
     sermonsLatestMock.mockReset().mockResolvedValue(null);
@@ -161,16 +157,7 @@ describe("homepage data loading", () => {
     );
   });
 
-  it("loads published ministry purpose and limits supporting events without duplicating the feature", async () => {
-    const about = {
-      id: "about",
-      mission: "Cùng trưởng thành.",
-      vision: "Đồng hành.",
-      values: [],
-      callToAction: { label: "Tham gia", url: "/join" },
-      publishedAt: "2026-08-20T00:00:00.000Z",
-    };
-    aboutPageMock.mockResolvedValue(about);
+  it("falls back when the Home Page is invalid and limits supporting events without duplicating the feature", async () => {
     homePageMock.mockRejectedValue(new Error("Home Page is invalid."));
     eventsUpcomingMock
       .mockResolvedValueOnce(collection([event]))
@@ -181,7 +168,6 @@ describe("homepage data loading", () => {
         ]),
       );
     const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
-    expect(result.aboutPage).toBe(about);
     expect(result.homePage).toBeNull();
     expect(result.upcomingEvents.map((item) => item.id)).toEqual(["2", "3"]);
   });

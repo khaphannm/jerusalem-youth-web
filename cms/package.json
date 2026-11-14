@@ -9,6 +9,7 @@
     "deploy": "strapi deploy",
     "dev": "strapi develop",
     "develop": "strapi develop",
+    "import:content": "node scripts/import-content.mjs",
     "seed:launch": "node scripts/seed-launch.mjs",
     "start": "strapi start",
     "strapi": "strapi",

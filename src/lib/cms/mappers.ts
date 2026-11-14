@@ -80,12 +80,18 @@ export const mapHomePage = (homePage: RawHomePage): HomePage => ({
     url: homePage.primaryCta.url,
   },
   introduction: mapSectionIntro(homePage.introduction),
+  introductionHighlight: homePage.introductionHighlight || null,
   community: mapSectionIntro(homePage.community),
   communityThemes: homePage.communityThemes.map(({ description, title }) => ({
     description,
     title,
   })),
   gathering: mapSectionIntro(homePage.gathering),
+  weeklySchedule: (homePage.weeklySchedule ?? []).map((item) => ({
+    title: item.title,
+    schedule: item.schedule,
+    note: item.note || null,
+  })),
   gatheringEmptyMessage: homePage.gatheringEmptyMessage,
   stories: mapSectionIntro(homePage.stories),
   teaching: mapSectionIntro(homePage.teaching),

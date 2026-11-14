@@ -2,7 +2,6 @@ import "server-only";
 
 import { getCmsClient } from "@/lib/cms";
 import type {
-  AboutPage,
   Article,
   CollectionResult,
   Event,
@@ -13,7 +12,6 @@ import type {
 } from "@/lib/cms/domain";
 
 export type HomePageData = Readonly<{
-  aboutPage: AboutPage | null;
   featuredEvent: Event | null;
   homePage: HomePage | null;
   latestArticle: Article | null;
@@ -29,7 +27,6 @@ const emptyCollection = <T>(): CollectionResult<T> => ({
 });
 
 const emptyHomePageData: HomePageData = {
-  aboutPage: null,
   featuredEvent: null,
   homePage: null,
   latestArticle: null,
@@ -71,7 +68,6 @@ export async function loadHomePageData(
       latestArticleResult,
       latestSermonResult,
       storiesResult,
-      aboutPageResult,
       homePageResult,
     ] = await Promise.allSettled([
       client.siteSettings(),
@@ -80,7 +76,6 @@ export async function loadHomePageData(
       client.articles.latest(),
       client.sermons.latest(),
       client.stories.latest({ pageSize: 3 }),
-      client.aboutPage(),
       client.homePage(),
     ]);
     const featuredEvents = settledValue(
@@ -96,7 +91,6 @@ export async function loadHomePageData(
     const featuredEvent = featuredEvents[0] ?? upcomingEvents[0] ?? null;
 
     return {
-      aboutPage: settledValue("about page", aboutPageResult, null),
       featuredEvent,
       homePage: settledValue("home page", homePageResult, null),
       latestArticle: settledValue("latest article", latestArticleResult, null),

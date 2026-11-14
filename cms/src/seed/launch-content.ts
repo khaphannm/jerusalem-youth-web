@@ -200,6 +200,7 @@ export const launchSingles = {
       description:
         'Jerusalem Youth mong muốn trở thành một cộng đồng nơi người trẻ cùng tìm hiểu Lời Chúa, chia sẻ những câu chuyện trong cuộc sống và khích lệ nhau trưởng thành trong đức tin.',
     },
+    introductionHighlight: 'sự đồng hành',
     community: {
       eyebrow: 'Đời sống cộng đồng',
       title: 'Cùng nhau sống đức tin.',

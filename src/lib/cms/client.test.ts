@@ -1014,9 +1014,13 @@ describe("CMS client", () => {
             title: "Faith together",
             description: "We walk together.",
           },
+          introductionHighlight: "together",
           community: intro("Community"),
           communityThemes: [{ title: "Worship", description: "We worship." }],
           gathering: intro("Next gathering"),
+          weeklySchedule: [
+            { title: "Main gathering", schedule: "Sundays 14:30", note: "" },
+          ],
           gatheringEmptyMessage: "Dates are coming soon.",
           stories: intro("Stories"),
           teaching: intro("Teaching"),
@@ -1042,9 +1046,13 @@ describe("CMS client", () => {
         title: "Faith together",
         description: "We walk together.",
       },
+      introductionHighlight: "together",
       community: { eyebrow: null, title: "Community", description: null },
       communityThemes: [{ title: "Worship", description: "We worship." }],
       newcomerSteps: [{ title: "Ask", description: "Send a message." }],
+      weeklySchedule: [
+        { title: "Main gathering", schedule: "Sundays 14:30", note: null },
+      ],
       visibleSections: {
         introduction: true,
         community: true,

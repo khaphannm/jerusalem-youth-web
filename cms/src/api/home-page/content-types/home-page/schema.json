@@ -37,6 +37,10 @@
       "required": true,
       "component": "shared.section-intro"
     },
+    "introductionHighlight": {
+      "type": "string",
+      "maxLength": 80
+    },
     "showCommunity": {
       "type": "boolean",
       "default": true
@@ -64,6 +68,12 @@
       "repeatable": false,
       "required": true,
       "component": "shared.section-intro"
+    },
+    "weeklySchedule": {
+      "type": "component",
+      "repeatable": true,
+      "max": 6,
+      "component": "shared.schedule-item"
     },
     "gatheringEmptyMessage": {
       "type": "text",

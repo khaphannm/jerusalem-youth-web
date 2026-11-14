@@ -12,10 +12,57 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { defaultHomePage } from "@/features/home/copy";
 import { loadHomePageData, loadHomeSiteSettings } from "@/features/home/data";
 import { HeroGallery } from "@/features/home/hero-gallery";
-import type { CallToAction, MinistryValue } from "@/lib/cms/domain";
+import { VisionStatement } from "@/features/home/vision-statement";
+import type {
+  CallToAction,
+  HomeSectionKey,
+  MinistryValue,
+} from "@/lib/cms/domain";
 
-const textLink =
-  "inline-flex min-h-11 items-center rounded-small py-2 font-label text-label font-bold text-primary underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none";
+const textLinkBase =
+  "inline-flex min-h-11 items-center rounded-small py-2 font-label text-label font-bold underline underline-offset-4 transition-colors duration-fast ease-standard motion-reduce:transition-none";
+const textLink = `${textLinkBase} text-primary hover:text-secondary`;
+const textLinkOnDark = `${textLinkBase} text-primary-foreground hover:text-calm`;
+
+const sectionOrder = [
+  "introduction",
+  "community",
+  "gathering",
+  "stories",
+  "teaching",
+  "newcomer",
+  "invitation",
+] as const satisfies readonly HomeSectionKey[];
+
+// The tone each section takes when its turn is light.
+const lightTones = {
+  introduction: "white",
+  community: "surface",
+  gathering: "white",
+  stories: "white",
+  teaching: "calm",
+  newcomer: "white",
+  invitation: "surface",
+} as const satisfies Record<HomeSectionKey, string>;
+
+type SectionTone = "secondary" | (typeof lightTones)[HomeSectionKey];
+
+// The hero is light, so the first section that is actually rendered is dark
+// and tones alternate from there, whichever sections are switched off.
+function alternateTones(rendered: Readonly<Record<HomeSectionKey, boolean>>) {
+  const tones = {} as Record<HomeSectionKey, SectionTone>;
+  let dark = false;
+
+  for (const key of sectionOrder) {
+    if (rendered[key]) dark = !dark;
+    tones[key] = dark ? "secondary" : lightTones[key];
+  }
+
+  return tones;
+}
+
+const linkOn = (tone: SectionTone) =>
+  tone === "secondary" ? textLinkOnDark : textLink;
 
 const centeredHeading = "mx-auto text-center";
 
@@ -35,6 +82,50 @@ function Arrow({ direction = "→" }: { direction?: "→" | "↓" }) {
     <span aria-hidden="true" className="ml-2">
       {direction}
     </span>
+  );
+}
+
+const bentoSpans = {
+  2: "lg:col-span-2",
+  3: "lg:col-span-3",
+  6: "lg:col-span-6",
+} as const;
+
+// Rows of three on a six-column grid; a short last row is widened to fill it
+// (five items become 3 + 2, four become 2 + 2).
+function bentoSpan(index: number, total: number): keyof typeof bentoSpans {
+  if (total <= 2) return total === 1 ? 6 : 3;
+  if (total === 4) return 3;
+  const remainder = total % 3;
+  if (remainder && index >= total - remainder) return remainder === 2 ? 3 : 6;
+  return 2;
+}
+
+function BentoTiles({ items }: { items: readonly MinistryValue[] }) {
+  return (
+    <ol className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-6">
+      {items.map((item, index) => (
+        <li
+          className={`motion-reveal ${items.length % 2 && index === items.length - 1 ? "md:col-span-2" : ""} ${bentoSpans[bentoSpan(index, items.length)]}`}
+          key={item.title}
+        >
+          <div className="h-full rounded-large border border-border/60 bg-primary-foreground p-8 transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none sm:rounded-xlarge sm:p-10">
+            <span
+              aria-hidden="true"
+              className="font-label text-label font-semibold tracking-widest text-muted"
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 className="mt-6 font-heading text-heading-3 font-semibold text-foreground">
+              {item.title}
+            </h3>
+            <p className="mt-3 text-body-small text-muted">
+              {item.description}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -114,7 +205,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const {
-    aboutPage,
     featuredEvent,
     homePage,
     latestArticle,
@@ -142,6 +232,8 @@ export default async function Home() {
       ? [{ image: fallbackImage, label: siteName, caption: null }]
       : [];
   const hasTeaching = Boolean(latestArticle || latestSermon);
+  const showStories = show.stories && stories.length > 0;
+  const tones = alternateTones({ ...show, stories: showStories });
 
   return (
     <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
@@ -198,56 +290,54 @@ export default async function Home() {
           aria-labelledby="introduction-title"
           className="scroll-mt-16"
           id="gioi-thieu"
-          tone="white"
+          tone={tones.introduction}
         >
           <Container size="wide">
-            <div className="motion-reveal">
-              <SectionHeading
-                className={centeredHeading}
+            <div className="py-section-compact">
+              <VisionStatement
+                dark={tones.introduction === "secondary"}
                 eyebrow={content.introduction.eyebrow}
+                highlight={content.introductionHighlight}
                 id="introduction-title"
                 title={content.introduction.title}
-                description={content.introduction.description}
-              />
-            </div>
-            {aboutPage ? (
-              <div className="motion-reveal mx-auto mt-12 max-w-content">
-                <div className="rounded-large bg-surface p-8 text-center sm:rounded-xlarge sm:p-14">
-                  <p className="font-label text-label font-bold uppercase text-secondary">
-                    Sứ mệnh của chúng mình
+              >
+                {content.introduction.description ? (
+                  <p
+                    className={`mx-auto max-w-reading text-pretty text-body-large ${tones.introduction === "secondary" ? "text-secondary-foreground/80" : "text-muted"}`}
+                  >
+                    {content.introduction.description}
                   </p>
-                  <p className="mx-auto mt-5 max-w-reading whitespace-pre-line text-pretty font-heading text-heading-3 font-semibold">
-                    {aboutPage.mission}
-                  </p>
-                </div>
-              </div>
-            ) : null}
-            <div className="mt-8 text-center">
-              <Link className={textLink} href="/about">
-                Tìm hiểu về {siteName} <Arrow />
-              </Link>
+                ) : null}
+                <Link
+                  className={`${linkOn(tones.introduction)} mt-4`}
+                  href="/about"
+                >
+                  Tìm hiểu về {siteName} <Arrow />
+                </Link>
+              </VisionStatement>
             </div>
           </Container>
         </Section>
       ) : null}
 
       {show.community ? (
-        <Section aria-labelledby="community-title" tone="surface">
+        <Section aria-labelledby="community-title" tone={tones.community}>
           <Container size="wide">
-            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-              <div className="lg:sticky lg:top-28 lg:self-start">
-                <SectionHeading
-                  eyebrow={content.community.eyebrow}
-                  id="community-title"
-                  title={content.community.title}
-                  description={content.community.description}
-                  tone="surface"
-                />
-                <Link className={`${textLink} mt-6`} href="/events">
-                  Xem các buổi gặp gỡ <Arrow />
-                </Link>
-              </div>
-              <NumberedTiles items={content.communityThemes} tone="white" />
+            <div className="motion-reveal">
+              <SectionHeading
+                className={centeredHeading}
+                eyebrow={content.community.eyebrow}
+                id="community-title"
+                title={content.community.title}
+                description={content.community.description}
+                tone={tones.community}
+              />
+            </div>
+            <BentoTiles items={content.communityThemes} />
+            <div className="mt-8 text-center">
+              <Link className={linkOn(tones.community)} href="/events">
+                Xem các buổi gặp gỡ <Arrow />
+              </Link>
             </div>
           </Container>
         </Section>
@@ -258,7 +348,7 @@ export default async function Home() {
           aria-labelledby="gathering-title"
           className="scroll-mt-16"
           id="gap-go"
-          tone="secondary"
+          tone={tones.gathering}
         >
           <Container size="wide">
             <div className="motion-reveal">
@@ -268,9 +358,39 @@ export default async function Home() {
                 id="gathering-title"
                 title={content.gathering.title}
                 description={content.gathering.description}
-                tone="secondary"
+                tone={tones.gathering}
               />
             </div>
+            {content.weeklySchedule.length ? (
+              <ul
+                aria-label="Lịch sinh hoạt hằng tuần"
+                className="mx-auto mt-12 grid max-w-content gap-5 md:grid-cols-2"
+              >
+                {content.weeklySchedule.map((item) => (
+                  <li className="motion-reveal" key={item.title}>
+                    <div
+                      className={`h-full rounded-large p-8 sm:rounded-xlarge sm:p-10 ${tones.gathering === "secondary" ? "border border-primary-foreground/20" : "bg-surface"}`}
+                    >
+                      <h3
+                        className={`font-label text-label font-bold uppercase ${tones.gathering === "secondary" ? "text-calm" : "text-secondary"}`}
+                      >
+                        {item.title}
+                      </h3>
+                      <p className="mt-4 font-heading text-heading-3 font-bold">
+                        {item.schedule}
+                      </p>
+                      {item.note ? (
+                        <p
+                          className={`mt-3 ${tones.gathering === "secondary" ? "text-secondary-foreground/80" : "text-foreground"}`}
+                        >
+                          {item.note}
+                        </p>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {featuredEvent ? (
               <div className="motion-reveal mt-12">
                 <EventCard
@@ -297,17 +417,12 @@ export default async function Home() {
                 ))}
               </div>
             ) : null}
-            <div className="mt-10 text-center">
-              <LinkButton href="/events" variant="secondary">
-                Xem tất cả sự kiện
-              </LinkButton>
-            </div>
           </Container>
         </Section>
       ) : null}
 
-      {show.stories && stories.length ? (
-        <Section aria-labelledby="stories-title" tone="white">
+      {showStories ? (
+        <Section aria-labelledby="stories-title" tone={tones.stories}>
           <Container size="wide">
             <div className="motion-reveal">
               <SectionHeading
@@ -316,22 +431,23 @@ export default async function Home() {
                 id="stories-title"
                 title={content.stories.title}
                 description={content.stories.description}
+                tone={tones.stories}
               />
             </div>
-            <div className="motion-reveal mt-12">
+            <div className="motion-reveal mt-12 text-foreground">
               <StoryCard story={stories[0]} featured locale="vi" />
             </div>
             {stories.length > 1 ? (
               <div className="mt-6 grid gap-6 md:grid-cols-2">
                 {stories.slice(1, 3).map((story) => (
-                  <div className="motion-reveal" key={story.id}>
+                  <div className="motion-reveal text-foreground" key={story.id}>
                     <StoryCard story={story} locale="vi" />
                   </div>
                 ))}
               </div>
             ) : null}
             <div className="mt-8 text-center">
-              <Link className={textLink} href="/stories">
+              <Link className={linkOn(tones.stories)} href="/stories">
                 Xem các câu chuyện <Arrow />
               </Link>
             </div>
@@ -340,7 +456,7 @@ export default async function Home() {
       ) : null}
 
       {show.teaching ? (
-        <Section aria-labelledby="grow-title" tone="calm">
+        <Section aria-labelledby="grow-title" tone={tones.teaching}>
           <Container size="wide">
             <div className="motion-reveal">
               <SectionHeading
@@ -349,25 +465,28 @@ export default async function Home() {
                 id="grow-title"
                 title={content.teaching.title}
                 description={content.teaching.description}
-                tone="calm"
+                tone={tones.teaching}
               />
             </div>
             {hasTeaching ? (
               <div className="mt-12 grid items-start gap-6 xl:grid-cols-2">
                 {latestSermon ? (
-                  <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
+                  <div className="motion-reveal min-w-0 text-foreground [&>article]:md:grid-cols-1">
                     <SermonCard sermon={latestSermon} locale="vi" />
                   </div>
                 ) : null}
                 {latestArticle ? (
-                  <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
+                  <div className="motion-reveal min-w-0 text-foreground [&>article]:md:grid-cols-1">
                     <ArticleCard article={latestArticle} locale="vi" />
                   </div>
                 ) : null}
               </div>
             ) : null}
             <div className="mt-10 text-center">
-              <LinkButton href="/resources" variant="outline">
+              <LinkButton
+                href="/resources"
+                variant={tones.teaching === "secondary" ? "secondary" : "outline"}
+              >
                 Khám phá tài liệu
               </LinkButton>
             </div>
@@ -380,7 +499,7 @@ export default async function Home() {
           aria-labelledby="visit-title"
           className="scroll-mt-16"
           id="lan-dau"
-          tone="white"
+          tone={tones.newcomer}
         >
           <Container size="wide">
             <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -390,11 +509,12 @@ export default async function Home() {
                   id="visit-title"
                   title={content.newcomer.title}
                   description={content.newcomer.description}
+                  tone={tones.newcomer}
                 />
                 <div className="mt-8">
                   <Invitation action={content.callToAction} />
                 </div>
-                <Link className={`${textLink} mt-4`} href="/join">
+                <Link className={`${linkOn(tones.newcomer)} mt-4`} href="/join">
                   Tìm hiểu cách tham gia <Arrow />
                 </Link>
               </div>
@@ -405,7 +525,7 @@ export default async function Home() {
       ) : null}
 
       {show.invitation ? (
-        <Section aria-labelledby="invitation-title" tone="secondary">
+        <Section aria-labelledby="invitation-title" tone={tones.invitation}>
           <Container size="content">
             <div className="motion-reveal text-center">
               <SectionHeading
@@ -414,7 +534,7 @@ export default async function Home() {
                 id="invitation-title"
                 title={content.invitation.title}
                 description={content.invitation.description}
-                tone="secondary"
+                tone={tones.invitation}
               />
               <div className="mt-10">
                 <Invitation action={content.callToAction} />

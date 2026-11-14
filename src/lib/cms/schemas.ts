@@ -382,9 +382,21 @@ export const homePageSchema = publishedDocumentSchema.extend({
   heroDescription: requiredString.max(400),
   primaryCta: callToActionSchema,
   introduction: sectionIntroSchema,
+  introductionHighlight: z.string().trim().max(80).nullable().optional(),
   community: sectionIntroSchema,
   communityThemes: z.array(ministryValueSchema).min(1).max(6),
   gathering: sectionIntroSchema,
+  weeklySchedule: z
+    .array(
+      z.object({
+        title: requiredString.max(80),
+        schedule: requiredString.max(80),
+        note: z.string().trim().max(160).nullable().optional(),
+      }),
+    )
+    .max(6)
+    .nullable()
+    .optional(),
   gatheringEmptyMessage: requiredString.max(400),
   stories: sectionIntroSchema,
   teaching: sectionIntroSchema,

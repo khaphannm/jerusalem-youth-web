@@ -674,6 +674,10 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
       }>;
     introduction: Schema.Attribute.Component<'shared.section-intro', false> &
       Schema.Attribute.Required;
+    introductionHighlight: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
     invitation: Schema.Attribute.Component<'shared.section-intro', false> &
       Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -711,6 +715,13 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    weeklySchedule: Schema.Attribute.Component<'shared.schedule-item', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+        },
+        number
+      >;
   };
 }
 

@@ -129,6 +129,7 @@ const populate = {
     "community",
     "communityThemes",
     "gathering",
+    "weeklySchedule",
     "stories",
     "teaching",
     "newcomer",

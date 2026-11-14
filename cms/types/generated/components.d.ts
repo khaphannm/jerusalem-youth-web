@@ -77,6 +77,30 @@ export interface SharedNavigationItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedScheduleItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_schedule_items';
+  info: {
+    description: 'A recurring weekly activity: its name, when it meets and an optional note.';
+    displayName: 'Schedule Item';
+  };
+  attributes: {
+    note: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    schedule: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+  };
+}
+
 export interface SharedSectionIntro extends Struct.ComponentSchema {
   collectionName: 'components_shared_section_intros';
   info: {
@@ -148,6 +172,7 @@ declare module '@strapi/strapi' {
       'shared.hero-slide': SharedHeroSlide;
       'shared.ministry-value': SharedMinistryValue;
       'shared.navigation-item': SharedNavigationItem;
+      'shared.schedule-item': SharedScheduleItem;
       'shared.section-intro': SharedSectionIntro;
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;

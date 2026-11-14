@@ -98,11 +98,31 @@ secret rotation, and multi-instance deployment requirements.
    six) and newcomer steps (up to four) can be added, removed and reordered.
 4. The call to action sets the label and link of every invitation button on
    the homepage. Use a site path such as `/join` or a full `https://` address.
+   The introduction heading is shown as the large vision statement. To mark
+   a phrase in it, copy that phrase exactly into **introductionHighlight**;
+   separate several phrases with `|` (for example `Vô số bạn trẻ|bạn thân`);
+   leave it empty for no highlight. Keep the statement under about 90
+   characters.
+   **Weekly schedule** lists recurring activities (for example the main
+   Sunday gathering): a name, when it meets, and an optional note. It appears
+   in the gathering section above the next event; leave it empty to hide it.
 5. To remove a section from the live homepage, switch off its **show…**
    toggle; switch it back on to restore it. The wording stays saved either
    way. The hero cannot be hidden.
 6. Save and publish, then check the homepage on mobile and desktop. Keep
    headings short: they are displayed very large.
+
+To load approved wording for the Home Page and About Page in one step, edit a
+file in `cms/content/` and run, with the CMS stopped:
+
+```bash
+cd cms
+npm run import:content -- content/jerusalem-youth-2026.json --confirm-overwrite
+```
+
+This overwrites both drafts; review them in the Content Manager and publish.
+Add `--publish` to publish immediately. Fields that are not in the file are
+left as they are.
 
 New installations get a draft Home Page with the current Vietnamese copy from
 `npm run seed:launch`; rerunning the seed never overwrites an existing entry.

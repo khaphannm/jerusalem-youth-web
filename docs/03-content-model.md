@@ -407,9 +407,11 @@ switch sections on or off.
 | heroDescription | text | required, max 400 |
 | primaryCta | `shared.cta` | required; site path or HTTP(S) URL. Used for every invitation button on the page |
 | introduction | `shared.section-intro` | required |
+| introductionHighlight | string | optional, max 80; one phrase, or several separated by `\|`, copied exactly from the introduction title, that get the highlighter stroke. A phrase that does not occur in the title, or overlaps an earlier match, is ignored |
 | community | `shared.section-intro` | required |
 | communityThemes | `shared.ministry-value`, repeatable | 1–6 |
 | gathering | `shared.section-intro` | required |
+| weeklySchedule | `shared.schedule-item`, repeatable | optional, max 6; recurring weekly activities shown as tiles in the gathering section: `title` (max 80), `schedule` (max 80), optional `note` (max 160) |
 | gatheringEmptyMessage | text | required, max 400; shown when no upcoming event is published |
 | stories | `shared.section-intro` | required |
 | teaching | `shared.section-intro` | required |
@@ -431,9 +433,10 @@ Web behavior:
   validated by `homePageSchema`; the UI consumes the `HomePage` domain type.
 - When the entry is unpublished, invalid, or the CMS is unreachable, the page
   renders the checked-in fallback in `src/features/home/copy.ts`.
-- The mission tile still comes from the About Page; events, stories, sermon
+- The mission grid is `communityThemes`; the homepage no longer reads the
+  About Page. Events, stories, sermon
   and article cards still come from their collections; navigation link labels
-  inside the page ("Xem tất cả sự kiện" and similar) stay in code.
+  inside the page ("Xem các câu chuyện" and similar) stay in code.
 - SEO title and description remain in Site Settings `defaultSeo`.
 
 ### Site Settings

@@ -1,0 +1,126 @@
+{
+  "source": "Jerusalem Youth board system 2026 (vision, mission, core values). Suggested public wording: review before publishing.",
+  "entries": {
+    "api::home-page.home-page": {
+      "heroHeadline": "Để Chúa Giê-xu là người bạn thân nhất.",
+      "heroDescription": "Jerusalem Youth là nơi người trẻ cùng học Lời Chúa, thờ phượng, nâng đỡ nhau và phục vụ — để ngày càng nhiều bạn trẻ gọi Chúa Giê-xu là người bạn thân nhất của cuộc đời mình.",
+      "primaryCta": {
+        "label": "Nhắn tin qua Facebook",
+        "url": "https://www.facebook.com/jerusalemyouth20"
+      },
+      "showIntroduction": true,
+      "introduction": {
+        "eyebrow": "Tầm nhìn",
+        "title": "Vô số bạn trẻ gọi Chúa Giê-xu là người bạn thân nhất của cuộc đời mình.",
+        "description": "Đó là điều chúng mình mong ước và cầu nguyện: không chỉ một vài người, mà là vô số bạn trẻ được biết Chúa cách gần gũi và cá nhân."
+      },
+      "introductionHighlight": "người bạn thân nhất",
+      "showCommunity": true,
+      "community": {
+        "eyebrow": "Sứ mệnh",
+        "title": "Năm việc chúng mình cùng làm.",
+        "description": "Mỗi buổi gặp gỡ, mỗi nhóm nhỏ và mỗi cơ hội phục vụ đều hướng về năm mục đích này."
+      },
+      "communityThemes": [
+        {
+          "title": "Trang bị",
+          "description": "Trang bị Lời Kinh Thánh cho mỗi bạn trẻ."
+        },
+        {
+          "title": "Tôn cao",
+          "description": "Tôn cao Danh Chúa qua sự thờ phượng."
+        },
+        {
+          "title": "San sẻ",
+          "description": "San sẻ gánh nặng của nhau."
+        },
+        {
+          "title": "Rèn tập",
+          "description": "Rèn tập tài năng qua sự phục vụ."
+        },
+        {
+          "title": "Công bố",
+          "description": "Công bố lẽ thật và tình yêu."
+        }
+      ],
+      "showGathering": true,
+      "gathering": {
+        "eyebrow": "Hẹn gặp bạn",
+        "title": "Buổi gặp gỡ sắp tới",
+        "description": "Xem chủ đề, thời gian và địa điểm để chuẩn bị cho buổi gặp gỡ cùng Jerusalem Youth."
+      },
+      "weeklySchedule": [
+        {
+          "title": "Giờ nhóm chính",
+          "schedule": "Chúa Nhật hằng tuần · 14:30 – 16:30"
+        },
+        {
+          "title": "Lem English Speak Club",
+          "schedule": "Thứ Ba hằng tuần · 19:00",
+          "note": "Câu lạc bộ Tiếng Anh · Khai giảng 3 tháng một lần."
+        }
+      ],
+      "gatheringEmptyMessage": "Thời gian cho buổi gặp gỡ tiếp theo sẽ được cập nhật tại đây. Bạn có thể nhắn tin qua Facebook để hỏi thêm thông tin.",
+      "showStories": true,
+      "stories": {
+        "eyebrow": "Câu chuyện cộng đồng",
+        "title": "Mỗi hành trình đều có một câu chuyện.",
+        "description": "Lắng nghe các bạn trong Jerusalem Youth chia sẻ về hành trình làm bạn với Chúa Giê-xu."
+      },
+      "showTeaching": true,
+      "teaching": {
+        "eyebrow": "Trang bị mỗi ngày",
+        "title": "Lớn lên trong Lời Chúa sau mỗi buổi gặp gỡ.",
+        "description": "Dành một khoảng lặng để suy ngẫm, lắng nghe và học thêm qua những bài chia sẻ và tài liệu được giới thiệu tại đây."
+      },
+      "showNewcomer": true,
+      "newcomer": {
+        "eyebrow": "Lần đầu tìm hiểu Jerusalem Youth?",
+        "title": "Bắt đầu từ một lời chào.",
+        "description": "Nếu bạn đang tìm hiểu về Jerusalem Youth, hãy nhắn tin cho chúng mình. Bạn có thể hỏi về buổi gặp gỡ sắp tới, địa điểm hoặc cách kết nối với cộng đồng."
+      },
+      "newcomerSteps": [
+        {
+          "title": "Xem thông tin buổi gặp gỡ",
+          "description": "Kiểm tra thời gian, địa điểm và những lưu ý được ghi trong trang sự kiện."
+        },
+        {
+          "title": "Hỏi điều bạn muốn biết",
+          "description": "Nhắn tin qua trang Facebook chính thức khi bạn cần thêm thông tin trước khi tham gia."
+        }
+      ],
+      "showInvitation": true,
+      "invitation": {
+        "eyebrow": "Một lời mời dành cho bạn",
+        "title": "Cùng làm bạn với Chúa Giê-xu.",
+        "description": "Bạn muốn tìm hiểu thêm hoặc kết nối với chúng mình? Hãy gửi một lời chào qua trang Facebook chính thức của Jerusalem Youth."
+      }
+    },
+    "api::about-page.about-page": {
+      "vision": "Vô số bạn trẻ gọi Chúa Giê-xu là người bạn thân nhất của cuộc đời mình.",
+      "mission": "Trang bị Lời Kinh Thánh cho mỗi bạn trẻ; tôn cao Danh Chúa qua thờ phượng; san sẻ gánh nặng của nhau; rèn tập tài năng qua phục vụ; công bố lẽ thật và tình yêu.",
+      "values": [
+        {
+          "title": "Biết Chúa",
+          "description": "Đời sống với Chúa đặt trước mọi kỹ năng."
+        },
+        {
+          "title": "Cam kết",
+          "description": "Trung tín bền bỉ với điều mình nhận."
+        },
+        {
+          "title": "Cho đi",
+          "description": "Rộng lượng với thời gian, tài năng và tiền bạc."
+        },
+        {
+          "title": "Xuất sắc",
+          "description": "Luôn cải tiến cách mình phục vụ."
+        }
+      ],
+      "primaryCta": {
+        "label": "Tìm hiểu cách tham gia",
+        "url": "/join"
+      }
+    }
+  }
+}
