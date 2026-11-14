@@ -66,14 +66,14 @@ describe("AboutPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "About Jerusalem Youth",
+        name: "Giới thiệu Jerusalem Youth",
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(aboutPage.vision)).toBeInTheDocument();
     expect(screen.getByText(aboutPage.mission)).toBeInTheDocument();
 
     const valuesSection = screen.getByRole("region", {
-      name: "What shapes our community",
+      name: "Điều định hình cộng đồng chúng mình",
     });
     expect(
       within(valuesSection).getByRole("heading", {
@@ -101,9 +101,9 @@ describe("AboutPage", () => {
     render(await AboutPage());
 
     expect(
-      screen.getByText("Our purpose will be shared here"),
+      screen.getByText("Mục đích của chúng mình sẽ được chia sẻ tại đây"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Our values are coming")).toBeInTheDocument();
+    expect(screen.getByText("Giá trị của chúng mình sắp được cập nhật")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Connect" })).toHaveAttribute(
       "href",
       "/contact",
@@ -115,16 +115,16 @@ describe("AboutPage", () => {
 
     await expect(generateMetadata()).resolves.toMatchObject({
       description:
-        "Learn about Jerusalem Youth, our vision, mission, and values. A community growing in faith and serving together.",
+        "Tìm hiểu tầm nhìn, sứ mệnh và giá trị của Jerusalem Youth. A community growing in faith and serving together.",
       openGraph: {
         siteName: "Jerusalem Youth",
-        title: "About Jerusalem Youth",
+        title: "Giới thiệu Jerusalem Youth",
         type: "website",
       },
-      title: "About",
+      title: "Giới thiệu",
       twitter: {
         card: "summary",
-        title: "About Jerusalem Youth",
+        title: "Giới thiệu Jerusalem Youth",
       },
     });
   });

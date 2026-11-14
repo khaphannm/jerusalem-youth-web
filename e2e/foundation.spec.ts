@@ -81,15 +81,18 @@ test("the About page presents ministry identity and a clear next step", async ({
   await page.goto("/about");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: /^About / }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { level: 2, name: "Why we gather" }),
+    page.getByRole("heading", { level: 1, name: /^Giới thiệu / }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 2,
-      name: "What shapes our community",
+      name: "Vì sao chúng mình gặp gỡ",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Điều định hình cộng đồng chúng mình",
     }),
   ).toBeVisible();
 
