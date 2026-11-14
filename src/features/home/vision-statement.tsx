@@ -2,12 +2,18 @@ import type { CSSProperties, ReactNode } from "react";
 
 type VisionStatementProps = Readonly<{
   children?: ReactNode;
-  dark?: boolean;
+  tone?: "calm" | "dark" | "light";
   eyebrow: string | null;
   highlight: string | null;
   id: string;
   title: string;
 }>;
+
+const pillClasses = {
+  calm: "bg-secondary/10 text-secondary",
+  dark: "bg-primary-foreground/10 text-calm",
+  light: "bg-primary/10 text-primary",
+} as const;
 
 type Word = Readonly<{ index: number; text: string }>;
 
@@ -86,28 +92,28 @@ function Words({ words }: { words: readonly Word[] }) {
  */
 export function VisionStatement({
   children,
-  dark = false,
   eyebrow,
   highlight,
   id,
   title,
+  tone = "light",
 }: VisionStatementProps) {
   const { parts, wordCount } = splitStatement(title, highlight);
 
   return (
     <div
-      className={`statement mx-auto max-w-content text-center ${dark ? "statement-dark" : ""}`}
+      className={`statement mx-auto max-w-content text-center ${tone === "dark" ? "statement-dark" : ""}`}
       style={cssVariables({ "--words": Math.max(wordCount, 1) })}
     >
       {eyebrow ? (
         <p
-          className={`inline-block rounded-full px-4 py-1.5 font-label text-label font-bold uppercase ${dark ? "bg-primary-foreground/10 text-calm" : "bg-primary/10 text-primary"}`}
+          className={`inline-block rounded-full px-4 py-1.5 font-label text-label font-bold uppercase ${pillClasses[tone]}`}
         >
           {eyebrow}
         </p>
       ) : null}
       <h2
-        className={`mt-8 text-balance font-display text-heading-1 font-extrabold lg:text-display ${dark ? "text-secondary-foreground" : "text-foreground"}`}
+        className={`mt-8 text-balance font-display text-heading-1 font-extrabold lg:text-display ${tone === "dark" ? "text-secondary-foreground" : "text-foreground"}`}
         id={id}
       >
         <span className="sr-only">{title}</span>

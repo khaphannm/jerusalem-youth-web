@@ -23,6 +23,7 @@ const textLinkBase =
   "inline-flex min-h-11 items-center rounded-small py-2 font-label text-label font-bold underline underline-offset-4 transition-colors duration-fast ease-standard motion-reduce:transition-none";
 const textLink = `${textLinkBase} text-primary hover:text-secondary`;
 const textLinkOnDark = `${textLinkBase} text-primary-foreground hover:text-calm`;
+const textLinkOnCalm = `${textLinkBase} text-secondary hover:text-foreground`;
 
 const sectionOrder = [
   "introduction",
@@ -34,35 +35,52 @@ const sectionOrder = [
   "invitation",
 ] as const satisfies readonly HomeSectionKey[];
 
-// The tone each section takes when its turn is light.
-const lightTones = {
-  introduction: "white",
-  community: "surface",
-  gathering: "white",
-  stories: "white",
-  teaching: "calm",
-  newcomer: "white",
-  invitation: "surface",
-} as const satisfies Record<HomeSectionKey, string>;
+// Backgrounds rotate dark, light, sage, light. The light turns cycle through
+// the pale tints and sand so neighbouring sections never share a tone.
+const toneRotation = ["secondary", "light", "calm", "light"] as const;
+const lightTones = ["primarySoft", "accentSoft", "surface"] as const;
 
-type SectionTone = "secondary" | (typeof lightTones)[HomeSectionKey];
+type SectionTone = "secondary" | "calm" | (typeof lightTones)[number];
 
 // The hero is light, so the first section that is actually rendered is dark
-// and tones alternate from there, whichever sections are switched off.
-function alternateTones(rendered: Readonly<Record<HomeSectionKey, boolean>>) {
+// and the rotation continues from there, whichever sections are switched off.
+function rotateTones(rendered: Readonly<Record<HomeSectionKey, boolean>>) {
   const tones = {} as Record<HomeSectionKey, SectionTone>;
-  let dark = false;
+  let position = 0;
+  let lightTurns = 0;
 
   for (const key of sectionOrder) {
-    if (rendered[key]) dark = !dark;
-    tones[key] = dark ? "secondary" : lightTones[key];
+    const turn = toneRotation[position % toneRotation.length];
+
+    tones[key] =
+      turn === "light" ? lightTones[lightTurns % lightTones.length] : turn;
+
+    if (rendered[key]) {
+      position += 1;
+      if (turn === "light") lightTurns += 1;
+    }
   }
 
   return tones;
 }
 
+// Blue text fails contrast on sage, so sage sections use navy for accents.
 const linkOn = (tone: SectionTone) =>
-  tone === "secondary" ? textLinkOnDark : textLink;
+  tone === "secondary"
+    ? textLinkOnDark
+    : tone === "calm"
+      ? textLinkOnCalm
+      : textLink;
+
+const softTextOn = (tone: SectionTone) =>
+  tone === "secondary"
+    ? "text-secondary-foreground/80"
+    : tone === "calm"
+      ? "text-calm-foreground"
+      : "text-foreground";
+
+const statementTone = (tone: SectionTone) =>
+  tone === "secondary" ? "dark" : tone === "calm" ? "calm" : "light";
 
 const centeredHeading = "mx-auto text-center";
 
@@ -129,20 +147,12 @@ function BentoTiles({ items }: { items: readonly MinistryValue[] }) {
   );
 }
 
-function NumberedTiles({
-  items,
-  tone,
-}: {
-  items: readonly MinistryValue[];
-  tone: "surface" | "white";
-}) {
+function NumberedTiles({ items }: { items: readonly MinistryValue[] }) {
   return (
     <ol className="grid gap-5">
       {items.map((item, index) => (
         <li className="motion-reveal" key={item.title}>
-          <div
-            className={`${tile} ${tone === "white" ? "bg-primary-foreground" : "bg-surface"}`}
-          >
+          <div className={`${tile} bg-primary-foreground text-foreground`}>
             <span
               aria-hidden="true"
               className="font-display text-heading-3 font-bold text-primary"
@@ -233,7 +243,7 @@ export default async function Home() {
       : [];
   const hasTeaching = Boolean(latestArticle || latestSermon);
   const showStories = show.stories && stories.length > 0;
-  const tones = alternateTones({ ...show, stories: showStories });
+  const tones = rotateTones({ ...show, stories: showStories });
 
   return (
     <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
@@ -295,7 +305,7 @@ export default async function Home() {
           <Container size="wide">
             <div className="py-section-compact">
               <VisionStatement
-                dark={tones.introduction === "secondary"}
+                tone={statementTone(tones.introduction)}
                 eyebrow={content.introduction.eyebrow}
                 highlight={content.introductionHighlight}
                 id="introduction-title"
@@ -303,7 +313,7 @@ export default async function Home() {
               >
                 {content.introduction.description ? (
                   <p
-                    className={`mx-auto max-w-reading text-pretty text-body-large ${tones.introduction === "secondary" ? "text-secondary-foreground/80" : "text-muted"}`}
+                    className={`mx-auto max-w-reading text-pretty text-body-large ${softTextOn(tones.introduction)}`}
                   >
                     {content.introduction.description}
                   </p>
@@ -369,7 +379,7 @@ export default async function Home() {
                 {content.weeklySchedule.map((item) => (
                   <li className="motion-reveal" key={item.title}>
                     <div
-                      className={`h-full rounded-large p-8 sm:rounded-xlarge sm:p-10 ${tones.gathering === "secondary" ? "border border-primary-foreground/20" : "bg-surface"}`}
+                      className={`h-full rounded-large p-8 sm:rounded-xlarge sm:p-10 ${tones.gathering === "secondary" ? "border border-primary-foreground/20" : "bg-primary-foreground text-foreground"}`}
                     >
                       <h3
                         className={`font-label text-label font-bold uppercase ${tones.gathering === "secondary" ? "text-calm" : "text-secondary"}`}
@@ -518,7 +528,7 @@ export default async function Home() {
                   Tìm hiểu cách tham gia <Arrow />
                 </Link>
               </div>
-              <NumberedTiles items={content.newcomerSteps} tone="surface" />
+              <NumberedTiles items={content.newcomerSteps} />
             </div>
           </Container>
         </Section>

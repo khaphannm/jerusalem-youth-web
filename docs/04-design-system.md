@@ -203,20 +203,25 @@ New visible colors require an explicit design-system change.
 
 ## Section rhythm
 
-The homepage alternates dark and light sections automatically. The hero is
-Warm Ivory; the first section rendered after it is Deep Navy, the next light,
-and so on. The pattern follows the sections that are actually shown, so
-switching a section off in the CMS (or having no stories) never leaves two
-dark or two light sections touching.
+The homepage rotates section backgrounds automatically: Deep Navy, a light
+tone, Soft Sage, a light tone, then navy again. The hero is Warm Ivory and the
+first section rendered after it is navy. The rotation follows the sections
+that are actually shown, so switching a section off in the CMS (or having no
+stories) never leaves two sections of the same tone touching.
 
-- Dark is always `secondary` (Deep Navy).
-- Light uses the section's own tone: white for the vision, gathering, stories
-  and newcomer sections, Soft Sand for the mission and closing invitation,
-  Soft Sage for teaching.
-- Each section must work in both tones: headings take the section tone, text
-  links are white on navy and blue on light, the highlighter stroke is 55%
-  on navy, and content cards set their own text colour so they never inherit
-  white from a dark section.
+- Light turns cycle through `primary-soft` (Electric Blue at 8% on white),
+  `accent-soft` (Warm Coral at 12% on white) and Soft Sand. The two tints are
+  section backgrounds only; do not use them for text, buttons or cards.
+- With every section on: vision navy, mission blue tint, gathering sage,
+  stories coral tint, teaching navy, newcomer sand, invitation sage.
+- Each section must work in every tone. Headings take the section tone. Text
+  links are white on navy, navy on sage (blue fails contrast there) and blue
+  on light tones. Secondary copy uses `foreground` on tints, sand and sage,
+  not `muted`. Tiles and content cards are white with their own text colour.
+  The highlighter stroke is 55% on navy and 45% elsewhere.
+
+This deliberately uses more sage and tint than the colour-ratio guideline
+above; that guideline still applies to every other page.
 
 ## Accent semantics
 

@@ -13,6 +13,9 @@
   --accent-foreground: #111827;
   --calm: #a8c7a1;
   --calm-foreground: #111827;
+  /* Pale tints of approved colours for light landing-page sections. */
+  --primary-soft: color-mix(in srgb, var(--primary) 8%, var(--primary-foreground));
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--primary-foreground));
   --border: #dedad3;
   --muted: #667085;
 
@@ -58,6 +61,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-calm: var(--calm);
   --color-calm-foreground: var(--calm-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent-soft: var(--accent-soft);
   --color-border: var(--border);
   --color-muted: var(--muted);
 

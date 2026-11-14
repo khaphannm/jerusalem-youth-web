@@ -7,6 +7,11 @@ const levelClasses = {
 } as const;
 
 const toneClasses = {
+  accentSoft: {
+    description: "text-foreground",
+    eyebrow: "text-primary",
+    title: "text-foreground",
+  },
   background: {
     description: "text-muted",
     eyebrow: "text-primary",
@@ -16,6 +21,11 @@ const toneClasses = {
     description: "text-calm-foreground",
     eyebrow: "text-secondary",
     title: "text-calm-foreground",
+  },
+  primarySoft: {
+    description: "text-foreground",
+    eyebrow: "text-primary",
+    title: "text-foreground",
   },
   secondary: {
     description: "text-secondary-foreground",

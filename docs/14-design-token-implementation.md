@@ -40,6 +40,16 @@ border                  #DEDAD3
 muted                   #667085
 ```
 
+## Derived section tints
+
+```text
+primary-soft   color-mix(primary 8%, white)   light landing-page sections
+accent-soft    color-mix(accent 12%, white)   light landing-page sections
+```
+
+Backgrounds only. They are derived from approved colours, so they follow any
+future palette change.
+
 ## Shape and motion tokens
 
 ```text

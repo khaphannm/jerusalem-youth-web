@@ -364,23 +364,23 @@ describe("Home", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("alternates dark and light section backgrounds for whichever sections are shown", async () => {
-    const isDark = (container: HTMLElement) =>
+  it("rotates navy, light and sage backgrounds across whichever sections are shown", async () => {
+    const backgrounds = (container: HTMLElement) =>
       [...container.querySelectorAll("main > section")].map((section) =>
-        section.classList.contains("bg-secondary"),
+        [...section.classList].find((name) => name.startsWith("bg-")),
       );
 
     loadHomePageDataMock.mockResolvedValue(fullPageData);
     const all = render(await Home());
-    expect(isDark(all.container)).toEqual([
-      false,
-      true,
-      false,
-      true,
-      false,
-      true,
-      false,
-      true,
+    expect(backgrounds(all.container)).toEqual([
+      "bg-background",
+      "bg-secondary",
+      "bg-primary-soft",
+      "bg-calm",
+      "bg-accent-soft",
+      "bg-secondary",
+      "bg-surface",
+      "bg-calm",
     ]);
     all.unmount();
 
@@ -396,13 +396,13 @@ describe("Home", () => {
       },
     } satisfies HomePageData);
     const some = render(await Home());
-    expect(isDark(some.container)).toEqual([
-      false,
-      true,
-      false,
-      true,
-      false,
-      true,
+    expect(backgrounds(some.container)).toEqual([
+      "bg-background",
+      "bg-secondary",
+      "bg-primary-soft",
+      "bg-calm",
+      "bg-accent-soft",
+      "bg-secondary",
     ]);
     expect(
       screen.queryByRole("link", { name: "Xem tất cả sự kiện" }),
