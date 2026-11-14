@@ -24,7 +24,10 @@ Optional provider settings:
 Use a dedicated identity with access limited to the configured bucket and prefix. It needs only the equivalent list, read, create, replace, and delete object operations required by the Media Library. CDN visitors receive read-only asset access and never receive the CMS storage credentials.
 
 For the AWS S3/CloudFront setup and the verified ACL compatibility caveat, follow
-the [production deployment guide](../../docs/production-deployment-guide.md).
+the [always-on alternative](../../docs/production-deployment-always-on.md).
+The selected [free-first plan](../../docs/production-deployment-guide.md) uses
+R2 plus a media Worker instead; its ACL-free upload handling and delivery are
+pending implementation. Do not apply the AWS-specific ACL value to R2.
 
 Configure bucket CORS to allow `GET` from the deployed Strapi admin origin. The CMS Content Security Policy automatically adds the configured `CDN_URL` origin for image and media previews. Use HTTPS for the CDN and production S3 endpoint.
 

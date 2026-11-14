@@ -49,12 +49,13 @@ export default async function RootLayout({
         <a
           className="fixed left-gutter top-gutter z-50 -translate-y-24 rounded-small bg-primary px-4 py-3 font-label text-label font-semibold text-primary-foreground transition-transform duration-fast ease-standard focus:translate-y-0 motion-reduce:transition-none"
           href="#main-content"
+          lang="vi"
         >
-          Skip to main content
+          Đến nội dung chính
         </a>
-        <Header />
+        <Header locale="vi" />
         {children}
-        <Footer />
+        <Footer locale="vi" />
       </body>
     </html>
   );

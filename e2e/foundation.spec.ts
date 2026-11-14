@@ -24,7 +24,7 @@ test("the accessible homepage and application shell load", async ({ page }) => {
 
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Upcoming events" }),
+    page.getByRole("heading", { level: 2, name: "Buổi gặp gỡ sắp tới" }),
   ).toBeVisible();
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
@@ -46,7 +46,7 @@ test("the accessible homepage and application shell load", async ({ page }) => {
   expect(structuredDataTypes).not.toContain("Article");
   expect(structuredDataTypes).not.toContain("Event");
 
-  const skipLink = page.getByRole("link", { name: "Skip to main content" });
+  const skipLink = page.getByRole("link", { name: "Đến nội dung chính" });
   await skipLink.focus();
   await expect(skipLink).toBeVisible();
   await skipLink.press("Enter");
@@ -62,7 +62,7 @@ test("the homepage is usable without horizontal overflow on mobile", async ({
   const primaryAction = page
     .locator("main > section")
     .first()
-    .getByRole("link");
+    .getByRole("link", { name: "Nhắn tin qua Facebook" });
 
   await expect(primaryAction).toBeVisible();
   await expect(primaryAction).toHaveCSS("background-color", "rgb(54, 87, 245)");

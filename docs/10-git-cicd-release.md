@@ -56,9 +56,13 @@ Never share privileged production credentials with preview environments.
 
 ## Release
 
-Provider setup and launch instructions are in the
-[production deployment guide](production-deployment-guide.md), including a
-free provider subdomain option and explicit backend cost/availability limits.
+The selected [free-first deployment plan](production-deployment-guide.md)
+requires snapshot publication work before launch; see the
+[execution plan](exec-plans/free-first-deployment.md). The existing live-CMS
+deployment path is retained as the
+[always-on alternative](production-deployment-always-on.md). In snapshot mode,
+release the exact validated content artifact with the web build and retain it
+for rollback; cache-tag expiration alone does not publish content.
 
 Before production:
 - Definition of Done

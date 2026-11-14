@@ -396,6 +396,14 @@ About-page hero.
   indexing preference while preserving safe fallbacks during CMS outages.
 
 ### Site Settings
+
+The Vietnamese homepage now supplements these settings with draft introductory
+copy in `src/features/home/copy.ts` and a published About Page mission. Its
+primary invitation uses the ministry-supplied official Facebook URL, overriding
+an unrelated Site Settings primary CTA on this page only. Existing detail-page
+CTA behavior is unchanged. CMS content, alt text and slide captions remain as
+authored; English translation and language routing are a later phase.
+
 - siteName
 - siteDescription
 - defaultSeo

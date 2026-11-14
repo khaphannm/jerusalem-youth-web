@@ -2,6 +2,7 @@ import "server-only";
 
 import { getCmsClient } from "@/lib/cms";
 import type {
+  AboutPage,
   Article,
   CollectionResult,
   Event,
@@ -11,6 +12,7 @@ import type {
 } from "@/lib/cms/domain";
 
 export type HomePageData = Readonly<{
+  aboutPage: AboutPage | null;
   featuredEvent: Event | null;
   latestArticle: Article | null;
   latestSermon: Sermon | null;
@@ -25,6 +27,7 @@ const emptyCollection = <T>(): CollectionResult<T> => ({
 });
 
 const emptyHomePageData: HomePageData = {
+  aboutPage: null,
   featuredEvent: null,
   latestArticle: null,
   latestSermon: null,
@@ -65,6 +68,7 @@ export async function loadHomePageData(
       latestArticleResult,
       latestSermonResult,
       storiesResult,
+      aboutPageResult,
     ] = await Promise.allSettled([
       client.siteSettings(),
       client.events.upcoming({ featured: true, from, pageSize: 1 }),
@@ -72,6 +76,7 @@ export async function loadHomePageData(
       client.articles.latest(),
       client.sermons.latest(),
       client.stories.latest({ pageSize: 3 }),
+      client.aboutPage(),
     ]);
     const featuredEvents = settledValue(
       "featured event",
@@ -86,30 +91,16 @@ export async function loadHomePageData(
     const featuredEvent = featuredEvents[0] ?? upcomingEvents[0] ?? null;
 
     return {
+      aboutPage: settledValue("about page", aboutPageResult, null),
       featuredEvent,
-      latestArticle: settledValue(
-        "latest article",
-        latestArticleResult,
-        null,
-      ),
-      latestSermon: settledValue(
-        "latest sermon",
-        latestSermonResult,
-        null,
-      ),
-      siteSettings: settledValue(
-        "site settings",
-        siteSettingsResult,
-        null,
-      ),
-      stories: settledValue(
-        "stories",
-        storiesResult,
-        emptyCollection<Story>(),
-      ).items,
+      latestArticle: settledValue("latest article", latestArticleResult, null),
+      latestSermon: settledValue("latest sermon", latestSermonResult, null),
+      siteSettings: settledValue("site settings", siteSettingsResult, null),
+      stories: settledValue("stories", storiesResult, emptyCollection<Story>())
+        .items,
       upcomingEvents: upcomingEvents
         .filter((event) => event.id !== featuredEvent?.id)
-        .slice(0, 3),
+        .slice(0, 2),
     };
   } catch (error) {
     logHomeDataError("CMS data", error);

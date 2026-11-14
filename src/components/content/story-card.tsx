@@ -6,9 +6,14 @@ import type { Story } from "@/lib/cms/domain";
 type StoryCardProps = Readonly<{
   featured?: boolean;
   story: Story;
+  locale?: "en" | "vi";
 }>;
 
-export function StoryCard({ featured = false, story }: StoryCardProps) {
+export function StoryCard({
+  featured = false,
+  story,
+  locale = "en",
+}: StoryCardProps) {
   const href = `/stories/${encodeURIComponent(story.slug)}`;
   const articleClasses = featured
     ? "overflow-hidden rounded-large border border-border bg-background md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
@@ -35,7 +40,9 @@ export function StoryCard({ featured = false, story }: StoryCardProps) {
       <div className={contentClasses}>
         {story.personDisplayName ? (
           <p className="font-label text-label font-bold uppercase text-secondary">
-            <span className="sr-only">Story shared by </span>
+            <span className="sr-only">
+              {locale === "vi" ? "Chia sẻ bởi " : "Story shared by "}
+            </span>
             {story.personDisplayName}
           </p>
         ) : null}
@@ -51,12 +58,14 @@ export function StoryCard({ featured = false, story }: StoryCardProps) {
             {story.title}
           </Link>
         </h3>
-        <p className="mt-3 flex-1 text-body-small text-muted">{story.summary}</p>
+        <p className="mt-3 flex-1 text-body-small text-muted">
+          {story.summary}
+        </p>
         <Link
           className="mt-5 inline-flex min-h-11 w-fit items-center rounded-small py-2 font-label text-label font-bold text-primary transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none"
           href={href}
         >
-          Read story
+          {locale === "vi" ? "Đọc câu chuyện" : "Read story"}
           <span aria-hidden="true">→</span>
         </Link>
       </div>

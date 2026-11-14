@@ -10,12 +10,23 @@ const subscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-export function HeroGallery({ slides }: { slides: readonly HeroSlide[] }) {
+export function HeroGallery({
+  slides,
+  locale = "en",
+}: {
+  slides: readonly HeroSlide[];
+  locale?: "en" | "vi";
+}) {
+  const vi = locale === "vi";
   const [active, setActive] = useState(0);
   const [visited, setVisited] = useState(() => new Set([0]));
   const [failed, setFailed] = useState<Set<number>>(() => new Set());
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const hydrated = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const hydrated = useSyncExternalStore(
+    subscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const galleryId = useId();
   const current = slides[active];
   const multiple = slides.length > 1;
@@ -29,16 +40,27 @@ export function HeroGallery({ slides }: { slides: readonly HeroSlide[] }) {
   };
 
   return (
-    <div aria-label="Life at Jerusalem Youth" aria-roledescription={multiple ? "carousel" : undefined} role="region">
-      <div className="overflow-hidden rounded-large bg-secondary text-white">
+    <div
+      aria-label={
+        vi ? "Khoảnh khắc tại Jerusalem Youth" : "Life at Jerusalem Youth"
+      }
+      aria-roledescription={multiple ? (vi ? "bộ ảnh" : "carousel") : undefined}
+      role="region"
+    >
+      <div className="overflow-hidden rounded-large bg-secondary text-primary-foreground">
         <div
           className="relative aspect-[4/3] touch-pan-y bg-surface"
           id={galleryId}
           onTouchStart={(event) => {
             const touch = event.touches[0];
-            touchStart.current = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : null;
+            touchStart.current =
+              event.touches.length === 1
+                ? { x: touch.clientX, y: touch.clientY }
+                : null;
           }}
-          onTouchCancel={() => { touchStart.current = null; }}
+          onTouchCancel={() => {
+            touchStart.current = null;
+          }}
           onTouchEnd={(event) => {
             const start = touchStart.current;
             touchStart.current = null;
@@ -51,72 +73,120 @@ export function HeroGallery({ slides }: { slides: readonly HeroSlide[] }) {
             }
           }}
         >
-          {slides.map((slide, index) => visited.has(index) ? (
-            <div
-              aria-hidden={index !== active}
-              aria-label={`${index + 1} of ${slides.length}: ${slide.label}`}
-              aria-roledescription="slide"
-              role="group"
-              className={`absolute inset-0 transition-opacity duration-normal ease-standard motion-reduce:transition-none ${index === active ? "opacity-100" : "pointer-events-none opacity-0"}`}
-              key={index}
-            >
-              {failed.has(index) ? (
-                <div className="flex h-full items-center justify-center p-8 text-center text-muted">
-                  This photograph is unavailable. {multiple ? "Explore another moment using the controls below." : ""}
-                </div>
-              ) : (
-                <ContentImage
-                  asset={slide.image}
-                  className="h-full w-full object-cover"
-                  loading="eager"
-                  fetchPriority={index === 0 ? "high" : "auto"}
-                  onError={() => setFailed((previous) => new Set([...previous, index]))}
-                  sizes="(min-width: 1280px) 720px, (min-width: 1024px) 55vw, 100vw"
-                />
-              )}
-            </div>
-          ) : null)}
+          {slides.map((slide, index) =>
+            visited.has(index) ? (
+              <div
+                aria-hidden={index !== active}
+                aria-label={
+                  vi
+                    ? `${index + 1} trên ${slides.length}: ${slide.label}`
+                    : `${index + 1} of ${slides.length}: ${slide.label}`
+                }
+                aria-roledescription={vi ? "ảnh" : "slide"}
+                role="group"
+                className={`absolute inset-0 transition-opacity duration-normal ease-standard motion-reduce:transition-none ${index === active ? "opacity-100" : "pointer-events-none opacity-0"}`}
+                key={index}
+              >
+                {failed.has(index) ? (
+                  <div className="flex h-full items-center justify-center p-8 text-center text-muted">
+                    {vi
+                      ? "Chưa thể tải ảnh này."
+                      : "This photograph is unavailable."}{" "}
+                    {multiple
+                      ? vi
+                        ? "Bạn có thể chọn ảnh khác bằng các nút bên dưới."
+                        : "Explore another moment using the controls below."
+                      : ""}
+                  </div>
+                ) : (
+                  <ContentImage
+                    asset={slide.image}
+                    className="h-full w-full object-cover"
+                    loading="eager"
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    onError={() =>
+                      setFailed((previous) => new Set([...previous, index]))
+                    }
+                    sizes="(min-width: 1280px) 720px, (min-width: 1024px) 55vw, 100vw"
+                  />
+                )}
+              </div>
+            ) : null,
+          )}
         </div>
         <div className="flex min-h-32 items-start gap-5 p-6 sm:p-8">
-          <span aria-hidden="true" className="font-display text-heading-3 font-bold text-accent">
+          <span
+            aria-hidden="true"
+            className="font-display text-heading-3 font-bold text-accent"
+          >
             {String(active + 1).padStart(2, "0")}
           </span>
           <div>
-            <p className="font-label text-label font-bold uppercase">{current.label}</p>
-            {current.caption ? <p className="mt-2 text-body-small">{current.caption}</p> : null}
+            <p className="font-label text-label font-bold uppercase">
+              {current.label}
+            </p>
+            {current.caption ? (
+              <p className="mt-2 text-body-small">{current.caption}</p>
+            ) : null}
           </div>
         </div>
       </div>
       {hydrated && multiple ? (
         <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-          <div aria-label="Choose a photograph" className="flex flex-wrap gap-2" role="group">
+          <div
+            aria-label={vi ? "Chọn ảnh" : "Choose a photograph"}
+            className="flex flex-wrap gap-2"
+            role="group"
+          >
             {slides.map((slide, index) => (
               <Button
                 aria-controls={galleryId}
-                aria-label={`Show photograph ${index + 1}: ${slide.label}`}
+                aria-label={
+                  vi
+                    ? `Xem ảnh ${index + 1}: ${slide.label}`
+                    : `Show photograph ${index + 1}: ${slide.label}`
+                }
                 aria-pressed={index === active}
-                className={index === active ? "underline underline-offset-4" : undefined}
+                className={
+                  index === active ? "underline underline-offset-4" : undefined
+                }
                 key={index}
                 onClick={() => select(index)}
                 variant={index === active ? "primary" : "outline"}
               >
-                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <span aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <span className="hidden xl:inline">{slide.label}</span>
               </Button>
             ))}
           </div>
           <div className="flex gap-2">
-            <Button aria-controls={galleryId} aria-label="Previous photograph" onClick={() => select(active - 1)} variant="outline">
+            <Button
+              aria-controls={galleryId}
+              aria-label={vi ? "Ảnh trước" : "Previous photograph"}
+              onClick={() => select(active - 1)}
+              variant="outline"
+            >
               <span aria-hidden="true">←</span>
             </Button>
-            <Button aria-controls={galleryId} aria-label="Next photograph" onClick={() => select(active + 1)} variant="outline">
+            <Button
+              aria-controls={galleryId}
+              aria-label={vi ? "Ảnh tiếp theo" : "Next photograph"}
+              onClick={() => select(active + 1)}
+              variant="outline"
+            >
               <span aria-hidden="true">→</span>
             </Button>
           </div>
         </div>
       ) : null}
       <p aria-live="polite" aria-atomic="true" className="sr-only">
-        {visited.size > 1 ? `Photograph ${active + 1} of ${slides.length}: ${current.label}` : ""}
+        {visited.size > 1
+          ? vi
+            ? `Ảnh ${active + 1} trên ${slides.length}: ${current.label}`
+            : `Photograph ${active + 1} of ${slides.length}: ${current.label}`
+          : ""}
       </p>
     </div>
   );

@@ -39,6 +39,15 @@ Contact may live in the utility/footer navigation if the header becomes crowded.
 
 ## Home information hierarchy
 
+The Vietnamese landing-page implementation uses the following sequence:
+welcome/gallery and Facebook invitation; ministry introduction; community
+themes; combined next/other gatherings; optional youth stories; combined
+teaching/articles and resources; first-visit guidance; final Facebook invitation.
+Empty optional previews are omitted. Detailed routes remain unchanged. See
+`docs/exec-plans/homepage-landing-page.md` for the implementation and review record.
+
+The original content-listing hierarchy was:
+
 1. Hero: concise identity + primary action
 2. Next gathering / featured event
 3. Upcoming events

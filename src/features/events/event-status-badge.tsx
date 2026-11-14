@@ -16,15 +16,22 @@ const statusContent = {
 
 export function EventStatusBadge({
   status,
-}: Readonly<{ status: EventStatus }>) {
+  locale = "en",
+}: Readonly<{ status: EventStatus; locale?: "en" | "vi" }>) {
   const content = statusContent[status];
 
   return (
     <p
       className={`w-fit rounded-small px-2 py-1 font-label text-label font-bold uppercase ${content.classes}`}
     >
-      <span className="sr-only">Event status: </span>
-      {content.label}
+      <span className="sr-only">
+        {locale === "vi" ? "Trạng thái: " : "Event status: "}
+      </span>
+      {locale === "vi"
+        ? status === "upcoming"
+          ? "Sắp diễn ra"
+          : "Đã diễn ra"
+        : content.label}
     </p>
   );
 }

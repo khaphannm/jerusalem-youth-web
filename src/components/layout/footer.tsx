@@ -5,11 +5,7 @@ import { Container } from "@/components/ui/container";
 import { SafeLink } from "@/components/ui/safe-link";
 import { siteConfig } from "@/config/site";
 import { getCmsClient } from "@/lib/cms";
-import type {
-  Navigation,
-  SiteSettings,
-  SocialLinks,
-} from "@/lib/cms/domain";
+import type { Navigation, SiteSettings, SocialLinks } from "@/lib/cms/domain";
 
 type FooterData = Readonly<{
   navigation: Navigation | null;
@@ -68,11 +64,14 @@ const sectionHeadingClasses =
 const footerLinkClasses =
   "inline-flex min-h-11 max-w-full items-center break-words rounded-small py-2 font-label text-label font-semibold text-primary-foreground transition-colors duration-fast ease-standard hover:text-calm motion-reduce:transition-none";
 
-export async function Footer() {
+export async function Footer({ locale = "en" }: { locale?: "en" | "vi" } = {}) {
   const { navigation, siteSettings, socialLinks } = await loadFooterData();
-  const siteName = siteSettings?.siteName ?? siteConfig.name;
+  const siteName =
+    siteSettings?.siteName ??
+    (locale === "vi" ? "Jerusalem Youth" : siteConfig.name);
   const siteDescription =
-    siteSettings?.siteDescription ?? siteConfig.description;
+    siteSettings?.siteDescription ??
+    (locale === "vi" ? "Cùng lớn lên trong đức tin." : siteConfig.description);
   const footerItems = navigation?.footerItems ?? [];
   const contact = siteSettings?.organizationContact;
   const hasContact = Boolean(
@@ -82,7 +81,7 @@ export async function Footer() {
   const year = new Date().getUTCFullYear();
 
   return (
-    <footer className="bg-foreground text-primary-foreground">
+    <footer className="bg-foreground text-primary-foreground" lang={locale}>
       <Container size="wide">
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-4 lg:py-16">
           <div className="min-w-0">
@@ -106,12 +105,16 @@ export async function Footer() {
                 className={sectionHeadingClasses}
                 id="footer-navigation-heading"
               >
-                Explore
+                {locale === "vi" ? "Khám phá" : "Explore"}
               </h2>
               <ul className="mt-4 grid grid-cols-2 gap-x-3">
                 {footerItems.map((item, index) => (
                   <li key={`${item.label}-${item.url}-${index}`}>
-                    <NavigationLink item={item} tone="inverse" />
+                    <NavigationLink
+                      item={item}
+                      tone="inverse"
+                      locale={locale}
+                    />
                   </li>
                 ))}
               </ul>
@@ -124,7 +127,7 @@ export async function Footer() {
               className="min-w-0"
             >
               <h2 className={sectionHeadingClasses} id="footer-contact-heading">
-                Contact
+                {locale === "vi" ? "Liên hệ" : "Contact"}
               </h2>
               <address className="mt-4 flex flex-col items-start not-italic text-body-small text-primary-foreground/70">
                 {contact?.email ? (
@@ -151,12 +154,9 @@ export async function Footer() {
           ) : null}
 
           {socialItems.length > 0 ? (
-            <nav
-              aria-labelledby="footer-social-heading"
-              className="min-w-0"
-            >
+            <nav aria-labelledby="footer-social-heading" className="min-w-0">
               <h2 className={sectionHeadingClasses} id="footer-social-heading">
-                Follow
+                {locale === "vi" ? "Kết nối" : "Follow"}
               </h2>
               <ul className="mt-4">
                 {socialItems.map((item, index) => (

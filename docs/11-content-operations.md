@@ -52,6 +52,13 @@ Before publication:
 
 ## Content freshness
 
+The selected [free-first publishing plan](production-deployment-guide.md) is
+pending implementation. Once enabled, editors must publish in CMS **and request
+a content release**; public changes, unpublish and delete take effect only after
+a successful snapshot deployment. The workflow below describes the current
+implemented live-CMS webhook behavior. Do not treat its successful response as
+proof that a new snapshot reached visitors.
+
 Assign recurring ownership for:
 - upcoming events
 - contact details

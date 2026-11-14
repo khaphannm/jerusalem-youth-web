@@ -14,12 +14,14 @@ const {
   sermonsLatestMock,
   siteSettingsMock,
   storiesLatestMock,
+  aboutPageMock,
 } = vi.hoisted(() => ({
   articlesLatestMock: vi.fn(),
   eventsUpcomingMock: vi.fn(),
   sermonsLatestMock: vi.fn(),
   siteSettingsMock: vi.fn(),
   storiesLatestMock: vi.fn(),
+  aboutPageMock: vi.fn(),
 }));
 
 vi.mock("@/lib/cms", () => ({
@@ -29,6 +31,7 @@ vi.mock("@/lib/cms", () => ({
     sermons: { latest: sermonsLatestMock },
     siteSettings: siteSettingsMock,
     stories: { latest: storiesLatestMock },
+    aboutPage: aboutPageMock,
   }),
 }));
 
@@ -103,6 +106,7 @@ const collection = <T>(items: readonly T[]): CollectionResult<T> => ({
 describe("homepage data loading", () => {
   beforeEach(() => {
     articlesLatestMock.mockReset().mockResolvedValue(null);
+    aboutPageMock.mockReset().mockResolvedValue(null);
     eventsUpcomingMock.mockReset();
     sermonsLatestMock.mockReset().mockResolvedValue(null);
     siteSettingsMock.mockReset().mockResolvedValue(null);
@@ -121,9 +125,7 @@ describe("homepage data loading", () => {
       .mockResolvedValueOnce(collection([event]))
       .mockResolvedValueOnce(collection([event, otherEvent]));
 
-    const result = await loadHomePageData(
-      new Date("2026-08-22T00:00:00.000Z"),
-    );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
 
     expect(eventsUpcomingMock).toHaveBeenNthCalledWith(1, {
       featured: true,
@@ -146,14 +148,35 @@ describe("homepage data loading", () => {
       .spyOn(console, "error")
       .mockImplementation(() => undefined);
 
-    const result = await loadHomePageData(
-      new Date("2026-08-22T00:00:00.000Z"),
-    );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
 
     expect(result.latestArticle).toBeNull();
     expect(result.stories).toEqual([story]);
     expect(errorSpy).toHaveBeenCalledWith(
       "Homepage latest article could not be loaded: Articles offline",
     );
+  });
+
+  it("loads published ministry purpose and limits supporting events without duplicating the feature", async () => {
+    const about = {
+      id: "about",
+      mission: "Cùng trưởng thành.",
+      vision: "Đồng hành.",
+      values: [],
+      callToAction: { label: "Tham gia", url: "/join" },
+      publishedAt: "2026-08-20T00:00:00.000Z",
+    };
+    aboutPageMock.mockResolvedValue(about);
+    eventsUpcomingMock
+      .mockResolvedValueOnce(collection([event]))
+      .mockResolvedValueOnce(
+        collection([
+          event,
+          ...[2, 3, 4].map((id) => ({ ...event, id: String(id) })),
+        ]),
+      );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
+    expect(result.aboutPage).toBe(about);
+    expect(result.upcomingEvents.map((item) => item.id)).toEqual(["2", "3"]);
   });
 });
