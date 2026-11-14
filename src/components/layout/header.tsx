@@ -22,9 +22,12 @@ export async function Header({ locale = "en" }: { locale?: "en" | "vi" } = {}) {
   const navigationItems = await loadPrimaryNavigation();
 
   return (
-    <header className="relative z-40 border-b bg-background" lang={locale}>
+    <header
+      className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-xl backdrop-saturate-150"
+      lang={locale}
+    >
       <Container
-        className="flex min-h-20 items-center justify-between gap-6 py-3"
+        className="flex min-h-16 items-center justify-between gap-6 py-2"
         size="wide"
       >
         <Link

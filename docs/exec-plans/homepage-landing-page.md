@@ -3,6 +3,19 @@
 Date: 12 November 2026.
 Status: Vietnamese implementation completed locally; English release pending.
 
+## Follow-up record — 14 November 2026
+
+- Layout and motion reworked to the landing-page direction now documented in
+  `docs/04-design-system.md` ("Landing-page layout and motion"): centred hero
+  above a full-width gallery, tiles, sticky section headings, CSS-only
+  scroll-linked reveals and a sticky translucent header.
+- Homepage copy moved to the new Home Page single type
+  (`docs/03-content-model.md`); `src/features/home/copy.ts` is now the
+  fallback. The invitation link is the Home Page `primaryCta`.
+- Still to do on the live CMS: deploy the schema, add Home Page to the
+  publication webhook, publish the entry. Not yet measured on production:
+  LCP/INP/CLS, real-device touch scrolling, Safari and Firefox rendering.
+
 ## Implementation record — 13 November 2026
 
 Application changes were made in the existing checkout at

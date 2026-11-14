@@ -9,18 +9,65 @@ import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/link-button";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { homeCopy } from "@/features/home/copy";
+import { defaultHomePage } from "@/features/home/copy";
 import { loadHomePageData, loadHomeSiteSettings } from "@/features/home/data";
 import { HeroGallery } from "@/features/home/hero-gallery";
+import type { CallToAction, MinistryValue } from "@/lib/cms/domain";
 
 const textLink =
   "inline-flex min-h-11 items-center rounded-small py-2 font-label text-label font-bold text-primary underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none";
 
-function FacebookInvitation() {
+const centeredHeading = "mx-auto text-center";
+
+const tile =
+  "h-full rounded-large p-8 transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none sm:rounded-xlarge sm:p-10";
+
+function Invitation({ action }: { action: CallToAction }) {
   return (
-    <LinkButton href={homeCopy.facebookUrl} size="large">
-      {homeCopy.facebookLabel}
+    <LinkButton href={action.url} size="large">
+      {action.label}
     </LinkButton>
+  );
+}
+
+function Arrow({ direction = "→" }: { direction?: "→" | "↓" }) {
+  return (
+    <span aria-hidden="true" className="ml-2">
+      {direction}
+    </span>
+  );
+}
+
+function NumberedTiles({
+  items,
+  tone,
+}: {
+  items: readonly MinistryValue[];
+  tone: "surface" | "white";
+}) {
+  return (
+    <ol className="grid gap-5">
+      {items.map((item, index) => (
+        <li className="motion-reveal" key={item.title}>
+          <div
+            className={`${tile} ${tone === "white" ? "bg-primary-foreground" : "bg-surface"}`}
+          >
+            <span
+              aria-hidden="true"
+              className="font-display text-heading-3 font-bold text-primary"
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 className="mt-5 font-heading text-heading-3 font-bold">
+              {item.title}
+            </h3>
+            <p className="mt-4 text-body-large text-muted">
+              {item.description}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -28,8 +75,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadHomeSiteSettings();
   const seo = settings?.defaultSeo;
   const siteName = settings?.siteName ?? "Jerusalem Youth";
-  const title = seo?.metaTitle ?? `${siteName} — ${homeCopy.headline}`;
-  const description = seo?.metaDescription ?? homeCopy.description;
+  const title =
+    seo?.metaTitle ?? `${siteName} — ${defaultHomePage.heroHeadline}`;
+  const description = seo?.metaDescription ?? defaultHomePage.heroDescription;
   const socialImage = seo?.socialImage ?? settings?.defaultSocialImage;
   const canonical = seo?.canonical ?? "/";
   const image = socialImage
@@ -68,12 +116,14 @@ export default async function Home() {
   const {
     aboutPage,
     featuredEvent,
+    homePage,
     latestArticle,
     latestSermon,
     siteSettings,
     stories,
     upcomingEvents,
   } = await loadHomePageData();
+  const content = homePage ?? defaultHomePage;
   const siteName = siteSettings?.siteName ?? "Jerusalem Youth";
   const fallbackImage =
     featuredEvent?.banner ??
@@ -89,47 +139,40 @@ export default async function Home() {
 
   return (
     <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
-      <Section aria-labelledby="home-title">
+      <Section
+        aria-labelledby="home-title"
+        className="overflow-x-clip"
+        spacing="compact"
+      >
         <Container size="wide">
-          <div
-            className={
-              heroSlides.length
-                ? "grid items-center gap-10 lg:grid-cols-5 lg:gap-12"
-                : "max-w-reading"
-            }
-          >
-            <div className={heroSlides.length ? "lg:col-span-2" : undefined}>
-              <p className="font-label text-label font-bold uppercase text-primary">
-                {siteName}
-              </p>
-              <h1
-                className="mt-5 text-balance font-display text-display font-extrabold leading-tight"
-                id="home-title"
-              >
-                {homeCopy.headline}
-              </h1>
-              <p className="mt-6 text-pretty text-body-large text-muted">
-                {homeCopy.description}
-              </p>
-              <div className="mt-8 flex flex-col items-start gap-3">
-                <FacebookInvitation />
-                <a className={textLink} href="#gioi-thieu">
-                  Khám phá cộng đồng{" "}
-                  <span aria-hidden="true" className="ml-2">
-                    ↓
-                  </span>
-                </a>
-              </div>
+          <div className="motion-recede mx-auto max-w-content text-center">
+            <p className="motion-enter font-label text-label font-bold uppercase text-primary">
+              {siteName}
+            </p>
+            <h1
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold leading-tight [--motion-step:1]"
+              id="home-title"
+            >
+              {content.heroHeadline}
+            </h1>
+            <p className="motion-enter mx-auto mt-6 max-w-reading text-pretty text-body-large text-muted [--motion-step:2]">
+              {content.heroDescription}
+            </p>
+            <div className="motion-enter mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 [--motion-step:3]">
+              <Invitation action={content.callToAction} />
+              <a className={textLink} href="#gioi-thieu">
+                Khám phá cộng đồng <Arrow direction="↓" />
+              </a>
             </div>
-            {heroSlides.length ? (
-              <div className="min-w-0 lg:col-span-3">
-                <HeroGallery slides={heroSlides} locale="vi" />
-              </div>
-            ) : null}
           </div>
+          {heroSlides.length ? (
+            <div className="mt-12 min-w-0 sm:mt-16">
+              <HeroGallery slides={heroSlides} locale="vi" />
+            </div>
+          ) : null}
           <nav
             aria-label="Khám phá Jerusalem Youth"
-            className="mt-12 flex flex-wrap gap-x-8 gap-y-2 border-t border-border pt-5"
+            className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 border-t border-border pt-5"
           >
             <a className={textLink} href="#gioi-thieu">
               Về chúng mình
@@ -146,84 +189,79 @@ export default async function Home() {
 
       <Section
         aria-labelledby="introduction-title"
+        className="scroll-mt-16"
         id="gioi-thieu"
         tone="white"
       >
         <Container size="wide">
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+          <div className="motion-reveal">
             <SectionHeading
-              eyebrow="Chúng mình là ai?"
+              className={centeredHeading}
+              eyebrow={content.introduction.eyebrow}
               id="introduction-title"
-              title="Đức tin được vun đắp trong sự đồng hành."
+              title={content.introduction.title}
+              description={content.introduction.description}
             />
-            <div>
-              <p className="text-pretty text-body-large text-muted">
-                {homeCopy.introduction}
-              </p>
-              {aboutPage ? (
-                <div className="mt-6 border-l-2 border-accent pl-6">
-                  <p className="font-label text-label font-bold uppercase text-secondary">
-                    Sứ mệnh của chúng mình
-                  </p>
-                  <p className="mt-3 whitespace-pre-line text-pretty">
-                    {aboutPage.mission}
-                  </p>
-                </div>
-              ) : null}
-              <Link className={`${textLink} mt-6`} href="/about">
-                Tìm hiểu về {siteName}{" "}
-                <span aria-hidden="true" className="ml-2">
-                  →
-                </span>
-              </Link>
+          </div>
+          {aboutPage ? (
+            <div className="motion-reveal mx-auto mt-12 max-w-content">
+              <div className="rounded-large bg-surface p-8 text-center sm:rounded-xlarge sm:p-14">
+                <p className="font-label text-label font-bold uppercase text-secondary">
+                  Sứ mệnh của chúng mình
+                </p>
+                <p className="mx-auto mt-5 max-w-reading whitespace-pre-line text-pretty font-heading text-heading-3 font-semibold">
+                  {aboutPage.mission}
+                </p>
+              </div>
             </div>
+          ) : null}
+          <div className="mt-8 text-center">
+            <Link className={textLink} href="/about">
+              Tìm hiểu về {siteName} <Arrow />
+            </Link>
           </div>
         </Container>
       </Section>
 
       <Section aria-labelledby="community-title" tone="surface">
         <Container size="wide">
-          <SectionHeading
-            eyebrow="Đời sống cộng đồng"
-            id="community-title"
-            title="Cùng nhau sống đức tin."
-          />
-          <ol className="mt-10 grid gap-8 md:grid-cols-3">
-            {homeCopy.themes.map((theme, index) => (
-              <li className="border-t border-border pt-6" key={theme.title}>
-                <span
-                  aria-hidden="true"
-                  className="font-display text-heading-3 font-bold text-primary"
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-5 font-heading text-heading-3 font-bold">
-                  {theme.title}
-                </h3>
-                <p className="mt-4 text-muted">{theme.description}</p>
-              </li>
-            ))}
-          </ol>
-          <Link className={`${textLink} mt-8`} href="/events">
-            Xem các buổi gặp gỡ{" "}
-            <span aria-hidden="true" className="ml-2">
-              →
-            </span>
-          </Link>
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <SectionHeading
+                eyebrow={content.community.eyebrow}
+                id="community-title"
+                title={content.community.title}
+                description={content.community.description}
+                tone="surface"
+              />
+              <Link className={`${textLink} mt-6`} href="/events">
+                Xem các buổi gặp gỡ <Arrow />
+              </Link>
+            </div>
+            <NumberedTiles items={content.communityThemes} tone="white" />
+          </div>
         </Container>
       </Section>
 
-      <Section aria-labelledby="gathering-title" id="gap-go" tone="secondary">
+      <Section
+        aria-labelledby="gathering-title"
+        className="scroll-mt-16"
+        id="gap-go"
+        tone="secondary"
+      >
         <Container size="wide">
-          <SectionHeading
-            eyebrow="Hẹn gặp bạn"
-            id="gathering-title"
-            title="Buổi gặp gỡ sắp tới"
-            description="Xem chủ đề, thời gian và địa điểm để chuẩn bị cho buổi gặp gỡ cùng Jerusalem Youth."
-            tone="secondary"
-          />
+          <div className="motion-reveal">
+            <SectionHeading
+              className={centeredHeading}
+              eyebrow={content.gathering.eyebrow}
+              id="gathering-title"
+              title={content.gathering.title}
+              description={content.gathering.description}
+              tone="secondary"
+            />
+          </div>
           {featuredEvent ? (
-            <div className="mt-10">
+            <div className="motion-reveal mt-12">
               <EventCard
                 event={featuredEvent}
                 featured
@@ -232,29 +270,23 @@ export default async function Home() {
               />
             </div>
           ) : (
-            <div className="mt-8 max-w-reading">
-              <p>
-                Thời gian cho buổi gặp gỡ tiếp theo sẽ được cập nhật tại đây.
-                Bạn có thể nhắn tin qua Facebook để hỏi thêm thông tin.
-              </p>
+            <div className="mx-auto mt-8 max-w-reading text-center">
+              <p>{content.gatheringEmptyMessage}</p>
               <div className="mt-6">
-                <FacebookInvitation />
+                <Invitation action={content.callToAction} />
               </div>
             </div>
           )}
           {upcomingEvents.length ? (
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
               {upcomingEvents.map((event) => (
-                <EventCard
-                  event={event}
-                  status="upcoming"
-                  locale="vi"
-                  key={event.id}
-                />
+                <div className="motion-reveal" key={event.id}>
+                  <EventCard event={event} status="upcoming" locale="vi" />
+                </div>
               ))}
             </div>
           ) : null}
-          <div className="mt-8">
+          <div className="mt-10 text-center">
             <LinkButton href="/events" variant="secondary">
               Xem tất cả sự kiện
             </LinkButton>
@@ -265,56 +297,63 @@ export default async function Home() {
       {stories.length ? (
         <Section aria-labelledby="stories-title" tone="white">
           <Container size="wide">
-            <SectionHeading
-              eyebrow="Câu chuyện cộng đồng"
-              id="stories-title"
-              title="Mỗi hành trình đều có một câu chuyện."
-              description="Lắng nghe những chia sẻ về đức tin và cuộc sống từ các bạn trong cộng đồng Jerusalem Youth."
-            />
-            <div className="mt-10">
+            <div className="motion-reveal">
+              <SectionHeading
+                className={centeredHeading}
+                eyebrow={content.stories.eyebrow}
+                id="stories-title"
+                title={content.stories.title}
+                description={content.stories.description}
+              />
+            </div>
+            <div className="motion-reveal mt-12">
               <StoryCard story={stories[0]} featured locale="vi" />
             </div>
             {stories.length > 1 ? (
               <div className="mt-6 grid gap-6 md:grid-cols-2">
                 {stories.slice(1, 3).map((story) => (
-                  <StoryCard story={story} locale="vi" key={story.id} />
+                  <div className="motion-reveal" key={story.id}>
+                    <StoryCard story={story} locale="vi" />
+                  </div>
                 ))}
               </div>
             ) : null}
-            <Link className={`${textLink} mt-6`} href="/stories">
-              Xem các câu chuyện{" "}
-              <span aria-hidden="true" className="ml-2">
-                →
-              </span>
-            </Link>
+            <div className="mt-8 text-center">
+              <Link className={textLink} href="/stories">
+                Xem các câu chuyện <Arrow />
+              </Link>
+            </div>
           </Container>
         </Section>
       ) : null}
 
       <Section aria-labelledby="grow-title" tone="calm">
         <Container size="wide">
-          <SectionHeading
-            eyebrow="Nuôi dưỡng đức tin mỗi ngày"
-            id="grow-title"
-            title="Tiếp tục hành trình sau mỗi buổi gặp gỡ."
-            description="Dành một khoảng lặng để suy ngẫm, lắng nghe và học thêm qua những bài chia sẻ và tài liệu được giới thiệu tại đây."
-            tone="calm"
-          />
+          <div className="motion-reveal">
+            <SectionHeading
+              className={centeredHeading}
+              eyebrow={content.teaching.eyebrow}
+              id="grow-title"
+              title={content.teaching.title}
+              description={content.teaching.description}
+              tone="calm"
+            />
+          </div>
           {hasTeaching ? (
-            <div className="mt-10 grid items-start gap-8 xl:grid-cols-2">
+            <div className="mt-12 grid items-start gap-6 xl:grid-cols-2">
               {latestSermon ? (
-                <div className="min-w-0 [&>article]:md:grid-cols-1">
+                <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
                   <SermonCard sermon={latestSermon} locale="vi" />
                 </div>
               ) : null}
               {latestArticle ? (
-                <div className="min-w-0 [&>article]:md:grid-cols-1">
+                <div className="motion-reveal min-w-0 [&>article]:md:grid-cols-1">
                   <ArticleCard article={latestArticle} locale="vi" />
                 </div>
               ) : null}
             </div>
           ) : null}
-          <div className="mt-8">
+          <div className="mt-10 text-center">
             <LinkButton href="/resources" variant="outline">
               Khám phá tài liệu
             </LinkButton>
@@ -322,67 +361,47 @@ export default async function Home() {
         </Container>
       </Section>
 
-      <Section aria-labelledby="visit-title" id="lan-dau" tone="white">
+      <Section
+        aria-labelledby="visit-title"
+        className="scroll-mt-16"
+        id="lan-dau"
+        tone="white"
+      >
         <Container size="wide">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            <div>
+            <div className="lg:sticky lg:top-28 lg:self-start">
               <SectionHeading
-                eyebrow="Lần đầu tìm hiểu Jerusalem Youth?"
+                eyebrow={content.newcomer.eyebrow}
                 id="visit-title"
-                title="Bắt đầu từ một lời chào."
-                description="Nếu bạn đang tìm hiểu về Jerusalem Youth, hãy nhắn tin cho chúng mình. Bạn có thể hỏi về buổi gặp gỡ sắp tới, địa điểm hoặc cách kết nối với cộng đồng."
+                title={content.newcomer.title}
+                description={content.newcomer.description}
               />
               <div className="mt-8">
-                <FacebookInvitation />
+                <Invitation action={content.callToAction} />
               </div>
               <Link className={`${textLink} mt-4`} href="/join">
-                Tìm hiểu cách tham gia{" "}
-                <span aria-hidden="true" className="ml-2">
-                  →
-                </span>
+                Tìm hiểu cách tham gia <Arrow />
               </Link>
             </div>
-            <ol className="space-y-8">
-              <li className="border-t border-border pt-6">
-                <p className="font-label text-label font-bold text-primary">
-                  01
-                </p>
-                <h3 className="mt-3 font-heading text-heading-3 font-bold">
-                  Xem thông tin buổi gặp gỡ
-                </h3>
-                <p className="mt-4 text-muted">
-                  Kiểm tra thời gian, địa điểm và những lưu ý được ghi trong
-                  trang sự kiện.
-                </p>
-              </li>
-              <li className="border-t border-border pt-6">
-                <p className="font-label text-label font-bold text-primary">
-                  02
-                </p>
-                <h3 className="mt-3 font-heading text-heading-3 font-bold">
-                  Hỏi điều bạn muốn biết
-                </h3>
-                <p className="mt-4 text-muted">
-                  Nhắn tin qua trang Facebook chính thức khi bạn cần thêm thông
-                  tin trước khi tham gia.
-                </p>
-              </li>
-            </ol>
+            <NumberedTiles items={content.newcomerSteps} tone="surface" />
           </div>
         </Container>
       </Section>
 
       <Section aria-labelledby="invitation-title" tone="secondary">
-        <Container size="reading">
-          <SectionHeading
-            eyebrow="Một lời mời dành cho bạn"
-            id="invitation-title"
-            title={`Cùng bắt đầu hành trình với ${siteName}.`}
-            description={`Bạn muốn tìm hiểu thêm hoặc kết nối với chúng mình? Hãy gửi một lời chào qua trang Facebook chính thức của ${siteName}.`}
-            tone="secondary"
-          />
-          <div className="mt-8">
-            <FacebookInvitation />
+        <Container size="content">
+          <div className="motion-reveal text-center">
+            <SectionHeading
+              className={centeredHeading}
+              eyebrow={content.invitation.eyebrow}
+              id="invitation-title"
+              title={content.invitation.title}
+              description={content.invitation.description}
+              tone="secondary"
+            />
+            <div className="mt-10">
+              <Invitation action={content.callToAction} />
+            </div>
           </div>
         </Container>
       </Section>

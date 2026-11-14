@@ -395,14 +395,46 @@ About-page hero.
 - Metadata uses Site Settings for the ministry name, default social image, and
   indexing preference while preserving safe fallbacks during CMS outages.
 
+### Home Page
+
+Single type (`api::home-page.home-page`, draft/publish) holding the landing-page
+copy. Section order and layout are fixed in code; editors change wording only.
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| heroHeadline | string | required, max 80 |
+| heroDescription | text | required, max 400 |
+| primaryCta | `shared.cta` | required; site path or HTTP(S) URL. Used for every invitation button on the page |
+| introduction | `shared.section-intro` | required |
+| community | `shared.section-intro` | required |
+| communityThemes | `shared.ministry-value`, repeatable | 1–6 |
+| gathering | `shared.section-intro` | required |
+| gatheringEmptyMessage | text | required, max 400; shown when no upcoming event is published |
+| stories | `shared.section-intro` | required |
+| teaching | `shared.section-intro` | required |
+| newcomer | `shared.section-intro` | required |
+| newcomerSteps | `shared.ministry-value`, repeatable | 1–4 |
+| invitation | `shared.section-intro` | required |
+
+`shared.section-intro`: `eyebrow` (string, optional, max 80), `title` (string,
+required, max 120), `description` (text, optional, max 400).
+
+Web behavior:
+- Read through `client.homePage()` with the `cms:home-page` cache tag and
+  validated by `homePageSchema`; the UI consumes the `HomePage` domain type.
+- When the entry is unpublished, invalid, or the CMS is unreachable, the page
+  renders the checked-in fallback in `src/features/home/copy.ts`.
+- The mission tile still comes from the About Page; events, stories, sermon
+  and article cards still come from their collections; navigation link labels
+  inside the page ("Xem tất cả sự kiện" and similar) stay in code.
+- SEO title and description remain in Site Settings `defaultSeo`.
+
 ### Site Settings
 
-The Vietnamese homepage now supplements these settings with draft introductory
-copy in `src/features/home/copy.ts` and a published About Page mission. Its
-primary invitation uses the ministry-supplied official Facebook URL, overriding
-an unrelated Site Settings primary CTA on this page only. Existing detail-page
-CTA behavior is unchanged. CMS content, alt text and slide captions remain as
-authored; English translation and language routing are a later phase.
+Site Settings supplies the homepage hero photographs (`heroSlides`) and site
+identity. Homepage copy lives in the Home Page single type below. Existing
+detail-page CTA behavior is unchanged. CMS content, alt text and slide captions
+remain as authored; English translation and language routing are a later phase.
 
 - siteName
 - siteDescription

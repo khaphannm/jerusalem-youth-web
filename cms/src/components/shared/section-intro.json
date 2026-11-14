@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_section_intros",
+  "info": {
+    "displayName": "Section Intro",
+    "description": "Small label, heading and supporting text shown at the top of a page section."
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "text",
+      "maxLength": 400
+    }
+  }
+}

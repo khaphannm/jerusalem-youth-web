@@ -10,6 +10,7 @@ export const publicReadActions = [
   'api::category.category.findOne',
   'api::event.event.find',
   'api::event.event.findOne',
+  'api::home-page.home-page.find',
   'api::navigation.navigation.find',
   'api::resource.resource.find',
   'api::resource.resource.findOne',

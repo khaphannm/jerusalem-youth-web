@@ -49,6 +49,11 @@ const navigation = ["About", "Events", "Stories", "Join Us"].map(
     openInNewTab: false,
   }),
 );
+const intro = (eyebrow, title, description = null) => ({
+  eyebrow,
+  title,
+  description,
+});
 const singles = {
   "/api/site-setting": {
     ...document,
@@ -63,6 +68,55 @@ const singles = {
     vision: "Cùng lớn lên trong đức tin.",
     values: [{ title: "Đồng hành", description: "Cùng nhau trưởng thành." }],
     primaryCta: { label: "Tham gia", url: "/join" },
+  },
+  "/api/home-page": {
+    ...document,
+    heroHeadline: "Cùng lớn lên trong đức tin.",
+    heroDescription:
+      "Một nơi để người trẻ kết nối, cùng học Lời Chúa và khích lệ nhau bước đi với Chúa mỗi ngày.",
+    primaryCta: {
+      label: "Nhắn tin qua Facebook",
+      url: "https://www.facebook.com/jerusalemyouth20",
+    },
+    introduction: intro(
+      "Chúng mình là ai?",
+      "Đức tin được vun đắp trong sự đồng hành.",
+      "Một cộng đồng nơi người trẻ cùng tìm hiểu Lời Chúa và khích lệ nhau.",
+    ),
+    community: intro("Đời sống cộng đồng", "Cùng nhau sống đức tin."),
+    communityThemes: [
+      ["Thờ phượng và cầu nguyện", "Dành thời gian hướng về Chúa."],
+      ["Học Lời Chúa", "Cùng suy ngẫm Kinh Thánh mỗi ngày."],
+      ["Kết nối và đồng hành", "Lắng nghe, sẻ chia và khích lệ nhau."],
+    ].map(([title, description]) => ({ title, description })),
+    gathering: intro(
+      "Hẹn gặp bạn",
+      "Buổi gặp gỡ sắp tới",
+      "Xem chủ đề, thời gian và địa điểm của buổi gặp gỡ.",
+    ),
+    gatheringEmptyMessage: "Thời gian sẽ được cập nhật tại đây.",
+    stories: intro(
+      "Câu chuyện cộng đồng",
+      "Mỗi hành trình đều có một câu chuyện.",
+    ),
+    teaching: intro(
+      "Nuôi dưỡng đức tin mỗi ngày",
+      "Tiếp tục hành trình sau mỗi buổi gặp gỡ.",
+    ),
+    newcomer: intro(
+      "Lần đầu tìm hiểu Jerusalem Youth?",
+      "Bắt đầu từ một lời chào.",
+      "Hãy nhắn tin cho chúng mình để hỏi về buổi gặp gỡ sắp tới.",
+    ),
+    newcomerSteps: [
+      ["Xem thông tin buổi gặp gỡ", "Kiểm tra thời gian và địa điểm."],
+      ["Hỏi điều bạn muốn biết", "Nhắn tin qua trang Facebook chính thức."],
+    ].map(([title, description]) => ({ title, description })),
+    invitation: intro(
+      "Một lời mời dành cho bạn",
+      "Cùng bắt đầu hành trình với Jerusalem Youth.",
+      "Hãy gửi một lời chào qua trang Facebook chính thức.",
+    ),
   },
   "/api/navigation": {
     ...document,

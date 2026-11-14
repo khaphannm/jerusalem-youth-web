@@ -90,7 +90,7 @@ test('launch review seed creates once and skips every matching record on rerun',
   const first = await seedLaunchReviewContent(strapi, options);
   assert.deepEqual(first, {
     assets: { created: 5, skipped: 0 },
-    documents: { created: 29, skipped: 0 },
+    documents: { created: 30, skipped: 0 },
   });
   assert.equal(media.length, 5);
 
@@ -110,7 +110,7 @@ test('launch review seed creates once and skips every matching record on rerun',
   const second = await seedLaunchReviewContent(strapi, options);
   assert.deepEqual(second, {
     assets: { created: 0, skipped: 5 },
-    documents: { created: 0, skipped: 29 },
+    documents: { created: 0, skipped: 30 },
   });
   assert.equal(media.length, 5);
 });

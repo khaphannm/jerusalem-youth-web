@@ -629,6 +629,83 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
+  collectionName: 'home_pages';
+  info: {
+    description: 'Landing-page copy. Hero photographs are managed in Site Settings.';
+    displayName: 'Home Page';
+    pluralName: 'home-pages';
+    singularName: 'home-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    community: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    communityThemes: Schema.Attribute.Component<'shared.ministry-value', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+          min: 1;
+        },
+        number
+      >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    gathering: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    gatheringEmptyMessage: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    heroDescription: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    heroHeadline: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    introduction: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    invitation: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::home-page.home-page'
+    > &
+      Schema.Attribute.Private;
+    newcomer: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    newcomerSteps: Schema.Attribute.Component<'shared.ministry-value', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 4;
+          min: 1;
+        },
+        number
+      >;
+    primaryCta: Schema.Attribute.Component<'shared.cta', false> &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    stories: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    teaching: Schema.Attribute.Component<'shared.section-intro', false> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
   collectionName: 'navigations';
   info: {
@@ -1391,6 +1468,7 @@ declare module '@strapi/strapi' {
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
       'api::event.event': ApiEventEvent;
+      'api::home-page.home-page': ApiHomePageHomePage;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::resource.resource': ApiResourceResource;
       'api::sermon-series.sermon-series': ApiSermonSeriesSermonSeries;

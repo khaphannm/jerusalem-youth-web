@@ -31,6 +31,7 @@ const cmsUidModelNames = {
   "api::author.author": "author",
   "api::category.category": "category",
   "api::event.event": "event",
+  "api::home-page.home-page": "home-page",
   "api::navigation.navigation": "navigation",
   "api::resource.resource": "resource",
   "api::sermon-series.sermon-series": "sermon-series",

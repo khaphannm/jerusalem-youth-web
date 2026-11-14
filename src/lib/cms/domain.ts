@@ -228,6 +228,28 @@ export type AboutPage = Readonly<{
   publishedAt: string;
 }>;
 
+export type SectionIntro = Readonly<{
+  eyebrow: string | null;
+  title: string;
+  description: string | null;
+}>;
+
+export type HomePage = Readonly<{
+  heroHeadline: string;
+  heroDescription: string;
+  callToAction: CallToAction;
+  introduction: SectionIntro;
+  community: SectionIntro;
+  communityThemes: readonly MinistryValue[];
+  gathering: SectionIntro;
+  gatheringEmptyMessage: string;
+  stories: SectionIntro;
+  teaching: SectionIntro;
+  newcomer: SectionIntro;
+  newcomerSteps: readonly MinistryValue[];
+  invitation: SectionIntro;
+}>;
+
 export type HeroSlide = Readonly<{
   image: MediaAsset;
   label: string;

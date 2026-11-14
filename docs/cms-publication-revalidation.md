@@ -41,6 +41,7 @@ The fixed UID mapping covers every public V1 CMS type:
 | `api::author.author` | `cms:authors` |
 | `api::category.category` | `cms:categories` |
 | `api::event.event` | `cms:events` |
+| `api::home-page.home-page` | `cms:home-page` |
 | `api::navigation.navigation` | `cms:navigation` |
 | `api::resource.resource` | `cms:resources` |
 | `api::sermon-series.sermon-series` | `cms:sermon-series` |

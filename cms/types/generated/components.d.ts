@@ -77,6 +77,29 @@ export interface SharedNavigationItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedSectionIntro extends Struct.ComponentSchema {
+  collectionName: 'components_shared_section_intros';
+  info: {
+    description: 'Small label, heading and supporting text shown at the top of a page section.';
+    displayName: 'Section Intro';
+  };
+  attributes: {
+    description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    eyebrow: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+  };
+}
+
 export interface SharedSeo extends Struct.ComponentSchema {
   collectionName: 'components_shared_seos';
   info: {
@@ -125,6 +148,7 @@ declare module '@strapi/strapi' {
       'shared.hero-slide': SharedHeroSlide;
       'shared.ministry-value': SharedMinistryValue;
       'shared.navigation-item': SharedNavigationItem;
+      'shared.section-intro': SharedSectionIntro;
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;
       'shared.tag': SharedTag;

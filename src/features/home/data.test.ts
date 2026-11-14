@@ -15,6 +15,7 @@ const {
   siteSettingsMock,
   storiesLatestMock,
   aboutPageMock,
+  homePageMock,
 } = vi.hoisted(() => ({
   articlesLatestMock: vi.fn(),
   eventsUpcomingMock: vi.fn(),
@@ -22,6 +23,7 @@ const {
   siteSettingsMock: vi.fn(),
   storiesLatestMock: vi.fn(),
   aboutPageMock: vi.fn(),
+  homePageMock: vi.fn(),
 }));
 
 vi.mock("@/lib/cms", () => ({
@@ -32,6 +34,7 @@ vi.mock("@/lib/cms", () => ({
     siteSettings: siteSettingsMock,
     stories: { latest: storiesLatestMock },
     aboutPage: aboutPageMock,
+    homePage: homePageMock,
   }),
 }));
 
@@ -107,6 +110,7 @@ describe("homepage data loading", () => {
   beforeEach(() => {
     articlesLatestMock.mockReset().mockResolvedValue(null);
     aboutPageMock.mockReset().mockResolvedValue(null);
+    homePageMock.mockReset().mockResolvedValue(null);
     eventsUpcomingMock.mockReset();
     sermonsLatestMock.mockReset().mockResolvedValue(null);
     siteSettingsMock.mockReset().mockResolvedValue(null);
@@ -167,6 +171,7 @@ describe("homepage data loading", () => {
       publishedAt: "2026-08-20T00:00:00.000Z",
     };
     aboutPageMock.mockResolvedValue(about);
+    homePageMock.mockRejectedValue(new Error("Home Page is invalid."));
     eventsUpcomingMock
       .mockResolvedValueOnce(collection([event]))
       .mockResolvedValueOnce(
@@ -177,6 +182,7 @@ describe("homepage data loading", () => {
       );
     const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
     expect(result.aboutPage).toBe(about);
+    expect(result.homePage).toBeNull();
     expect(result.upcomingEvents.map((item) => item.id)).toEqual(["2", "3"]);
   });
 });

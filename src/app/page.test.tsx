@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Home, { generateMetadata } from "@/app/page";
+import { defaultHomePage } from "@/features/home/copy";
 import type { HomePageData } from "@/features/home/data";
 import type {
   Article,
@@ -163,6 +164,7 @@ const siteSettings = {
 
 const fullPageData = {
   aboutPage: null,
+  homePage: null,
   featuredEvent,
   latestArticle,
   latestSermon,
@@ -264,9 +266,52 @@ describe("Home", () => {
     ).toHaveAttribute("href", "/join");
   });
 
+  it("renders landing copy and the invitation link published in the CMS", async () => {
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      featuredEvent: null,
+      upcomingEvents: [],
+      homePage: {
+        ...defaultHomePage,
+        heroHeadline: "Lớn lên cùng nhau.",
+        callToAction: { label: "Kết nối với chúng mình", url: "/join" },
+        community: {
+          eyebrow: null,
+          title: "Nhịp sống của nhóm",
+          description: "Ba điều chúng mình cùng làm mỗi tuần.",
+        },
+        communityThemes: [{ title: "Phục vụ", description: "Cùng phục vụ." }],
+        gatheringEmptyMessage: "Lịch mới sẽ sớm được cập nhật.",
+      },
+    } satisfies HomePageData);
+
+    render(await Home());
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Lớn lên cùng nhau." }),
+    ).toBeInTheDocument();
+    for (const action of screen.getAllByRole("link", {
+      name: "Kết nối với chúng mình",
+    })) {
+      expect(action).toHaveAttribute("href", "/join");
+    }
+    const community = screen.getByRole("region", { name: "Nhịp sống của nhóm" });
+    expect(within(community).getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      within(community).getByRole("heading", { level: 3, name: "Phục vụ" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Lịch mới sẽ sớm được cập nhật."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Nhắn tin qua Facebook" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders useful empty states when homepage content is unavailable", async () => {
     loadHomePageDataMock.mockResolvedValue({
       aboutPage: null,
+      homePage: null,
       featuredEvent: null,
       latestArticle: null,
       latestSermon: null,

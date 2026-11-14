@@ -70,6 +70,21 @@ describe("POST /api/revalidate", () => {
     });
   });
 
+  it("expires the Home Page cache after publication", async () => {
+    const response = await POST(
+      createRequest({
+        ...validPayload,
+        model: "home-page",
+        uid: "api::home-page.home-page",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(revalidateTag).toHaveBeenCalledExactlyOnceWith("cms:home-page", {
+      expire: 0,
+    });
+  });
+
   it("expires supporting-content tags on public data changes", async () => {
     const response = await POST(
       createRequest({

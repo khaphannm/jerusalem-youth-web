@@ -265,6 +265,7 @@ Approved scale:
 - small: 6px
 - medium: 12px
 - large: 20px
+- xlarge: 28px (landing-page tiles and hero stage only)
 
 Default card: medium.
 Hero/featured media: large where appropriate.
@@ -322,13 +323,54 @@ Accent is not a default button variant.
 ## Homepage photographic hero
 
 The approved homepage exception to the carousel guidance is a manual,
-photo-led gallery: fixed welcome copy occupies two desktop grid columns out of
-five and imagery occupies three. On mobile, show copy, gallery, then the CTA.
-Use a stable 4:3 image stage, the large radius, a secondary/navy caption strip,
-white caption text, and an accent/coral slide number. Controls use existing
-primary/outline buttons, visible focus, and an underline for selection.
-Use the normal-duration opacity transition and disable it for reduced motion.
-No autoplay, decorative gradients, or additional carousel dependencies.
+photo-led gallery. Welcome copy is centred above it (eyebrow, display headline,
+one supporting paragraph, one primary action and one text link); the gallery
+spans the wide container beneath. Use a stable image stage (4:3 on mobile,
+16:9 from `sm`), the `large` radius on mobile and `xlarge` from `sm`, and a
+caption row beneath the image: label and caption on the left, controls on the
+right. Controls are 44px round targets on `surface`: one dot per photograph
+(the selected dot widens and uses `primary`, and is also exposed with
+`aria-pressed`) plus previous/next arrows. Slides cross-fade with the slow
+duration and emphasized easing. No autoplay, decorative gradients, text over
+photographs, or additional carousel dependencies.
+
+## Landing-page layout and motion
+
+Approved for the homepage on 14 November 2026. The direction is a product
+landing page: generous whitespace, centred section headings, one idea per
+section, large rounded tiles, and motion tied to scrolling. It uses the
+approved palette and typeface only.
+
+Layout:
+- Section headings are centred, except two-column sections, where the heading
+  stays left and sticks below the header (`lg:sticky`) while its tiles scroll.
+- Tiles use `surface` on white sections and white on `surface` sections, the
+  `large` radius on mobile and `xlarge` (28px) from `sm`, no border and no
+  shadow. `xlarge` is reserved for landing-page tiles and the hero stage.
+- The site header is sticky and translucent (`background` at 85% with a
+  backdrop blur). This is the only approved use of a blurred surface.
+
+Motion tokens: `--motion-slow` (700ms) and `--motion-ease-emphasized`, exposed
+as `duration-slow` and `ease-emphasized`. Utilities in `globals.css`:
+
+| Utility | Effect | Use |
+| --- | --- | --- |
+| `motion-enter` | Rise and fade once on load, staggered with `--motion-step` | Hero copy only |
+| `motion-reveal` | Rise, fade and settle as the element scrolls into view | Section headings, tiles, cards |
+| `motion-settle` | Scale from 90% to full size while scrolling into view | Hero image stage |
+| `motion-recede` | Fade and lift slightly while scrolling out of view | Hero copy |
+
+Rules:
+- CSS only: no animation library and no scroll listeners. Scroll-linked
+  utilities use view timelines and apply only where the browser supports them;
+  elsewhere the content is simply visible.
+- Every utility is disabled under `prefers-reduced-motion: reduce`. Content
+  must be complete and readable with motion off and with JavaScript off.
+- Animate `opacity` and `transform` only. Do not animate layout properties.
+- Do not put `motion-reveal` and a hover transform on the same element; wrap
+  the hover target instead.
+- Do not fade in the hero image: it is the likely LCP element.
+- Tiles may lift 4px on hover. Nothing loops, bounces, or plays automatically.
 
 ## Dark mode
 

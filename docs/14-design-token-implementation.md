@@ -40,6 +40,23 @@ border                  #DEDAD3
 muted                   #667085
 ```
 
+## Shape and motion tokens
+
+```text
+radius-small    6px
+radius-medium   12px
+radius-large    20px
+radius-xlarge   28px   landing-page tiles and hero stage only
+duration-fast   150ms
+duration-normal 250ms
+duration-slow   700ms  landing-page entrances and slide cross-fades
+ease-standard   cubic-bezier(0.2, 0, 0, 1)
+ease-emphasized cubic-bezier(0.16, 1, 0.3, 1)
+```
+
+See "Landing-page layout and motion" in `04-design-system.md` for the
+`motion-*` utilities and their rules.
+
 ## Good
 
 ```tsx

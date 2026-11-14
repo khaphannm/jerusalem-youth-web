@@ -4,12 +4,14 @@ import type {
   Author,
   Category,
   Event,
+  HomePage,
   MediaAsset,
   Navigation,
   Resource,
   RichText,
   RichTextInline,
   RichTextList,
+  SectionIntro,
   Seo,
   Sermon,
   SermonSeries,
@@ -23,6 +25,7 @@ import type {
   RawAuthor,
   RawCategory,
   RawEvent,
+  RawHomePage,
   RawMedia,
   RawNavigation,
   RawResource,
@@ -50,6 +53,39 @@ export const mapAboutPage = (aboutPage: RawAboutPage): AboutPage => ({
     url: aboutPage.primaryCta.url,
   },
   publishedAt: aboutPage.publishedAt,
+});
+
+const mapSectionIntro = (
+  intro: RawHomePage["introduction"],
+): SectionIntro => ({
+  eyebrow: intro.eyebrow || null,
+  title: intro.title,
+  description: intro.description || null,
+});
+
+export const mapHomePage = (homePage: RawHomePage): HomePage => ({
+  heroHeadline: homePage.heroHeadline,
+  heroDescription: homePage.heroDescription,
+  callToAction: {
+    label: homePage.primaryCta.label,
+    url: homePage.primaryCta.url,
+  },
+  introduction: mapSectionIntro(homePage.introduction),
+  community: mapSectionIntro(homePage.community),
+  communityThemes: homePage.communityThemes.map(({ description, title }) => ({
+    description,
+    title,
+  })),
+  gathering: mapSectionIntro(homePage.gathering),
+  gatheringEmptyMessage: homePage.gatheringEmptyMessage,
+  stories: mapSectionIntro(homePage.stories),
+  teaching: mapSectionIntro(homePage.teaching),
+  newcomer: mapSectionIntro(homePage.newcomer),
+  newcomerSteps: homePage.newcomerSteps.map(({ description, title }) => ({
+    description,
+    title,
+  })),
+  invitation: mapSectionIntro(homePage.invitation),
 });
 
 export const mapMedia = (media: RawMedia, cmsBaseUrl: string): MediaAsset => ({

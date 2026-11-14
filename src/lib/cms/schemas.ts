@@ -368,6 +368,28 @@ export const aboutPageSchema = publishedDocumentSchema.extend({
   vision: requiredString,
 });
 
+const sectionIntroSchema = z.object({
+  eyebrow: z.string().trim().max(80).nullable().optional(),
+  title: requiredString.max(120),
+  description: z.string().trim().max(400).nullable().optional(),
+});
+
+export const homePageSchema = publishedDocumentSchema.extend({
+  heroHeadline: requiredString.max(80),
+  heroDescription: requiredString.max(400),
+  primaryCta: callToActionSchema,
+  introduction: sectionIntroSchema,
+  community: sectionIntroSchema,
+  communityThemes: z.array(ministryValueSchema).min(1).max(6),
+  gathering: sectionIntroSchema,
+  gatheringEmptyMessage: requiredString.max(400),
+  stories: sectionIntroSchema,
+  teaching: sectionIntroSchema,
+  newcomer: sectionIntroSchema,
+  newcomerSteps: z.array(ministryValueSchema).min(1).max(4),
+  invitation: sectionIntroSchema,
+});
+
 export const heroSlideSchema = z.object({
   image: mediaSchema.refine((image) => image.mime.startsWith("image/"), "Hero media must be an image."),
   label: requiredString.max(40),
@@ -419,4 +441,5 @@ export type RawResource = z.infer<typeof resourceSchema>;
 export type RawNavigation = z.infer<typeof navigationSchema>;
 export type RawSocialLinks = z.infer<typeof socialLinksSchema>;
 export type RawAboutPage = z.infer<typeof aboutPageSchema>;
+export type RawHomePage = z.infer<typeof homePageSchema>;
 export type RawSiteSettings = z.infer<typeof siteSettingsSchema>;

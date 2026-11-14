@@ -4,6 +4,7 @@ import type { z } from "zod";
 
 import type {
   AboutPage,
+  HomePage,
   Article,
   Author,
   Category,
@@ -27,6 +28,7 @@ import {
 import { CmsError } from "./errors";
 import {
   mapAboutPage,
+  mapHomePage,
   mapArticle,
   mapAuthor,
   mapCategory,
@@ -41,6 +43,7 @@ import {
 } from "./mappers";
 import {
   aboutPageSchema,
+  homePageSchema,
   articleSchema,
   authorSchema,
   categorySchema,
@@ -120,6 +123,18 @@ const populate = {
   ],
   author: ["avatar"],
   event: ["banner", "gallery", "seo.socialImage"],
+  homePage: [
+    "primaryCta",
+    "introduction",
+    "community",
+    "communityThemes",
+    "gathering",
+    "stories",
+    "teaching",
+    "newcomer",
+    "newcomerSteps",
+    "invitation",
+  ],
   navigation: ["primaryItems", "utilityItems", "footerItems"],
   resource: [
     "category",
@@ -570,6 +585,14 @@ export const createCmsClient = ({
         z.infer<typeof aboutPageSchema>,
         AboutPage
       >),
+    homePage: () =>
+      readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.homePage] },
+        endpoint: "home-page",
+        populate: populate.homePage,
+        schema: homePageSchema,
+        map: (homePage) => mapHomePage(homePage),
+      } satisfies SingleDefinition<z.infer<typeof homePageSchema>, HomePage>),
     articles: {
       list: (options?: CollectionOptions) =>
         readCollection(articles, {
