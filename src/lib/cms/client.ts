@@ -26,6 +26,7 @@ import {
   type CmsCacheTag,
 } from "./cache";
 import { CmsError } from "./errors";
+import { populate } from "./populate";
 import {
   mapAboutPage,
   mapHomePage,
@@ -58,6 +59,9 @@ import {
   socialLinksSchema,
   storySchema,
 } from "./schemas";
+import { createSnapshotFetch } from "./snapshot/fetch.ts";
+import { loadSnapshotFromDisk } from "./snapshot/load.ts";
+import { resolveCmsSource } from "./source.ts";
 import {
   minimumSearchQueryLength,
   normalizeSearchQuery,
@@ -110,52 +114,6 @@ type CollectionQuery = CollectionOptions &
   }>;
 
 const defaultTimeoutMs = 8_000;
-
-const populate = {
-  aboutPage: ["values", "primaryCta"],
-  article: [
-    "featuredImage",
-    "author.avatar",
-    "category",
-    "tags",
-    "bibleReferences",
-    "seo.socialImage",
-  ],
-  author: ["avatar"],
-  event: ["banner", "gallery", "seo.socialImage"],
-  homePage: [
-    "primaryCta",
-    "introduction",
-    "community",
-    "communityThemes",
-    "gathering",
-    "weeklySchedule",
-    "stories",
-    "teaching",
-    "newcomer",
-    "newcomerSteps",
-    "invitation",
-  ],
-  navigation: ["primaryItems", "utilityItems", "footerItems"],
-  resource: [
-    "category",
-    "file",
-    "author.avatar",
-    "thumbnail",
-    "seo.socialImage",
-  ],
-  sermon: ["series.coverImage", "thumbnail", "seo.socialImage"],
-  sermonSeries: ["coverImage"],
-  siteSettings: [
-    "heroSlides.image",
-    "defaultSeo.socialImage",
-    "defaultSocialImage",
-    "organizationContact",
-    "primaryCta",
-  ],
-  socialLinks: ["links"],
-  story: ["featuredImage", "seo.socialImage"],
-} as const;
 
 const isLocalHostname = (hostname: string) =>
   hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
@@ -820,7 +778,22 @@ export const createCmsClient = ({
 
 let defaultClient: ReturnType<typeof createCmsClient> | undefined;
 
+// In snapshot mode every read is answered from the content file bundled with
+// the deployment. The client never falls back to the live CMS.
+const createDefaultClient = () => {
+  if (resolveCmsSource(process.env) === "snapshot") {
+    const snapshot = loadSnapshotFromDisk();
+
+    return createCmsClient({
+      baseUrl: snapshot.sourceOrigin,
+      fetch: createSnapshotFetch(snapshot),
+    });
+  }
+
+  return createCmsClient({ baseUrl: process.env.CMS_BASE_URL ?? "" });
+};
+
 export const getCmsClient = () => {
-  defaultClient ??= createCmsClient({ baseUrl: process.env.CMS_BASE_URL ?? "" });
+  defaultClient ??= createDefaultClient();
   return defaultClient;
 };

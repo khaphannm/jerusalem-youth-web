@@ -6,6 +6,7 @@ import {
   getOptionalS3Credentials,
   requireEnvironmentValue,
   requireHttpsUrl,
+  resolveS3AclParams,
 } from '../../utils/media';
 
 const config: Core.Config.Shared.ConfigFunction<Core.Config.Plugin> = ({ env }) => {
@@ -28,7 +29,7 @@ const config: Core.Config.Shared.ConfigFunction<Core.Config.Plugin> = ({ env }) 
             forcePathStyle: env.bool('AWS_FORCE_PATH_STYLE', false),
             params: {
               Bucket: requireEnvironmentValue(env, 'AWS_BUCKET'),
-              ...(objectAcl ? { ACL: objectAcl } : {}),
+              ...resolveS3AclParams(objectAcl),
             },
           },
         },

@@ -15,6 +15,21 @@ describe("validateEnvironment", () => {
     });
   });
 
+  it("needs only the site URL for a snapshot deployment", () => {
+    expect(() =>
+      validateEnvironment({ CMS_SOURCE: "snapshot", SITE_URL: "https://x.test" }),
+    ).not.toThrow();
+    expect(() => validateEnvironment({ CMS_SOURCE: "snapshot" })).toThrow(
+      "Missing required environment variable: SITE_URL.",
+    );
+    expect(() =>
+      validateEnvironment({ CMS_SOURCE: "live", SITE_URL: "https://x.test" }),
+    ).toThrow(/CMS_BASE_URL, CMS_REVALIDATION_SECRET/);
+    expect(() => validateEnvironment({ CMS_SOURCE: "static" })).toThrow(
+      'CMS_SOURCE must be "live" or "snapshot".',
+    );
+  });
+
   it("accepts an environment that supplies every required value", () => {
     expect(() =>
       validateEnvironment(

@@ -42,6 +42,19 @@ describe("POST /api/revalidate", () => {
     vi.unstubAllEnvs();
   });
 
+  it("refuses to report publication on a snapshot deployment", async () => {
+    vi.stubEnv("CMS_SOURCE", "snapshot");
+
+    const response = await POST(createRequest());
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error:
+        "This deployment serves a content snapshot. Publish with a new release.",
+    });
+    expect(revalidateTag).not.toHaveBeenCalled();
+  });
+
   it("immediately expires the fixed cache tag for published content", async () => {
     const response = await POST(createRequest());
 

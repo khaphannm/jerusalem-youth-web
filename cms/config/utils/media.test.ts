@@ -8,6 +8,7 @@ import {
   getOptionalHttpsUrl,
   getOptionalS3Credentials,
   requireHttpsUrl,
+  resolveS3AclParams,
   uploadMaxFileSizeBytes,
 } from './media';
 
@@ -73,4 +74,18 @@ test('an explicitly configured S3 endpoint must use HTTPS', () => {
       ),
     /valid HTTPS URL/,
   );
+});
+
+test('object ACL can be defaulted, set, or switched off for stores without ACLs', () => {
+  assert.deepEqual(resolveS3AclParams(undefined), {});
+  assert.deepEqual(resolveS3AclParams('bucket-owner-full-control'), {
+    ACL: 'bucket-owner-full-control',
+  });
+
+  const disabled = resolveS3AclParams('none');
+
+  // The provider skips the ACL header only when the key exists and is empty.
+  assert.equal('ACL' in disabled, true);
+  assert.equal(disabled.ACL, undefined);
+  assert.equal('ACL' in resolveS3AclParams('NONE'), true);
 });

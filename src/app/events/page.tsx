@@ -17,6 +17,10 @@ import type { Event } from "@/lib/cms/domain";
 const listingDescription =
   "Xem các buổi gặp gỡ sắp tới của ban thanh niên, thời gian, địa điểm và những sự kiện đã diễn ra.";
 
+// Upcoming and past events depend on the current time. Re-render at most
+// every five minutes so they stay correct without a CMS call or a rebuild.
+export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadEventSiteSettings();
   const siteName = settings?.siteName ?? siteConfig.name;

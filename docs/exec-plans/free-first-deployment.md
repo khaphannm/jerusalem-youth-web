@@ -1,7 +1,10 @@
 # Execution plan — Free-first deployment
 
-Status: Direction approved; implementation not started.
-Updated: 31 October 2026.
+Status: Steps 1–4 implemented in code and configuration and unit-tested (see
+[snapshot publication](../snapshot-publication.md) and
+[free hosting setup](../free-hosting-setup.md)). Nothing has run on the real
+services; step 5 (verification on real hosting, backups, handoff) is open.
+Updated: 16 November 2026.
 
 ## Goal and scope
 

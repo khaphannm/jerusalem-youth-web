@@ -1,0 +1,15 @@
+# Free-first production build: capture the published CMS content, then build
+# the website so it serves that snapshot. See docs/free-hosting-setup.md.
+#
+# Set in the Netlify UI (Site configuration → Environment variables):
+#   CMS_BASE_URL  the Strapi address, e.g. https://your-cms.onrender.com
+#   SITE_URL      the public website origin, e.g. https://your-site.netlify.app
+#
+# If the capture or the build fails, Netlify keeps the previous deploy live.
+[build]
+  command = "npm run release:build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"
+  CMS_SOURCE = "snapshot"

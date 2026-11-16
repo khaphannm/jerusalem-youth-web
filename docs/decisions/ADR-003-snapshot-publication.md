@@ -1,6 +1,7 @@
 # ADR-003 — Snapshot publication for the free-first launch
 
-Status: Accepted direction; implementation pending.
+Status: Accepted. Export and snapshot adapter implemented; hosting and release
+workflow pending.
 Date: 31 October 2026.
 
 ## Context

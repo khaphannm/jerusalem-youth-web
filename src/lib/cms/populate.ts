@@ -1,0 +1,47 @@
+// Relations and components requested with every read of each content type.
+// Shared by the live client and the snapshot capture.
+export const populate = {
+  aboutPage: ["values", "primaryCta"],
+  article: [
+    "featuredImage",
+    "author.avatar",
+    "category",
+    "tags",
+    "bibleReferences",
+    "seo.socialImage",
+  ],
+  author: ["avatar"],
+  event: ["banner", "gallery", "seo.socialImage"],
+  homePage: [
+    "primaryCta",
+    "introduction",
+    "community",
+    "communityThemes",
+    "gathering",
+    "weeklySchedule",
+    "stories",
+    "teaching",
+    "newcomer",
+    "newcomerSteps",
+    "invitation",
+  ],
+  navigation: ["primaryItems", "utilityItems", "footerItems"],
+  resource: [
+    "category",
+    "file",
+    "author.avatar",
+    "thumbnail",
+    "seo.socialImage",
+  ],
+  sermon: ["series.coverImage", "thumbnail", "seo.socialImage"],
+  sermonSeries: ["coverImage"],
+  siteSettings: [
+    "heroSlides.image",
+    "defaultSeo.socialImage",
+    "defaultSocialImage",
+    "organizationContact",
+    "primaryCta",
+  ],
+  socialLinks: ["links"],
+  story: ["featuredImage", "seo.socialImage"],
+} as const;

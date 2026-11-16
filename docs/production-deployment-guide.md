@@ -1,10 +1,12 @@
 # Free-first production deployment plan
 
-Updated 31 October 2026. Selected direction for Jerusalem Youth's current low
-traffic and infrequent editing. **Planning only: snapshot publishing and the R2
-media Worker are not implemented.** Complete the
-[execution plan](exec-plans/free-first-deployment.md) before using this as the
-public launch workflow. Existing code still reads Strapi during requests/builds.
+Updated 16 November 2026. Selected direction for Jerusalem Youth's current low
+traffic and infrequent editing. Snapshot publishing, the R2 media Worker and
+the hosting configuration are now implemented and unit-tested, **but have not
+been run on the real services**. Follow [free hosting setup](free-hosting-setup.md)
+and pass its checks before treating this as the public launch workflow.
+Sections 3 and 4 below are the original plan, kept as the checklist the
+implementation was built against.
 
 Target $0 monthly service charges within free allowances, then upgrade services
 individually. Free tiers carry availability limits; no hosting resources have

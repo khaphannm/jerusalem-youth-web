@@ -172,6 +172,10 @@ function NumberedTiles({ items }: { items: readonly MinistryValue[] }) {
   );
 }
 
+// Upcoming and past events depend on the current time. Re-render at most
+// every five minutes so they stay correct without a CMS call or a rebuild.
+export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadHomeSiteSettings();
   const seo = settings?.defaultSeo;
