@@ -56,7 +56,7 @@ future palette change.
 radius-small    6px
 radius-medium   12px
 radius-large    20px
-radius-xlarge   28px   landing-page tiles and hero stage only
+radius-xlarge   28px   tiles, cards and image stages
 duration-fast   150ms
 duration-normal 250ms
 duration-slow   700ms  landing-page entrances and slide cross-fades

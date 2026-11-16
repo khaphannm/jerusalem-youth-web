@@ -11,7 +11,7 @@ export function SermonCard({
   const href = `/sermons/${encodeURIComponent(sermon.slug)}`;
 
   return (
-    <article className="overflow-hidden rounded-large border border-border bg-primary-foreground md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+    <article className="overflow-hidden rounded-large border border-border bg-primary-foreground sm:rounded-xlarge md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       {sermon.thumbnail ? (
         <ContentImage
           asset={sermon.thumbnail}

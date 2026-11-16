@@ -37,9 +37,9 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested sermon could not be found.",
+      description: "Không tìm thấy bài giảng bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Sermon not found",
+      title: "Không tìm thấy bài giảng",
     };
   }
 
@@ -97,7 +97,7 @@ function SermonErrorState() {
             Sermons
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="sermon-error-title"
           >
             This sermon is temporarily unavailable
@@ -153,7 +153,7 @@ export default async function SermonPage({ params }: SermonPageProps) {
               )}
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="sermon-title"
             >
               {sermon.title}
@@ -182,7 +182,7 @@ export default async function SermonPage({ params }: SermonPageProps) {
                 >
                   Watch the sermon
                 </h2>
-                <div className="mt-8 overflow-hidden rounded-large border border-border bg-surface">
+                <div className="mt-8 overflow-hidden rounded-large border border-border bg-surface sm:rounded-xlarge">
                   {videoEmbed ? (
                     <DeferredVideoPlayer
                       contentTitle={sermon.title}
@@ -205,7 +205,7 @@ export default async function SermonPage({ params }: SermonPageProps) {
 
               <aside
                 aria-labelledby="sermon-details-title"
-                className="rounded-medium border border-border bg-background p-6 sm:p-8"
+                className="motion-reveal rounded-large border border-border bg-background p-6 sm:rounded-xlarge sm:p-8"
               >
                 <h2
                   className="font-heading text-heading-3 font-bold"

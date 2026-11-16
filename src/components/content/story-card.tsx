@@ -16,8 +16,8 @@ export function StoryCard({
 }: StoryCardProps) {
   const href = `/stories/${encodeURIComponent(story.slug)}`;
   const articleClasses = featured
-    ? "overflow-hidden rounded-large border border-border bg-background md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
-    : "flex h-full flex-col overflow-hidden rounded-medium border border-border bg-background";
+    ? "overflow-hidden rounded-large border border-border bg-background sm:rounded-xlarge md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
+    : "flex h-full flex-col overflow-hidden rounded-large border border-border bg-background sm:rounded-xlarge transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none";
   const contentClasses = featured
     ? "flex flex-col justify-center p-6 sm:p-10"
     : "flex flex-1 flex-col p-5";

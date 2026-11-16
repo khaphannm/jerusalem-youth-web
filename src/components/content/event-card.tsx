@@ -21,8 +21,8 @@ export function EventCard({
 }: EventCardProps) {
   const href = `/events/${encodeURIComponent(event.slug)}`;
   const articleClasses = featured
-    ? "overflow-hidden rounded-large border border-primary-foreground/20 bg-secondary text-secondary-foreground lg:grid lg:grid-cols-2"
-    : "flex h-full flex-col overflow-hidden rounded-medium border border-border bg-background text-foreground";
+    ? "overflow-hidden rounded-large border border-primary-foreground/20 bg-secondary text-secondary-foreground sm:rounded-xlarge lg:grid lg:grid-cols-2"
+    : "flex h-full flex-col overflow-hidden rounded-large border border-border bg-background text-foreground sm:rounded-xlarge transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none";
   const imageClasses = featured
     ? "aspect-[4/3] h-full w-full object-cover lg:aspect-auto"
     : "aspect-[4/3] w-full object-cover";

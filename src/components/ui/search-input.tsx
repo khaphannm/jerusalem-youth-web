@@ -12,7 +12,7 @@ export function SearchInput({ defaultValue = "" }: SearchInputProps) {
   return (
     <form
       action="/search"
-      aria-label="Site search"
+      aria-label="Tìm kiếm trong trang"
       className="mt-8 max-w-reading"
       method="get"
       role="search"
@@ -21,7 +21,7 @@ export function SearchInput({ defaultValue = "" }: SearchInputProps) {
         className="font-label text-label font-bold text-secondary-foreground"
         htmlFor="site-search-query"
       >
-        What are you looking for?
+        Bạn đang tìm gì?
       </label>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row">
         <input
@@ -33,20 +33,24 @@ export function SearchInput({ defaultValue = "" }: SearchInputProps) {
           maxLength={maximumSearchQueryLength}
           minLength={minimumSearchQueryLength}
           name="q"
-          placeholder="Try faith, Friday, or prayer"
+          placeholder="Ví dụ: đức tin, cầu nguyện"
           required
           type="search"
         />
-        <Button className="w-full sm:w-auto" size="large" type="submit">
-          Search
+        <Button
+          className="w-full shrink-0 whitespace-nowrap sm:w-auto"
+          size="large"
+          type="submit"
+        >
+          Tìm kiếm
         </Button>
       </div>
       <p
         className="mt-3 text-body-small text-secondary-foreground/80"
         id="site-search-help"
       >
-        Use at least {minimumSearchQueryLength} characters. Search includes
-        published articles, events, sermons, stories, and resources.
+        Nhập ít nhất {minimumSearchQueryLength} ký tự. Tìm trong bài viết, sự
+        kiện, bài giảng, câu chuyện và tài liệu đã đăng.
       </p>
     </form>
   );

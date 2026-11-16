@@ -15,12 +15,12 @@ import type { EventStatus } from "@/features/events/dates";
 import type { Event } from "@/lib/cms/domain";
 
 const listingDescription =
-  "Find upcoming youth ministry gatherings, see when and where we meet, and revisit past events.";
+  "Xem các buổi gặp gỡ sắp tới của ban thanh niên, thời gian, địa điểm và những sự kiện đã diễn ra.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadEventSiteSettings();
   const siteName = settings?.siteName ?? siteConfig.name;
-  const socialTitle = `Events | ${siteName}`;
+  const socialTitle = `Sự kiện | ${siteName}`;
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -38,6 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       description: listingDescription,
       images: image ? [image] : undefined,
+      locale: "vi_VN",
       siteName,
       title: socialTitle,
       type: "website",
@@ -46,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }
       : undefined,
-    title: "Events",
+    title: "Sự kiện",
     twitter: {
       card: image ? "summary_large_image" : "summary",
       description: listingDescription,
@@ -63,8 +64,8 @@ function EventGrid({
   return (
     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((event) => (
-        <li className="h-full" key={event.id}>
-          <EventCard event={event} status={status} />
+        <li className="motion-reveal h-full" key={event.id}>
+          <EventCard event={event} locale="vi" status={status} />
         </li>
       ))}
     </ul>
@@ -75,22 +76,22 @@ export default async function EventsPage() {
   const listing = await loadEventListing();
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="events-title" tone="surface">
         <Container size="wide">
           <div className="max-w-reading">
             <p className="font-label text-label font-bold uppercase text-accent">
-              Gather with us
+              Hẹn gặp bạn
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="events-title"
             >
-              Events worth showing up for
+              Những buổi gặp gỡ đáng để có mặt
             </h1>
             <p className="mt-6 text-pretty text-body-large text-muted">
-              Find the next gathering, make plans with friends, and see where
-              our community has been. All event times are shown in UTC.
+              Tìm buổi gặp gỡ tiếp theo, rủ bạn bè cùng tham gia và xem lại
+              những sự kiện đã qua. Thời gian hiển thị theo giờ Việt Nam.
             </p>
           </div>
         </Container>
@@ -101,29 +102,27 @@ export default async function EventsPage() {
           <SectionHeading
             description={
               listing.status === "ready"
-                ? `${listing.groups.upcoming.length} ${
-                    listing.groups.upcoming.length === 1 ? "event" : "events"
-                  }, ordered by date and time.`
-                : "Published events will appear here when the connection is restored."
+                ? `${listing.groups.upcoming.length} sự kiện, xếp theo ngày giờ.`
+                : "Sự kiện sẽ hiển thị tại đây khi kết nối được khôi phục."
             }
-            eyebrow="Coming up"
+            eyebrow="Sắp tới"
             id="upcoming-events-list-title"
             tone="white"
-            title="Upcoming events"
+            title="Sự kiện sắp tới"
           />
           <div className="mt-10">
             {listing.status === "error" ? (
               <EmptyState
-                action={<LinkButton href="/events">Try again</LinkButton>}
-                description="We could not load the events right now. Please try again in a little while."
-                title="Events are temporarily unavailable"
+                action={<LinkButton href="/events">Thử lại</LinkButton>}
+                description="Hiện chưa tải được danh sách sự kiện. Bạn vui lòng thử lại sau ít phút."
+                title="Tạm thời chưa xem được sự kiện"
               />
             ) : listing.groups.upcoming.length > 0 ? (
               <EventGrid events={listing.groups.upcoming} status="upcoming" />
             ) : (
               <EmptyState
-                description="There are no upcoming dates to share right now. New gatherings will appear here when they are published."
-                title="The next event is on the way"
+                description="Hiện chưa có lịch mới. Các buổi gặp gỡ sắp tới sẽ xuất hiện tại đây khi được đăng."
+                title="Sự kiện tiếp theo sắp được công bố"
               />
             )}
           </div>
@@ -134,21 +133,19 @@ export default async function EventsPage() {
         <Section aria-labelledby="past-events-list-title" tone="surface">
           <Container size="wide">
             <SectionHeading
-              description={`${listing.groups.past.length} ${
-                listing.groups.past.length === 1 ? "event" : "events"
-              }, most recent first.`}
-              eyebrow="From the archive"
+              description={`${listing.groups.past.length} sự kiện, mới nhất trước.`}
+              eyebrow="Lưu trữ"
               id="past-events-list-title"
               tone="surface"
-              title="Past events"
+              title="Sự kiện đã qua"
             />
             <div className="mt-10">
               {listing.groups.past.length > 0 ? (
                 <EventGrid events={listing.groups.past} status="past" />
               ) : (
                 <EmptyState
-                  description="Past gatherings will collect here after their dates have passed."
-                  title="No past events yet"
+                  description="Các buổi gặp gỡ đã diễn ra sẽ được lưu tại đây."
+                  title="Chưa có sự kiện đã qua"
                 />
               )}
             </div>

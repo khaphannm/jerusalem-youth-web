@@ -20,19 +20,19 @@ type SearchPageProps = Readonly<{
 }>;
 
 const searchDescription =
-  "Search published articles, events, sermons, stories, and resources from across the site.";
+  "Tìm trong các bài viết, sự kiện, bài giảng, câu chuyện và tài liệu đã đăng trên trang.";
 
 export const metadata: Metadata = {
   description: searchDescription,
   robots: { follow: true, index: false },
-  title: "Search",
+  title: "Tìm kiếm",
 };
 
 function ResultGroup({ group }: Readonly<{ group: SearchResultGroup }>) {
   const visibleDescription =
     group.total > group.items.length
-      ? `Showing ${group.items.length} of ${group.total}`
-      : `${group.total} ${group.total === 1 ? "result" : "results"}`;
+      ? `Hiển thị ${group.items.length} trên ${group.total}`
+      : `${group.total} kết quả`;
 
   return (
     <section aria-labelledby={`search-${group.id}-title`} className="mt-12">
@@ -48,8 +48,8 @@ function ResultGroup({ group }: Readonly<{ group: SearchResultGroup }>) {
 
       <ul className="mt-6 grid gap-5 md:grid-cols-2">
         {group.items.map((result) => (
-          <li className="h-full" key={`${group.id}-${result.id}`}>
-            <article className="flex h-full flex-col rounded-medium border border-border bg-surface p-6 sm:p-8">
+          <li className="motion-reveal h-full" key={`${group.id}-${result.id}`}>
+            <article className="flex h-full flex-col rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8 transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
               <p className="font-label text-label font-bold uppercase text-primary">
                 {result.typeLabel}
                 {result.context ? (
@@ -72,7 +72,7 @@ function ResultGroup({ group }: Readonly<{ group: SearchResultGroup }>) {
                 className="mt-5 inline-flex min-h-11 w-fit items-center gap-2 rounded-small py-2 font-label text-label font-bold text-primary transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none"
                 href={result.href}
               >
-                View {result.typeLabel.toLowerCase()}
+                Xem {result.typeLabel.toLowerCase()}
                 <span aria-hidden="true">→</span>
               </SafeLink>
             </article>
@@ -90,8 +90,8 @@ function SearchResults({
   if (query.status === "empty") {
     return (
       <EmptyState
-        description="Enter a topic, event name, speaker, or resource title to search published content."
-        title="Start with a search"
+        description="Nhập chủ đề, tên sự kiện, người chia sẻ hoặc tên tài liệu để tìm trong nội dung đã đăng."
+        title="Bắt đầu tìm kiếm"
       />
     );
   }
@@ -99,8 +99,8 @@ function SearchResults({
   if (query.status === "too-short") {
     return (
       <EmptyState
-        description="Add another character so the search is specific enough to be useful."
-        title="Search needs at least two characters"
+        description="Hãy nhập thêm ký tự để tìm chính xác hơn."
+        title="Cần ít nhất hai ký tự để tìm"
       />
     );
   }
@@ -108,8 +108,8 @@ function SearchResults({
   if (!data || data.status === "error") {
     return (
       <EmptyState
-        description="Published content could not be searched right now. Please try again in a moment."
-        title="Search is temporarily unavailable"
+        description="Hiện chưa tìm kiếm được. Bạn vui lòng thử lại sau ít phút."
+        title="Tạm thời chưa tìm kiếm được"
       />
     );
   }
@@ -120,7 +120,7 @@ function SearchResults({
         className="mb-6 rounded-medium border border-border bg-background p-4 text-body-small text-muted"
         role="status"
       >
-        Some results are temporarily unavailable: {data.unavailableTypes.join(", ")}.
+        Một số kết quả tạm thời chưa xem được: {data.unavailableTypes.join(", ")}.
       </p>
     ) : null;
 
@@ -129,8 +129,8 @@ function SearchResults({
       <>
         {availabilityNotice}
         <EmptyState
-          description="Try a broader topic, check the spelling, or search for a different event, message, story, or resource."
-          title={`No results for “${query.value}”`}
+          description="Hãy thử chủ đề rộng hơn, kiểm tra chính tả hoặc tìm một sự kiện, bài giảng, câu chuyện hay tài liệu khác."
+          title={`Không có kết quả cho “${query.value}”`}
         />
       </>
     );
@@ -153,24 +153,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     query.status === "ready" ? await searchPublicContent(query.value) : null;
   const resultsDescription =
     query.status !== "ready"
-      ? "Submit a search above to explore published content."
+      ? "Nhập từ khóa ở trên để tìm trong nội dung đã đăng."
       : data?.status === "ready"
-        ? `${data.matchedTotal} ${data.matchedTotal === 1 ? "result" : "results"} for “${query.value}”.`
-        : `Results for “${query.value}” could not be loaded.`;
+        ? `${data.matchedTotal} kết quả cho “${query.value}”.`
+        : `Chưa tải được kết quả cho “${query.value}”.`;
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="search-title" tone="secondary">
         <Container size="wide">
           <div className="max-w-reading">
             <p className="font-label text-label font-bold uppercase text-calm">
-              Find what you need
+              Tìm điều bạn cần
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="search-title"
             >
-              Search the site
+              Tìm kiếm trên trang
             </h1>
             <p className="mt-6 text-pretty text-body-large text-secondary-foreground">
               {searchDescription}
@@ -184,10 +184,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <Container size="wide">
           <SectionHeading
             description={resultsDescription}
-            eyebrow="Published content"
+            eyebrow="Nội dung đã đăng"
             id="search-results-title"
             tone="white"
-            title="Search results"
+            title="Kết quả tìm kiếm"
           />
           <div className="mt-10">
             <SearchResults data={data} query={query} />

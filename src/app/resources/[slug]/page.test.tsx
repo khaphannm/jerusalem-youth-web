@@ -184,10 +184,10 @@ describe("ResourcePage", () => {
 
     render(<ResourceNotFound />);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Resource not found" }),
+      screen.getByRole("heading", { level: 1, name: "Không tìm thấy tài liệu" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all resources" }),
+      screen.getByRole("link", { name: "Xem tất cả tài liệu" }),
     ).toHaveAttribute("href", "/resources");
   });
 
@@ -206,7 +206,7 @@ describe("ResourcePage", () => {
       generateMetadata(pageProps, parentMetadata),
     ).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Resource not found",
+      title: "Không tìm thấy tài liệu",
     });
 
     loadResourceDetailMock.mockResolvedValueOnce({ status: "error" });

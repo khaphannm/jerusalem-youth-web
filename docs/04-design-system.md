@@ -272,7 +272,7 @@ Approved scale:
 - small: 6px
 - medium: 12px
 - large: 20px
-- xlarge: 28px (landing-page tiles and hero stage only)
+- xlarge: 28px (tiles, cards and image stages; not small controls)
 
 Default card: medium.
 Hero/featured media: large where appropriate.
@@ -359,9 +359,21 @@ Layout:
   where it falls below AA contrast.
 - Tiles use `surface` on white sections and white on `surface` sections, the
   `large` radius on mobile and `xlarge` (28px) from `sm`, no border and no
-  shadow; white tiles may carry a `border/60` hairline. `xlarge` is reserved for landing-page tiles and the hero stage.
+  shadow; white tiles may carry a `border/60` hairline. `xlarge` is for
+  tiles, cards and image stages, not for small controls.
 - The site header is sticky and translucent (`background` at 85% with a
   backdrop blur). This is the only approved use of a blurred surface.
+
+Inner pages (listings, detail pages, Join, Contact, Search, About, 404)
+share the same language in a lighter form:
+- The page title (`h1`) uses `motion-enter`.
+- Cards, tiles, side panels and empty states use the `large` radius on mobile
+  and `xlarge` from `sm`. Small chips, inputs and buttons keep `small`.
+- Grid cards (event, story, resource, media, search result) lift 4px on hover.
+  Wide feature cards do not.
+- List items, info tiles and side panels use `motion-reveal`; the banner image
+  on detail pages uses `motion-settle`. The reveal goes on the list item or
+  wrapper, never on the element that lifts on hover.
 
 Vision statement (`VisionStatement`, homepage introduction): the sentence is
 set at display size, centred, with a pill eyebrow. Words go from 18% opacity

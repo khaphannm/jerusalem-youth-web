@@ -114,10 +114,10 @@ describe("public content search", () => {
             {
               href: "/articles/faith-for-monday",
               title: "Faith for Monday",
-              typeLabel: "Article",
+              typeLabel: "Bài viết",
             },
           ],
-          label: "Articles",
+          label: "Bài viết",
         },
         {
           id: "events",
@@ -125,10 +125,10 @@ describe("public content search", () => {
             {
               context: "Youth Hall",
               href: "/events/friday-gathering",
-              typeLabel: "Event",
+              typeLabel: "Sự kiện",
             },
           ],
-          label: "Events",
+          label: "Sự kiện",
         },
       ],
       matchedTotal: 2,
@@ -164,7 +164,7 @@ describe("public content search", () => {
       groups: [],
       matchedTotal: 0,
       status: "ready",
-      unavailableTypes: ["Articles"],
+      unavailableTypes: ["Bài viết"],
     });
     expect(errorSpy).toHaveBeenCalledWith(
       "Search articles could not be loaded: Articles offline",

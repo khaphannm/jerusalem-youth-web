@@ -15,8 +15,8 @@ import {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadContactSiteSettings();
   const siteName = settings?.siteName ?? siteConfig.name;
-  const title = `Contact ${siteName}`;
-  const description = `Find the official email, phone, address, and community channels for ${siteName}.`;
+  const title = `Liên hệ ${siteName}`;
+  const description = `Email, số điện thoại, địa chỉ và các kênh cộng đồng chính thức của ${siteName}.`;
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -34,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       description,
       images: image ? [image] : undefined,
+      locale: "vi_VN",
       siteName,
       title,
       type: "website",
@@ -42,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }
       : undefined,
-    title: "Contact",
+    title: "Liên hệ",
     twitter: {
       card: image ? "summary_large_image" : "summary",
       description,
@@ -65,22 +66,22 @@ export default async function ContactPage() {
   const communityLinks = socialLinks?.links ?? [];
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="contact-title" tone="secondary">
         <Container size="wide">
           <div className="max-w-reading">
             <p className="font-label text-label font-bold uppercase text-calm">
-              Official contact
+              Liên hệ chính thức
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="contact-title"
             >
-              Contact {siteName}
+              Liên hệ {siteName}
             </h1>
             <p className="mt-6 text-pretty text-body-large text-secondary-foreground">
-              Use the organization-level channels published below. We do not
-              list private staff details or collect messages on this page.
+              Hãy dùng các kênh chính thức bên dưới. Trang này không đăng thông
+              tin cá nhân của người phụ trách và không thu thập tin nhắn.
             </p>
           </div>
         </Container>
@@ -89,11 +90,11 @@ export default async function ContactPage() {
       <Section aria-labelledby="contact-channels-title" tone="white">
         <Container size="wide">
           <SectionHeading
-            description="Choose the channel that best fits your question. Email and phone links open the app already configured on your device."
-            eyebrow="Get in touch"
+            description="Chọn kênh phù hợp với câu hỏi của bạn. Liên kết email và điện thoại sẽ mở ứng dụng có sẵn trên thiết bị."
+            eyebrow="Liên hệ với chúng mình"
             id="contact-channels-title"
             tone="white"
-            title="Official contact channels"
+            title="Các kênh liên hệ chính thức"
           />
 
           <div className="mt-10">
@@ -101,15 +102,15 @@ export default async function ContactPage() {
               <address className="not-italic">
                 <ul className="grid gap-6 md:grid-cols-3">
                   {contact?.email ? (
-                    <li className="rounded-medium border border-border bg-surface p-6 sm:p-8">
+                    <li className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8">
                       <h3 className="font-heading text-heading-3 font-bold">
                         Email
                       </h3>
                       <p className="mt-3 text-muted">
-                        Send a message through your email provider.
+                        Gửi thư qua ứng dụng email của bạn.
                       </p>
                       <SafeLink
-                        aria-label={`Email ${siteName} at ${contact.email}`}
+                        aria-label={`Gửi email cho ${siteName} qua ${contact.email}`}
                         className={contactLinkClasses}
                         href={`mailto:${contact.email}`}
                       >
@@ -119,15 +120,15 @@ export default async function ContactPage() {
                   ) : null}
 
                   {contact?.phone ? (
-                    <li className="rounded-medium border border-border bg-surface p-6 sm:p-8">
+                    <li className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8">
                       <h3 className="font-heading text-heading-3 font-bold">
-                        Phone
+                        Điện thoại
                       </h3>
                       <p className="mt-3 text-muted">
-                        Call using your device&apos;s phone app.
+                        Gọi bằng ứng dụng điện thoại trên thiết bị.
                       </p>
                       <SafeLink
-                        aria-label={`Call ${siteName} at ${contact.phone}`}
+                        aria-label={`Gọi ${siteName} theo số ${contact.phone}`}
                         className={contactLinkClasses}
                         href={`tel:${contact.phone}`}
                       >
@@ -137,12 +138,12 @@ export default async function ContactPage() {
                   ) : null}
 
                   {contact?.address ? (
-                    <li className="rounded-medium border border-border bg-surface p-6 sm:p-8">
+                    <li className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8">
                       <h3 className="font-heading text-heading-3 font-bold">
-                        Address
+                        Địa chỉ
                       </h3>
                       <p className="mt-3 text-muted">
-                        Our published organization address.
+                        Địa chỉ chính thức của chúng mình.
                       </p>
                       <p className="mt-4 whitespace-pre-line text-body-large font-bold">
                         {contact.address}
@@ -153,9 +154,9 @@ export default async function ContactPage() {
               </address>
             ) : (
               <EmptyState
-                action={<LinkButton href="/join">Explore ways to join</LinkButton>}
-                description="Our official direct contact details are being updated. You can still find a clear next step on the Join Us page."
-                title="Contact details are being updated"
+                action={<LinkButton href="/join">Xem cách tham gia</LinkButton>}
+                description="Thông tin liên hệ trực tiếp đang được cập nhật. Bạn vẫn có thể tìm bước tiếp theo ở trang Tham gia."
+                title="Thông tin liên hệ đang được cập nhật"
               />
             )}
           </div>
@@ -165,11 +166,11 @@ export default async function ContactPage() {
       <Section aria-labelledby="contact-community-title" tone="calm">
         <Container size="reading">
           <SectionHeading
-            description="These links come from our approved public channel list. No external form is required to view them."
-            eyebrow="Community channels"
+            description="Các liên kết này thuộc danh sách kênh công khai đã được duyệt. Bạn không cần điền biểu mẫu nào để xem."
+            eyebrow="Kênh cộng đồng"
             id="contact-community-title"
             tone="calm"
-            title="Connect through an official channel"
+            title="Kết nối qua kênh chính thức"
           />
 
           {communityLinks.length > 0 ? (
@@ -178,7 +179,7 @@ export default async function ContactPage() {
                 {communityLinks.map((item, index) => (
                   <li key={`${item.platform}-${item.url}-${index}`}>
                     <LinkButton href={item.url} variant="outline">
-                      Visit {item.platform}
+                      Mở {item.platform}
                     </LinkButton>
                   </li>
                 ))}
@@ -186,8 +187,8 @@ export default async function ContactPage() {
             </nav>
           ) : (
             <p className="mt-8 text-calm-foreground">
-              Our public community links are being updated. Please use an
-              official contact channel above or visit the Join Us page.
+              Các kênh cộng đồng đang được cập nhật. Bạn vui lòng dùng kênh
+              liên hệ chính thức ở trên hoặc xem trang Tham gia.
             </p>
           )}
         </Container>

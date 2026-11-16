@@ -88,7 +88,7 @@ export default async function ArticlesPage({
               Read and reflect
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="articles-title"
             >
               Articles for everyday faith
@@ -123,7 +123,7 @@ export default async function ArticlesPage({
               <>
                 <ul className="space-y-8">
                   {articles.map((article) => (
-                    <li key={article.id}>
+                    <li className="motion-reveal" key={article.id}>
                       <ArticleCard article={article} />
                     </li>
                   ))}

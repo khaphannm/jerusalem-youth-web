@@ -72,7 +72,7 @@ export default async function AboutPage() {
               Về chúng mình
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="about-title"
             >
               Giới thiệu {siteName}
@@ -139,7 +139,7 @@ export default async function AboutPage() {
               <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {aboutPage.values.map((value, index) => (
                   <li
-                    className="rounded-medium border border-border bg-surface p-6 sm:p-8"
+                    className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8"
                     key={`${value.title}-${index}`}
                   >
                     <p className="font-label text-label font-bold text-primary">

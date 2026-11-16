@@ -36,9 +36,9 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested article category could not be found.",
+      description: "Không tìm thấy chuyên mục bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Article category not found",
+      title: "Không tìm thấy chuyên mục",
     };
   }
 
@@ -107,7 +107,7 @@ function ArticleCategoryError({ slug }: Readonly<{ slug: string }>) {
             Article category
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="category-error-title"
           >
             This category is temporarily unavailable
@@ -168,7 +168,7 @@ export default async function ArticleCategoryPage({
               Article category
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="article-category-title"
             >
               {category.name} articles
@@ -197,7 +197,7 @@ export default async function ArticleCategoryPage({
               <>
                 <ul className="space-y-8">
                   {articles.map((article) => (
-                    <li key={article.id}>
+                    <li className="motion-reveal" key={article.id}>
                       <ArticleCard article={article} />
                     </li>
                   ))}

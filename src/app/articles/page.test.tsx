@@ -135,12 +135,12 @@ describe("ArticlesPage", () => {
     const pagination = screen.getByRole("navigation", {
       name: "Article pages",
     });
-    expect(within(pagination).getByText("Page 2 of 3")).toBeInTheDocument();
-    expect(within(pagination).getByRole("link", { name: /Previous/ })).toHaveAttribute(
+    expect(within(pagination).getByText("Trang 2 / 3")).toBeInTheDocument();
+    expect(within(pagination).getByRole("link", { name: /Trước/ })).toHaveAttribute(
       "href",
       "/articles",
     );
-    expect(within(pagination).getByRole("link", { name: /Next/ })).toHaveAttribute(
+    expect(within(pagination).getByRole("link", { name: /Sau/ })).toHaveAttribute(
       "href",
       "/articles?page=3",
     );

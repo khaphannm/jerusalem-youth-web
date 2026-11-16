@@ -15,15 +15,27 @@ const publicationDateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-const vietnameseEventDateFormatter = new Intl.DateTimeFormat("vi-VN", {
+const vietnameseEventDateParts = new Intl.DateTimeFormat("vi-VN", {
   day: "numeric",
-  month: "long",
+  month: "numeric",
   year: "numeric",
   hour: "2-digit",
   minute: "2-digit",
+  hourCycle: "h23",
   timeZone: "Asia/Ho_Chi_Minh",
-  timeZoneName: "short",
 });
+
+// Built from parts so the wording is the same on every runtime:
+// "18:30, 4 tháng 9, 2099", always in Vietnam time.
+const formatVietnameseEventDateTime = (date: Date) => {
+  const parts = Object.fromEntries(
+    vietnameseEventDateParts
+      .formatToParts(date)
+      .map((part) => [part.type, part.value]),
+  );
+
+  return `${parts.hour}:${parts.minute}, ${parts.day} tháng ${parts.month}, ${parts.year}`;
+};
 
 const vietnamesePublicationDateFormatter = new Intl.DateTimeFormat("vi-VN", {
   day: "numeric",
@@ -36,9 +48,9 @@ export const formatEventDateTime = (
   value: string,
   locale: "en" | "vi" = "en",
 ) =>
-  (locale === "vi" ? vietnameseEventDateFormatter : eventDateFormatter).format(
-    new Date(value),
-  );
+  locale === "vi"
+    ? formatVietnameseEventDateTime(new Date(value))
+    : eventDateFormatter.format(new Date(value));
 
 export const formatPublicationDate = (
   value: string,

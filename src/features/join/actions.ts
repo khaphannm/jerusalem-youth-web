@@ -1,7 +1,7 @@
 import type { CallToAction } from "@/lib/cms/domain";
 
 const fallbackJoinAction = {
-  label: "Find a gathering",
+  label: "Tìm một buổi gặp gỡ",
   url: "/events",
 } satisfies CallToAction;
 

@@ -14,7 +14,7 @@ export function ArticleCard({
   )}`;
 
   return (
-    <article className="overflow-hidden rounded-large border border-calm-foreground/20 bg-background md:grid md:grid-cols-2">
+    <article className="overflow-hidden rounded-large border border-calm-foreground/20 bg-background sm:rounded-xlarge md:grid md:grid-cols-2">
       <ContentImage
         asset={article.featuredImage}
         className="aspect-[4/3] h-full w-full object-cover"

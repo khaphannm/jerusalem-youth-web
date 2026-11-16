@@ -14,7 +14,7 @@ export function EmptyState({
   title,
 }: EmptyStateProps) {
   const classes = [
-    "rounded-medium border border-border bg-background p-6 text-foreground sm:p-8",
+    "rounded-large border border-border bg-background p-6 text-foreground sm:rounded-xlarge sm:p-8",
     className,
   ]
     .filter(Boolean)

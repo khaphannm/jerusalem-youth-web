@@ -115,12 +115,12 @@ describe("ArticleCategoryPage", () => {
     const pagination = screen.getByRole("navigation", {
       name: "Article pages",
     });
-    expect(within(pagination).getByText("Page 2 of 3")).toBeInTheDocument();
+    expect(within(pagination).getByText("Trang 2 / 3")).toBeInTheDocument();
     expect(
-      within(pagination).getByRole("link", { name: /Previous/ }),
+      within(pagination).getByRole("link", { name: /Trước/ }),
     ).toHaveAttribute("href", "/articles/category/devotional");
     expect(
-      within(pagination).getByRole("link", { name: /Next/ }),
+      within(pagination).getByRole("link", { name: /Sau/ }),
     ).toHaveAttribute("href", "/articles/category/devotional?page=3");
     expect(loadArticleCategoryMock).toHaveBeenCalledExactlyOnceWith(
       "devotional",
@@ -205,11 +205,11 @@ describe("ArticleCategoryPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Article category not found",
+        name: "Không tìm thấy chuyên mục",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all articles" }),
+      screen.getByRole("link", { name: "Xem tất cả bài viết" }),
     ).toHaveAttribute("href", "/articles");
   });
 
@@ -236,7 +236,7 @@ describe("ArticleCategoryPage", () => {
       generateMetadata(pageProps(), parentMetadata),
     ).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Article category not found",
+      title: "Không tìm thấy chuyên mục",
     });
 
     loadArticleCategoryMock.mockResolvedValueOnce({ status: "error" });

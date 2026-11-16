@@ -11,7 +11,7 @@ export function MediaCard({ item }: Readonly<{ item: MediaItem }>) {
     item.kind === "video" ? getExternalVideoEmbed(item.videoUrl) : null;
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-medium border border-border bg-background">
+    <article className="flex h-full flex-col overflow-hidden rounded-large border border-border bg-background sm:rounded-xlarge transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
       <div className="overflow-hidden bg-secondary">
         {item.kind === "image" ? (
           <ContentImage
