@@ -37,9 +37,9 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested story could not be found.",
+      description: "Không tìm thấy câu chuyện bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Story not found",
+      title: "Không tìm thấy câu chuyện",
     };
   }
 
@@ -91,7 +91,7 @@ function StoryErrorState() {
             Stories
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="story-error-title"
           >
             This story is temporarily unavailable
@@ -142,7 +142,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
               Community story
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="story-title"
             >
               {story.title}
@@ -166,7 +166,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
         <Section aria-label="Story image" spacing="compact" tone="white">
           <Container size="wide">
-            <div className="overflow-hidden rounded-large border border-border bg-surface">
+            <div className="motion-settle overflow-hidden rounded-large border border-border bg-surface sm:rounded-xlarge">
               <ContentImage
                 asset={story.featuredImage}
                 className="aspect-[16/9] h-auto w-full object-cover"
@@ -192,7 +192,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
                 >
                   Watch the story
                 </h2>
-                <div className="mt-8 overflow-hidden rounded-large border border-border bg-background">
+                <div className="mt-8 overflow-hidden rounded-large border border-border bg-background sm:rounded-xlarge">
                   {videoEmbed ? (
                     <DeferredVideoPlayer
                       contentTitle={story.title}

@@ -53,7 +53,7 @@ export default async function MediaPage() {
               Life together
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="media-title"
             >
               Moments from our community
@@ -89,7 +89,7 @@ export default async function MediaPage() {
                 ) : null}
                 <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((item) => (
-                    <li key={item.id}>
+                    <li className="motion-reveal" key={item.id}>
                       <MediaCard item={item} />
                     </li>
                   ))}

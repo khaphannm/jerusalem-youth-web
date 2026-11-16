@@ -84,7 +84,8 @@ CMS-002 defines these collection types:
 - Article, Event, Sermon, Story / Testimony, and Resource
 - Author, Category, and Series
 
-HOME-004 adds the About Page single type. The CMS also defines Site Settings,
+HOME-004 adds the About Page single type and the Home Page single type holds
+landing-page copy. The CMS also defines Site Settings,
 Navigation, and Social Links, plus reusable SEO, navigation, contact, CTA,
 ministry-value, tag, Bible-reference, and social-link components.
 

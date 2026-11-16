@@ -32,7 +32,7 @@ export function Pagination({
           rel="prev"
         >
           <span aria-hidden="true">←</span>
-          Previous
+          Trước
         </Link>
       ) : (
         <span
@@ -40,12 +40,12 @@ export function Pagination({
           className="inline-flex min-h-11 items-center gap-2 rounded-small border border-border px-4 py-2 font-label text-label font-bold text-muted"
         >
           <span aria-hidden="true">←</span>
-          Previous
+          Trước
         </span>
       )}
 
       <p className="text-body-small text-muted">
-        Page {currentPage} of {pageCount}
+        Trang {currentPage} / {pageCount}
       </p>
 
       {currentPage < pageCount ? (
@@ -54,7 +54,7 @@ export function Pagination({
           href={pageHref(basePath, currentPage + 1)}
           rel="next"
         >
-          Next
+          Sau
           <span aria-hidden="true">→</span>
         </Link>
       ) : (
@@ -62,7 +62,7 @@ export function Pagination({
           aria-disabled="true"
           className="inline-flex min-h-11 items-center gap-2 rounded-small border border-border px-4 py-2 font-label text-label font-bold text-muted"
         >
-          Next
+          Sau
           <span aria-hidden="true">→</span>
         </span>
       )}

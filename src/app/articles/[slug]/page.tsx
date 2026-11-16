@@ -39,9 +39,9 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested article could not be found.",
+      description: "Không tìm thấy bài viết bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Article not found",
+      title: "Không tìm thấy bài viết",
     };
   }
 
@@ -93,7 +93,7 @@ function ArticleErrorState() {
             Articles
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="article-error-title"
           >
             This article is temporarily unavailable
@@ -158,7 +158,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </Link>
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="article-title"
             >
               {article.title}
@@ -178,7 +178,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         <Section aria-label="Article image" spacing="compact" tone="white">
           <Container size="wide">
-            <div className="overflow-hidden rounded-large border border-border bg-surface">
+            <div className="motion-settle overflow-hidden rounded-large border border-border bg-surface sm:rounded-xlarge">
               <ContentImage
                 asset={article.featuredImage}
                 className="aspect-[16/9] h-auto w-full object-cover"
@@ -234,7 +234,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {hasAuthorProfile ? (
               <aside
                 aria-labelledby="article-author-title"
-                className="mt-12 rounded-medium border border-border bg-surface p-6 sm:p-8"
+                className="motion-reveal mt-12 rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8"
               >
                 <div className="flex items-start gap-5">
                   {article.author.avatar ? (

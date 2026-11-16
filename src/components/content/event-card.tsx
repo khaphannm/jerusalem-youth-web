@@ -10,13 +10,19 @@ type EventCardProps = Readonly<{
   event: Event;
   featured?: boolean;
   status: EventStatus;
+  locale?: "en" | "vi";
 }>;
 
-export function EventCard({ event, featured = false, status }: EventCardProps) {
+export function EventCard({
+  event,
+  featured = false,
+  status,
+  locale = "en",
+}: EventCardProps) {
   const href = `/events/${encodeURIComponent(event.slug)}`;
   const articleClasses = featured
-    ? "overflow-hidden rounded-large border border-primary-foreground/20 bg-secondary text-secondary-foreground lg:grid lg:grid-cols-2"
-    : "flex h-full flex-col overflow-hidden rounded-medium border border-border bg-background text-foreground";
+    ? "overflow-hidden rounded-large border border-primary-foreground/20 bg-secondary text-secondary-foreground sm:rounded-xlarge lg:grid lg:grid-cols-2"
+    : "flex h-full flex-col overflow-hidden rounded-large border border-border bg-background text-foreground sm:rounded-xlarge transition-transform duration-normal ease-emphasized hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none";
   const imageClasses = featured
     ? "aspect-[4/3] h-full w-full object-cover lg:aspect-auto"
     : "aspect-[4/3] w-full object-cover";
@@ -26,18 +32,26 @@ export function EventCard({ event, featured = false, status }: EventCardProps) {
       <ContentImage
         asset={event.banner}
         className={imageClasses}
-        sizes={featured ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"}
+        sizes={
+          featured
+            ? "(min-width: 1024px) 50vw, 100vw"
+            : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        }
       />
       <div
-        className={featured ? "flex flex-col justify-center p-6 sm:p-10" : "flex flex-1 flex-col p-5"}
+        className={
+          featured
+            ? "flex flex-col justify-center p-6 sm:p-10"
+            : "flex flex-1 flex-col p-5"
+        }
       >
         <div className="flex flex-wrap items-center gap-3">
-          <EventStatusBadge status={status} />
+          <EventStatusBadge status={status} locale={locale} />
           <p
             className={`font-label text-label font-bold uppercase ${featured ? "text-secondary-foreground" : "text-secondary"}`}
           >
             <time dateTime={event.startDateTime}>
-              {formatEventDateTime(event.startDateTime)}
+              {formatEventDateTime(event.startDateTime, locale)}
             </time>
           </p>
         </div>
@@ -65,7 +79,7 @@ export function EventCard({ event, featured = false, status }: EventCardProps) {
           className={`mt-6 inline-flex min-h-11 w-fit items-center rounded-small py-2 font-label text-label font-bold transition-colors duration-fast ease-standard motion-reduce:transition-none ${featured ? "text-primary-foreground hover:text-calm" : "text-primary hover:text-secondary"}`}
           href={href}
         >
-          View event
+          {locale === "vi" ? "Xem chi tiết" : "View event"}
           <span aria-hidden="true">→</span>
         </Link>
       </div>

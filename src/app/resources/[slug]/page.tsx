@@ -41,9 +41,9 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested resource could not be found.",
+      description: "Không tìm thấy tài liệu bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Resource not found",
+      title: "Không tìm thấy tài liệu",
     };
   }
 
@@ -110,7 +110,7 @@ function ResourceErrorState() {
             Resources
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="resource-error-title"
           >
             This resource is temporarily unavailable
@@ -161,7 +161,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
               {source.typeLabel}
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="resource-title"
             >
               {resource.title}
@@ -187,7 +187,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
           <Container size="wide">
             <div className="grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)] lg:items-start">
               {resource.thumbnail ? (
-                <div className="overflow-hidden rounded-large border border-border bg-surface">
+                <div className="motion-settle overflow-hidden rounded-large border border-border bg-surface sm:rounded-xlarge">
                   <ContentImage
                     asset={resource.thumbnail}
                     className="aspect-[4/3] h-auto w-full object-cover"
@@ -197,13 +197,13 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
               ) : (
                 <div
                   aria-hidden="true"
-                  className="flex aspect-[4/3] items-end rounded-large bg-secondary p-8 font-heading text-heading-2 font-bold text-secondary-foreground"
+                  className="flex aspect-[4/3] items-end rounded-large bg-secondary p-8 sm:rounded-xlarge font-heading text-heading-2 font-bold text-secondary-foreground"
                 >
                   {source.typeLabel}
                 </div>
               )}
 
-              <aside className="rounded-medium border border-border bg-background p-6 sm:p-8">
+              <aside className="motion-reveal rounded-large border border-border bg-background p-6 sm:rounded-xlarge sm:p-8">
                 <p className="font-label text-label font-bold uppercase text-primary">
                   {source.typeLabel}
                 </p>

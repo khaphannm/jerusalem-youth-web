@@ -203,18 +203,25 @@ New visible colors require an explicit design-system change.
 
 ## Section rhythm
 
-Recommended homepage rhythm:
+The homepage rotates section backgrounds automatically: Deep Navy, a light
+tone, Soft Sage, a light tone, then navy again. The hero is Warm Ivory and the
+first section rendered after it is navy. The rotation follows the sections
+that are actually shown, so switching a section off in the CMS (or having no
+stories) never leaves two sections of the same tone touching.
 
-1. Hero — Warm Ivory
-2. Upcoming Events — White
-3. Featured / Next Gathering — Deep Navy
-4. Latest Sermon — Soft Sand
-5. Stories — White
-6. Devotional / Quiet content — Soft Sage
-7. Join CTA — Deep Navy
-8. Footer — Midnight
+- Light turns cycle through `primary-soft` (Electric Blue at 8% on white),
+  `accent-soft` (Warm Coral at 12% on white) and Soft Sand. The two tints are
+  section backgrounds only; do not use them for text, buttons or cards.
+- With every section on: vision navy, mission blue tint, gathering sage,
+  stories coral tint, teaching navy, newcomer sand, invitation sage.
+- Each section must work in every tone. Headings take the section tone. Text
+  links are white on navy, navy on sage (blue fails contrast there) and blue
+  on light tones. Secondary copy uses `foreground` on tints, sand and sage,
+  not `muted`. Tiles and content cards are white with their own text colour.
+  The highlighter stroke is 55% on navy and 45% elsewhere.
 
-Do not alternate colors mechanically. Use color to reinforce content mood and hierarchy.
+This deliberately uses more sage and tint than the colour-ratio guideline
+above; that guideline still applies to every other page.
 
 ## Accent semantics
 
@@ -265,6 +272,7 @@ Approved scale:
 - small: 6px
 - medium: 12px
 - large: 20px
+- xlarge: 28px (tiles, cards and image stages; not small controls)
 
 Default card: medium.
 Hero/featured media: large where appropriate.
@@ -322,13 +330,80 @@ Accent is not a default button variant.
 ## Homepage photographic hero
 
 The approved homepage exception to the carousel guidance is a manual,
-photo-led gallery: fixed welcome copy occupies two desktop grid columns out of
-five and imagery occupies three. On mobile, show copy, gallery, then the CTA.
-Use a stable 4:3 image stage, the large radius, a secondary/navy caption strip,
-white caption text, and an accent/coral slide number. Controls use existing
-primary/outline buttons, visible focus, and an underline for selection.
-Use the normal-duration opacity transition and disable it for reduced motion.
-No autoplay, decorative gradients, or additional carousel dependencies.
+photo-led gallery. Welcome copy is centred above it (eyebrow, display headline,
+one supporting paragraph, one primary action and one text link); the gallery
+spans the wide container beneath. Use a stable image stage (4:3 on mobile,
+16:9 from `sm`), the `large` radius on mobile and `xlarge` from `sm`, and a
+caption row beneath the image: label and caption on the left, controls on the
+right. Controls are 44px round targets on `surface`: one dot per photograph
+(the selected dot widens and uses `primary`, and is also exposed with
+`aria-pressed`) plus previous/next arrows. Slides cross-fade with the slow
+duration and emphasized easing. No autoplay, decorative gradients, text over
+photographs, or additional carousel dependencies.
+
+## Landing-page layout and motion
+
+Approved for the homepage on 14 November 2026. The direction is a product
+landing page: generous whitespace, centred section headings, one idea per
+section, large rounded tiles, and motion tied to scrolling. It uses the
+approved palette and typeface only.
+
+Layout:
+- Section headings are centred, except two-column sections, where the heading
+  stays left and sticks below the header (`lg:sticky`) while its tiles scroll.
+- A set of short parallel items (the mission) uses a bento grid: one column on
+  mobile, two from `md`, and rows of three from `lg` with a short last row
+  widened to fill it (five items read 3 + 2). Each tile has a small muted
+  counter, a semibold title and small secondary copy.
+- Small `muted` text must sit on white or `background`, not on `surface`,
+  where it falls below AA contrast.
+- Tiles use `surface` on white sections and white on `surface` sections, the
+  `large` radius on mobile and `xlarge` (28px) from `sm`, no border and no
+  shadow; white tiles may carry a `border/60` hairline. `xlarge` is for
+  tiles, cards and image stages, not for small controls.
+- The site header is sticky and translucent (`background` at 85% with a
+  backdrop blur). This is the only approved use of a blurred surface.
+
+Inner pages (listings, detail pages, Join, Contact, Search, About, 404)
+share the same language in a lighter form:
+- The page title (`h1`) uses `motion-enter`.
+- Cards, tiles, side panels and empty states use the `large` radius on mobile
+  and `xlarge` from `sm`. Small chips, inputs and buttons keep `small`.
+- Grid cards (event, story, resource, media, search result) lift 4px on hover.
+  Wide feature cards do not.
+- List items, info tiles and side panels use `motion-reveal`; the banner image
+  on detail pages uses `motion-settle`. The reveal goes on the list item or
+  wrapper, never on the element that lifts on hover.
+
+Vision statement (`VisionStatement`, homepage introduction): the sentence is
+set at display size, centred, with a pill eyebrow. Words go from 18% opacity
+to full in reading order as the block scrolls towards mid-screen
+(`statement-word`); an optional phrase then gets a flat `accent` stroke at 45%
+under its lower third (`statement-mark`), and the description and link rise in
+last (`statement-after`). Screen readers get one plain sentence. Use it once
+per page, for one sentence.
+
+Motion tokens: `--motion-slow` (700ms) and `--motion-ease-emphasized`, exposed
+as `duration-slow` and `ease-emphasized`. Utilities in `globals.css`:
+
+| Utility | Effect | Use |
+| --- | --- | --- |
+| `motion-enter` | Rise and fade once on load, staggered with `--motion-step` | Hero copy only |
+| `motion-reveal` | Rise, fade and settle as the element scrolls into view | Section headings, tiles, cards |
+| `motion-settle` | Scale from 90% to full size while scrolling into view | Hero image stage |
+| `motion-recede` | Fade and lift slightly while scrolling out of view | Hero copy |
+
+Rules:
+- CSS only: no animation library and no scroll listeners. Scroll-linked
+  utilities use view timelines and apply only where the browser supports them;
+  elsewhere the content is simply visible.
+- Every utility is disabled under `prefers-reduced-motion: reduce`. Content
+  must be complete and readable with motion off and with JavaScript off.
+- Animate `opacity` and `transform` only. Do not animate layout properties.
+- Do not put `motion-reveal` and a hover transform on the same element; wrap
+  the hover target instead.
+- Do not fade in the hero image: it is the likely LCP element.
+- Tiles may lift 4px on hover. Nothing loops, bounces, or plays automatically.
 
 ## Dark mode
 

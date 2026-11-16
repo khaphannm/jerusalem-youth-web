@@ -1,0 +1,10 @@
+# Deploy with: npx wrangler deploy  (from this folder)
+# Change `name` and `bucket_name` to the values created for Jerusalem Youth.
+name = "jerusalem-youth-media"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "jerusalem-youth-media"

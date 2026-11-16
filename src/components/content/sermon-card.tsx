@@ -4,11 +4,14 @@ import { ContentImage } from "@/components/ui/content-image";
 import type { Sermon } from "@/lib/cms/domain";
 import { formatPublicationDate } from "@/lib/format-date";
 
-export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
+export function SermonCard({
+  sermon,
+  locale = "en",
+}: Readonly<{ sermon: Sermon; locale?: "en" | "vi" }>) {
   const href = `/sermons/${encodeURIComponent(sermon.slug)}`;
 
   return (
-    <article className="overflow-hidden rounded-large border border-border bg-primary-foreground md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+    <article className="overflow-hidden rounded-large border border-border bg-primary-foreground sm:rounded-xlarge md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       {sermon.thumbnail ? (
         <ContentImage
           asset={sermon.thumbnail}
@@ -20,20 +23,22 @@ export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
           aria-hidden="true"
           className="flex min-h-52 items-end bg-secondary p-6 text-heading-3 font-bold text-secondary-foreground"
         >
-          Watch the message
+          {locale === "vi" ? "Sứ điệp gần đây" : "Watch the message"}
         </div>
       )}
       <div className="flex flex-col justify-center p-6 sm:p-10">
         <p className="font-label text-label font-bold uppercase text-primary">
           {sermon.series ? (
             <>
-              <span className="sr-only">Series: </span>
+              <span className="sr-only">
+                {locale === "vi" ? "Loạt bài: " : "Series: "}
+              </span>
               {sermon.series.name}
               <span aria-hidden="true"> · </span>
             </>
           ) : null}
           <time dateTime={sermon.date}>
-            {formatPublicationDate(sermon.date)}
+            {formatPublicationDate(sermon.date, locale)}
           </time>
         </p>
         <h3 className="mt-4 font-heading text-heading-3 font-bold">
@@ -45,7 +50,9 @@ export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
           </Link>
         </h3>
         <p className="mt-2 font-label text-label font-semibold text-secondary">
-          <span className="sr-only">Speaker: </span>
+          <span className="sr-only">
+            {locale === "vi" ? "Diễn giả: " : "Speaker: "}
+          </span>
           {sermon.speaker}
         </p>
         <p className="mt-4 text-muted">{sermon.summary}</p>
@@ -53,7 +60,7 @@ export function SermonCard({ sermon }: Readonly<{ sermon: Sermon }>) {
           className="mt-6 inline-flex min-h-11 w-fit items-center rounded-small py-2 font-label text-label font-bold text-primary transition-colors duration-fast ease-standard hover:text-secondary motion-reduce:transition-none"
           href={href}
         >
-          Watch sermon
+          {locale === "vi" ? "Xem sứ điệp" : "Watch sermon"}
           <span aria-hidden="true">→</span>
         </Link>
       </div>

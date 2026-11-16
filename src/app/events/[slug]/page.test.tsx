@@ -107,7 +107,7 @@ describe("EventPage", () => {
         name: "Friday night gathering",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Upcoming")).toBeInTheDocument();
+    expect(screen.getByText("Sắp diễn ra")).toBeInTheDocument();
     expect(
       screen.getByText("Come as you are and bring a friend."),
     ).toBeInTheDocument();
@@ -119,36 +119,36 @@ describe("EventPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Jerusalem Youth Hall")).toBeInTheDocument();
     expect(screen.getByText("123 Community Street")).toBeInTheDocument();
-    expect(screen.getByText("Sep 4, 2099, 11:30 AM UTC")).toHaveAttribute(
+    expect(screen.getByText("18:30, 4 tháng 9, 2099")).toHaveAttribute(
       "datetime",
       event.startDateTime,
     );
-    expect(screen.getByText("Sep 4, 2099, 1:30 PM UTC")).toHaveAttribute(
+    expect(screen.getByText("20:30, 4 tháng 9, 2099")).toHaveAttribute(
       "datetime",
       event.endDateTime,
     );
-    expect(screen.getByRole("link", { name: "View map" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Xem bản đồ" })).toHaveAttribute(
       "href",
       event.mapUrl,
     );
     expect(
-      screen.getByRole("link", { name: "Contact Youth Team" }),
+      screen.getByRole("link", { name: "Liên hệ Youth Team" }),
     ).toHaveAttribute("href", event.contactLink);
     expect(
-      screen.getByRole("heading", { name: "Registration is open" }),
+      screen.getByRole("heading", { name: "Đang mở đăng ký" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Register for this event" }),
+      screen.getByRole("link", { name: "Đăng ký tham gia" }),
     ).toHaveAttribute("href", event.registrationUrl);
     expect(
       screen.getByRole("img", { name: galleryImage.alternativeText }),
     ).toBeInTheDocument();
 
     const nextSection = screen.getByRole("region", {
-      name: "Explore more events",
+      name: "Khám phá thêm sự kiện",
     });
     expect(
-      within(nextSection).getByRole("link", { name: "Browse all events" }),
+      within(nextSection).getByRole("link", { name: "Xem tất cả sự kiện" }),
     ).toHaveAttribute("href", "/events");
   });
 
@@ -162,11 +162,11 @@ describe("EventPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Registration is not available online",
+        name: "Không có đăng ký trực tuyến",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "Register for this event" }),
+      screen.queryByRole("link", { name: "Đăng ký tham gia" }),
     ).not.toBeInTheDocument();
   });
 
@@ -182,13 +182,13 @@ describe("EventPage", () => {
     render(await EventPage(pageProps));
 
     expect(
-      screen.getByRole("heading", { name: "Registration is closed" }),
+      screen.getByRole("heading", { name: "Đã đóng đăng ký" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("The registration deadline has passed."),
+      screen.getByText("Đã qua hạn đăng ký."),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "Register for this event" }),
+      screen.queryByRole("link", { name: "Đăng ký tham gia" }),
     ).not.toBeInTheDocument();
   });
 
@@ -205,11 +205,11 @@ describe("EventPage", () => {
 
     render(await EventPage(pageProps));
 
-    expect(screen.getByText("Past event")).toBeInTheDocument();
+    expect(screen.getByText("Đã diễn ra")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Registration is closed" }),
+      screen.getByRole("heading", { name: "Đã đóng đăng ký" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("This event has ended.")).toBeInTheDocument();
+    expect(screen.getByText("Sự kiện này đã kết thúc.")).toBeInTheDocument();
   });
 
   it("builds event social metadata from validated SEO fields", async () => {
@@ -258,10 +258,10 @@ describe("EventPage", () => {
 
     render(<EventNotFound />);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Event not found" }),
+      screen.getByRole("heading", { level: 1, name: "Không tìm thấy sự kiện" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all events" }),
+      screen.getByRole("link", { name: "Xem tất cả sự kiện" }),
     ).toHaveAttribute("href", "/events");
   });
 
@@ -273,11 +273,11 @@ describe("EventPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "This event is temporarily unavailable",
+        name: "Tạm thời chưa xem được sự kiện này",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all events" }),
+      screen.getByRole("link", { name: "Xem tất cả sự kiện" }),
     ).toHaveAttribute("href", "/events");
   });
 
@@ -285,13 +285,13 @@ describe("EventPage", () => {
     loadEventDetailMock.mockResolvedValueOnce({ status: "not-found" });
     await expect(generateMetadata(pageProps)).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Event not found",
+      title: "Không tìm thấy sự kiện",
     });
 
     loadEventDetailMock.mockResolvedValueOnce({ status: "error" });
     await expect(generateMetadata(pageProps)).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Event",
+      title: "Sự kiện",
     });
   });
 });

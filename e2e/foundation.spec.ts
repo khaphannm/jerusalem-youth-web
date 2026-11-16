@@ -24,7 +24,7 @@ test("the accessible homepage and application shell load", async ({ page }) => {
 
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Upcoming events" }),
+    page.getByRole("heading", { level: 2, name: "Buổi gặp gỡ sắp tới" }),
   ).toBeVisible();
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
@@ -46,7 +46,7 @@ test("the accessible homepage and application shell load", async ({ page }) => {
   expect(structuredDataTypes).not.toContain("Article");
   expect(structuredDataTypes).not.toContain("Event");
 
-  const skipLink = page.getByRole("link", { name: "Skip to main content" });
+  const skipLink = page.getByRole("link", { name: "Đến nội dung chính" });
   await skipLink.focus();
   await expect(skipLink).toBeVisible();
   await skipLink.press("Enter");
@@ -62,7 +62,7 @@ test("the homepage is usable without horizontal overflow on mobile", async ({
   const primaryAction = page
     .locator("main > section")
     .first()
-    .getByRole("link");
+    .getByRole("link", { name: "Nhắn tin qua Facebook" });
 
   await expect(primaryAction).toBeVisible();
   await expect(primaryAction).toHaveCSS("background-color", "rgb(54, 87, 245)");
@@ -81,15 +81,18 @@ test("the About page presents ministry identity and a clear next step", async ({
   await page.goto("/about");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: /^About / }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { level: 2, name: "Why we gather" }),
+    page.getByRole("heading", { level: 1, name: /^Giới thiệu / }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 2,
-      name: "What shapes our community",
+      name: "Vì sao chúng mình gặp gỡ",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Điều định hình cộng đồng chúng mình",
     }),
   ).toBeVisible();
 
@@ -152,34 +155,34 @@ test("the event listing separates upcoming and past events on mobile", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Events worth showing up for",
+      name: "Những buổi gặp gỡ đáng để có mặt",
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Upcoming events" }),
+    page.getByRole("heading", { level: 2, name: "Sự kiện sắp tới" }),
   ).toBeVisible();
 
   const unavailableState = page.getByRole("heading", {
     level: 3,
-    name: "Events are temporarily unavailable",
+    name: "Tạm thời chưa xem được sự kiện",
   });
 
   if (await unavailableState.count()) {
     await expect(unavailableState).toBeVisible();
-    await expect(page.getByRole("link", { name: "Try again" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Thử lại" })).toHaveAttribute(
       "href",
       "/events",
     );
   } else {
     await expect(
-      page.getByRole("heading", { level: 2, name: "Past events" }),
+      page.getByRole("heading", { level: 2, name: "Sự kiện đã qua" }),
     ).toBeVisible();
     await expect(
       page
-        .getByRole("heading", { level: 2, name: "Upcoming events" })
+        .getByRole("heading", { level: 2, name: "Sự kiện sắp tới" })
         .locator("xpath=ancestor::section")
         .getByRole("article")
-        .or(page.getByRole("heading", { name: "The next event is on the way" }))
+        .or(page.getByRole("heading", { name: "Sự kiện tiếp theo sắp được công bố" }))
         .first(),
     ).toBeVisible();
   }
@@ -330,16 +333,16 @@ test("the Join page presents mobile-first next steps without collecting data", a
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /^Find your next step with /,
+      name: /^Tìm bước tiếp theo cùng /,
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Start where you are" }),
+    page.getByRole("heading", { level: 2, name: "Bắt đầu từ nơi bạn đang đứng" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 2,
-      name: "Connect without another form",
+      name: "Kết nối không cần điền biểu mẫu",
     }),
   ).toBeVisible();
 
@@ -368,25 +371,25 @@ test("the Contact page exposes accessible official channels without collecting d
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /^Contact /,
+      name: /^Liên hệ /,
     }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 2,
-      name: "Official contact channels",
+      name: "Các kênh liên hệ chính thức",
     }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 2,
-      name: "Connect through an official channel",
+      name: "Kết nối qua kênh chính thức",
     }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       level: 3,
-      name: "Contact details are being updated",
+      name: "Thông tin liên hệ đang được cập nhật",
     }),
   ).toBeVisible();
   await expect(page.getByRole("form")).toHaveCount(0);
@@ -405,30 +408,30 @@ test("the site search handles empty, short, and submitted mobile queries", async
   await page.goto("/search");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: "Search the site" }),
+    page.getByRole("heading", { level: 1, name: "Tìm kiếm trên trang" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 3, name: "Start with a search" }),
+    page.getByRole("heading", { level: 3, name: "Bắt đầu tìm kiếm" }),
   ).toBeVisible();
 
   await page.goto("/search?q=a");
   await expect(
     page.getByRole("heading", {
       level: 3,
-      name: "Search needs at least two characters",
+      name: "Cần ít nhất hai ký tự để tìm",
     }),
   ).toBeVisible();
 
   const searchInput = page.getByRole("searchbox", {
-    name: "What are you looking for?",
+    name: "Bạn đang tìm gì?",
   });
   await searchInput.fill("faith");
-  await page.getByRole("button", { name: "Search" }).click();
+  await page.getByRole("button", { name: "Tìm kiếm" }).click();
   await expect(page).toHaveURL(/\/search\?q=faith$/);
   await expect(
     page.getByRole("heading", {
       level: 3,
-      name: /^(?:Search is temporarily unavailable|No results for “faith”)$/,
+      name: /^(?:Tạm thời chưa tìm kiếm được|Không có kết quả cho “faith”)$/,
     }),
   ).toBeVisible();
   expect((await searchInput.boundingBox())?.height).toBeGreaterThanOrEqual(48);
@@ -447,9 +450,9 @@ test("an invalid article slug returns a useful mobile not-found page", async ({
 
   expect(response?.status()).toBe(404);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Article not found" }),
+    page.getByRole("heading", { level: 1, name: "Không tìm thấy bài viết" }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all articles" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả bài viết" });
   await expect(returnAction).toHaveAttribute("href", "/articles");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
@@ -467,9 +470,9 @@ test("an invalid event slug returns a useful mobile not-found page", async ({
 
   expect(response?.status()).toBe(404);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Event not found" }),
+    page.getByRole("heading", { level: 1, name: "Không tìm thấy sự kiện" }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all events" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả sự kiện" });
   await expect(returnAction).toHaveAttribute("href", "/events");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
@@ -487,9 +490,9 @@ test("an invalid sermon slug returns a useful mobile not-found page", async ({
 
   expect(response?.status()).toBe(404);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Sermon not found" }),
+    page.getByRole("heading", { level: 1, name: "Không tìm thấy bài giảng" }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all sermons" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả bài giảng" });
   await expect(returnAction).toHaveAttribute("href", "/sermons");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
@@ -507,9 +510,9 @@ test("an invalid story slug returns a useful mobile not-found page", async ({
 
   expect(response?.status()).toBe(404);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Story not found" }),
+    page.getByRole("heading", { level: 1, name: "Không tìm thấy câu chuyện" }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all stories" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả câu chuyện" });
   await expect(returnAction).toHaveAttribute("href", "/stories");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
@@ -527,9 +530,9 @@ test("an invalid resource slug returns a useful mobile not-found page", async ({
 
   expect(response?.status()).toBe(404);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Resource not found" }),
+    page.getByRole("heading", { level: 1, name: "Không tìm thấy tài liệu" }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all resources" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả tài liệu" });
   await expect(returnAction).toHaveAttribute("href", "/resources");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(
@@ -551,10 +554,10 @@ test("an invalid article category returns a useful mobile not-found page", async
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Article category not found",
+      name: "Không tìm thấy chuyên mục",
     }),
   ).toBeVisible();
-  const returnAction = page.getByRole("link", { name: "Browse all articles" });
+  const returnAction = page.getByRole("link", { name: "Xem tất cả bài viết" });
   await expect(returnAction).toHaveAttribute("href", "/articles");
   expect((await returnAction.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   expect(

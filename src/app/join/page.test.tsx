@@ -68,38 +68,38 @@ describe("JoinPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Find your next step with Jerusalem Youth",
+        name: "Tìm bước tiếp theo cùng Jerusalem Youth",
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Join the community" }),
     ).toHaveAttribute("href", siteSettings.primaryCallToAction.url);
     expect(
-      screen.getByRole("link", { name: "See upcoming events" }),
+      screen.getByRole("link", { name: "Xem sự kiện sắp tới" }),
     ).toHaveAttribute("href", "/events");
 
-    const steps = screen.getByRole("region", { name: "Start where you are" });
+    const steps = screen.getByRole("region", { name: "Bắt đầu từ nơi bạn đang đứng" });
     expect(
-      within(steps).getByRole("heading", { name: "Find a gathering" }),
+      within(steps).getByRole("heading", { name: "Tìm một buổi gặp gỡ" }),
     ).toBeInTheDocument();
     expect(
-      within(steps).getByRole("link", { name: "Browse events" }),
+      within(steps).getByRole("link", { name: "Xem sự kiện" }),
     ).toHaveAttribute("href", "/events");
     expect(
-      within(steps).getByRole("link", { name: "Read community stories" }),
+      within(steps).getByRole("link", { name: "Đọc câu chuyện cộng đồng" }),
     ).toHaveAttribute("href", "/stories");
     expect(
-      within(steps).getByRole("link", { name: "Explore resources" }),
+      within(steps).getByRole("link", { name: "Khám phá tài liệu" }),
     ).toHaveAttribute("href", "/resources");
 
     const channels = screen.getByRole("navigation", {
-      name: "Connect without another form",
+      name: "Kết nối không cần điền biểu mẫu",
     });
     expect(
-      within(channels).getByRole("link", { name: "Connect on Instagram" }),
+      within(channels).getByRole("link", { name: "Kết nối qua Instagram" }),
     ).toHaveAttribute("href", socialLinks.links[0].url);
     expect(
-      within(channels).getByRole("link", { name: "Connect on YouTube" }),
+      within(channels).getByRole("link", { name: "Kết nối qua YouTube" }),
     ).toHaveAttribute("href", socialLinks.links[1].url);
     expect(screen.queryByRole("form")).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
@@ -117,14 +117,14 @@ describe("JoinPage", () => {
     render(await JoinPage());
 
     expect(
-      screen.getByRole("link", { name: "Find a gathering" }),
+      screen.getByRole("link", { name: "Tìm một buổi gặp gỡ" }),
     ).toHaveAttribute("href", "/events");
-    expect(screen.getByRole("link", { name: "Learn about us" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Tìm hiểu về chúng mình" })).toHaveAttribute(
       "href",
       "/about",
     );
     expect(
-      screen.getByText(/Our official community links are being updated\./),
+      screen.getByText(/Các kênh cộng đồng chính thức đang được cập nhật\./),
     ).toBeInTheDocument();
   });
 
@@ -139,11 +139,11 @@ describe("JoinPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Find your next step with Youth Ministry",
+        name: "Tìm bước tiếp theo cùng Youth Ministry",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Find a gathering" }),
+      screen.getByRole("link", { name: "Tìm một buổi gặp gỡ" }),
     ).toHaveAttribute("href", "/events");
   });
 
@@ -154,14 +154,14 @@ describe("JoinPage", () => {
       openGraph: {
         images: [{ url: socialImage.url }],
         siteName: "Jerusalem Youth",
-        title: "Join Jerusalem Youth",
+        title: "Tham gia Jerusalem Youth",
         type: "website",
       },
-      title: "Join Us",
+      title: "Tham gia",
       twitter: {
         card: "summary_large_image",
         images: [socialImage.url],
-        title: "Join Jerusalem Youth",
+        title: "Tham gia Jerusalem Youth",
       },
     });
   });

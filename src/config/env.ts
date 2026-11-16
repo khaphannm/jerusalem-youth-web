@@ -1,3 +1,5 @@
+import { resolveCmsSource } from "../lib/cms/source.ts";
+
 export type EnvironmentDefinition = Readonly<{
   server: readonly string[];
   public: readonly `NEXT_PUBLIC_${string}`[];
@@ -14,9 +16,19 @@ function isMissing(value: string | undefined) {
   return value === undefined || value.trim().length === 0;
 }
 
+// A snapshot deployment reads no CMS and accepts no publication webhook, so
+// it needs neither the CMS origin nor the revalidation secret.
+export const snapshotEnvironmentDefinition = {
+  server: ["SITE_URL"],
+  public: [],
+} as const satisfies EnvironmentDefinition;
+
 export function validateEnvironment(
   environment: Environment,
-  definition: EnvironmentDefinition = environmentDefinition,
+  definition: EnvironmentDefinition = resolveCmsSource(environment) ===
+  "snapshot"
+    ? snapshotEnvironmentDefinition
+    : environmentDefinition,
 ) {
   const requiredNames = [...definition.server, ...definition.public];
   const missingNames = requiredNames.filter((name) =>

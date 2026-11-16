@@ -41,17 +41,17 @@ export async function generateMetadata({
 
   if (result.status === "not-found") {
     return {
-      description: "The requested event could not be found.",
+      description: "Không tìm thấy sự kiện bạn yêu cầu.",
       robots: { follow: false, index: false },
-      title: "Event not found",
+      title: "Không tìm thấy sự kiện",
     };
   }
 
   if (result.status === "error") {
     return {
-      description: "Find youth ministry gatherings and community events.",
+      description: "Xem các buổi gặp gỡ và sự kiện của ban thanh niên.",
       robots: { follow: false, index: false },
-      title: "Event",
+      title: "Sự kiện",
     };
   }
 
@@ -68,6 +68,7 @@ export async function generateMetadata({
     openGraph: {
       description,
       images: [image],
+      locale: "vi_VN",
       title,
       type: "website",
       url: canonical,
@@ -87,24 +88,24 @@ export async function generateMetadata({
 
 function EventErrorState() {
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="event-error-title" tone="surface">
         <Container size="reading">
           <p className="font-label text-label font-bold uppercase text-accent">
-            Events
+            Sự kiện
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="event-error-title"
           >
-            This event is temporarily unavailable
+            Tạm thời chưa xem được sự kiện này
           </h1>
           <p className="mt-6 text-pretty text-body-large text-muted">
-            We could not load the event right now. Please return to the event
-            calendar and try again in a little while.
+            Hiện chưa tải được sự kiện. Bạn vui lòng quay lại danh sách sự kiện
+            và thử lại sau ít phút.
           </p>
           <div className="mt-8">
-            <LinkButton href="/events">Browse all events</LinkButton>
+            <LinkButton href="/events">Xem tất cả sự kiện</LinkButton>
           </div>
         </Container>
       </Section>
@@ -130,7 +131,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const registrationState = getEventRegistrationState(event, now);
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <article>
         <script
           dangerouslySetInnerHTML={{
@@ -146,13 +147,13 @@ export default async function EventPage({ params }: EventPageProps) {
               href="/events"
             >
               <span aria-hidden="true">←</span>
-              All events
+              Tất cả sự kiện
             </Link>
             <div className="mt-8">
-              <EventStatusBadge status={eventStatus} />
+              <EventStatusBadge locale="vi" status={eventStatus} />
             </div>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="event-title"
             >
               {event.title}
@@ -163,9 +164,9 @@ export default async function EventPage({ params }: EventPageProps) {
           </Container>
         </Section>
 
-        <Section aria-label="Event banner" spacing="compact" tone="white">
+        <Section aria-label="Ảnh sự kiện" spacing="compact" tone="white">
           <Container size="wide">
-            <div className="overflow-hidden rounded-large border border-border bg-surface">
+            <div className="motion-settle overflow-hidden rounded-large border border-border bg-surface sm:rounded-xlarge">
               <ContentImage
                 asset={event.banner}
                 className="aspect-[16/9] h-auto w-full object-cover"
@@ -175,12 +176,12 @@ export default async function EventPage({ params }: EventPageProps) {
           </Container>
         </Section>
 
-        <Section aria-label="Event information" tone="white">
+        <Section aria-label="Thông tin sự kiện" tone="white">
           <Container size="wide">
             <div className="grid gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
               <div>
                 <h2 className="font-heading text-heading-2 font-bold">
-                  About this event
+                  Về sự kiện này
                 </h2>
                 <div className="mt-8">
                   <RichText content={event.description} />
@@ -190,28 +191,28 @@ export default async function EventPage({ params }: EventPageProps) {
               <div className="space-y-6">
                 <aside
                   aria-labelledby="event-practical-details-title"
-                  className="rounded-medium border border-border bg-background p-6 sm:p-8"
+                  className="motion-reveal rounded-large border border-border bg-background p-6 sm:rounded-xlarge sm:p-8"
                 >
                   <h2
                     className="font-heading text-heading-3 font-bold"
                     id="event-practical-details-title"
                   >
-                    When and where
+                    Thời gian và địa điểm
                   </h2>
                   <dl className="mt-6 space-y-6">
                     <div>
                       <dt className="font-label text-label font-bold uppercase text-primary">
-                        Date and time
+                        Ngày giờ
                       </dt>
                       <dd className="mt-2 text-body-small text-muted">
                         <time dateTime={event.startDateTime}>
-                          {formatEventDateTime(event.startDateTime)}
+                          {formatEventDateTime(event.startDateTime, "vi")}
                         </time>
                         {event.endDateTime ? (
                           <>
                             {" – "}
                             <time dateTime={event.endDateTime}>
-                              {formatEventDateTime(event.endDateTime)}
+                              {formatEventDateTime(event.endDateTime, "vi")}
                             </time>
                           </>
                         ) : null}
@@ -219,7 +220,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     </div>
                     <div>
                       <dt className="font-label text-label font-bold uppercase text-primary">
-                        Location
+                        Địa điểm
                       </dt>
                       <dd className="mt-2 font-semibold">
                         {event.locationName}
@@ -233,7 +234,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     {event.contactName ? (
                       <div>
                         <dt className="font-label text-label font-bold uppercase text-primary">
-                          Contact
+                          Liên hệ
                         </dt>
                         <dd className="mt-2 text-body-small text-muted">
                           {event.contactName}
@@ -245,12 +246,12 @@ export default async function EventPage({ params }: EventPageProps) {
                     <div className="mt-6 flex flex-wrap gap-3">
                       {event.mapUrl ? (
                         <LinkButton href={event.mapUrl} variant="outline">
-                          View map
+                          Xem bản đồ
                         </LinkButton>
                       ) : null}
                       {event.contactLink ? (
                         <LinkButton href={event.contactLink} variant="outline">
-                          Contact {event.contactName ?? "event team"}
+                          Liên hệ {event.contactName ?? "ban tổ chức"}
                         </LinkButton>
                       ) : null}
                     </div>
@@ -267,16 +268,16 @@ export default async function EventPage({ params }: EventPageProps) {
           <Section aria-labelledby="event-gallery-title" tone="surface">
             <Container size="wide">
               <SectionHeading
-                description="More moments and details from this gathering."
-                eyebrow="Event gallery"
+                description="Thêm những khoảnh khắc từ buổi gặp gỡ này."
+                eyebrow="Hình ảnh sự kiện"
                 id="event-gallery-title"
                 tone="surface"
-                title="A closer look"
+                title="Nhìn gần hơn"
               />
               <ul className="mt-10 grid gap-6 sm:grid-cols-2">
                 {event.gallery.map((image) => (
                   <li
-                    className="overflow-hidden rounded-medium border border-border bg-background"
+                    className="motion-reveal overflow-hidden rounded-large border border-border bg-background sm:rounded-xlarge"
                     key={image.id}
                   >
                     <ContentImage
@@ -295,14 +296,14 @@ export default async function EventPage({ params }: EventPageProps) {
       <Section aria-labelledby="event-next-title" tone="secondary">
         <Container size="reading">
           <SectionHeading
-            description="Find another gathering and make plans to join the community."
-            eyebrow="Keep gathering"
+            description="Tìm một buổi gặp gỡ khác và lên kế hoạch tham gia cùng cộng đồng."
+            eyebrow="Tiếp tục gặp gỡ"
             id="event-next-title"
             tone="secondary"
-            title="Explore more events"
+            title="Khám phá thêm sự kiện"
           />
           <div className="mt-8">
-            <LinkButton href="/events">Browse all events</LinkButton>
+            <LinkButton href="/events">Xem tất cả sự kiện</LinkButton>
           </div>
         </Container>
       </Section>

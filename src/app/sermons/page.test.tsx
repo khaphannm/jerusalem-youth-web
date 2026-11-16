@@ -126,12 +126,12 @@ describe("SermonsPage", () => {
     const pagination = screen.getByRole("navigation", {
       name: "Sermon pages",
     });
-    expect(within(pagination).getByText("Page 2 of 3")).toBeInTheDocument();
-    expect(within(pagination).getByRole("link", { name: /Previous/ })).toHaveAttribute(
+    expect(within(pagination).getByText("Trang 2 / 3")).toBeInTheDocument();
+    expect(within(pagination).getByRole("link", { name: /Trước/ })).toHaveAttribute(
       "href",
       "/sermons",
     );
-    expect(within(pagination).getByRole("link", { name: /Next/ })).toHaveAttribute(
+    expect(within(pagination).getByRole("link", { name: /Sau/ })).toHaveAttribute(
       "href",
       "/sermons?page=3",
     );

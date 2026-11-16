@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = settings?.siteName ?? siteConfig.name;
   const siteDescription =
     settings?.siteDescription ?? siteConfig.description;
-  const description = `Learn about ${siteName}, our vision, mission, and values. ${siteDescription}`;
+  const description = `Tìm hiểu tầm nhìn, sứ mệnh và giá trị của ${siteName}. ${siteDescription}`;
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -34,20 +34,21 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       description,
       images: image ? [image] : undefined,
+      locale: "vi_VN",
       siteName,
-      title: `About ${siteName}`,
+      title: `Giới thiệu ${siteName}`,
       type: "website",
       url: "/about",
     },
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }
       : undefined,
-    title: "About",
+    title: "Giới thiệu",
     twitter: {
       card: image ? "summary_large_image" : "summary",
       description,
       images: image ? [image.url] : undefined,
-      title: `About ${siteName}`,
+      title: `Giới thiệu ${siteName}`,
     },
   };
 }
@@ -60,21 +61,21 @@ export default async function AboutPage() {
   const callToAction =
     aboutPage?.callToAction ??
     siteSettings?.primaryCallToAction ??
-    { label: "Join us", url: "/join" };
+    { label: "Tham gia cùng chúng mình", url: "/join" };
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="about-title">
         <Container size="wide">
           <div className="max-w-reading">
             <p className="font-label text-label font-bold uppercase text-primary">
-              About us
+              Về chúng mình
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="about-title"
             >
-              About {siteName}
+              Giới thiệu {siteName}
             </h1>
             <p className="mt-6 text-pretty text-body-large text-muted">
               {siteDescription}
@@ -86,11 +87,11 @@ export default async function AboutPage() {
       <Section aria-labelledby="purpose-title" tone="secondary">
         <Container size="wide">
           <SectionHeading
-            description="Our vision names where we are headed. Our mission describes how we move toward it together."
-            eyebrow="Our purpose"
+            description="Tầm nhìn cho biết nơi chúng mình hướng đến. Sứ mệnh mô tả cách chúng mình cùng nhau bước đi."
+            eyebrow="Mục đích"
             id="purpose-title"
             tone="secondary"
-            title="Why we gather"
+            title="Vì sao chúng mình gặp gỡ"
           />
 
           <div className="mt-10">
@@ -98,7 +99,7 @@ export default async function AboutPage() {
               <div className="grid gap-8 lg:grid-cols-2">
                 <article className="border-t border-calm pt-6">
                   <h3 className="font-heading text-heading-3 font-bold">
-                    Our vision
+                    Tầm nhìn
                   </h3>
                   <p className="mt-4 whitespace-pre-line text-pretty text-body-large text-secondary-foreground/80">
                     {aboutPage.vision}
@@ -106,7 +107,7 @@ export default async function AboutPage() {
                 </article>
                 <article className="border-t border-accent pt-6">
                   <h3 className="font-heading text-heading-3 font-bold">
-                    Our mission
+                    Sứ mệnh
                   </h3>
                   <p className="mt-4 whitespace-pre-line text-pretty text-body-large text-secondary-foreground/80">
                     {aboutPage.mission}
@@ -115,8 +116,8 @@ export default async function AboutPage() {
               </div>
             ) : (
               <EmptyState
-                description="Our ministry team is preparing this page. Please check back soon to learn more about our vision and mission."
-                title="Our purpose will be shared here"
+                description="Nhóm đang chuẩn bị trang này. Bạn hãy quay lại sau để tìm hiểu về tầm nhìn và sứ mệnh nhé."
+                title="Mục đích của chúng mình sẽ được chia sẻ tại đây"
               />
             )}
           </div>
@@ -126,11 +127,11 @@ export default async function AboutPage() {
       <Section aria-labelledby="values-title" tone="white">
         <Container size="wide">
           <SectionHeading
-            description="These values guide how we gather, grow, and care for one another."
-            eyebrow="Our values"
+            description="Những giá trị này định hướng cách chúng mình gặp gỡ, lớn lên và quan tâm đến nhau."
+            eyebrow="Giá trị cốt lõi"
             id="values-title"
             tone="white"
-            title="What shapes our community"
+            title="Điều định hình cộng đồng chúng mình"
           />
 
           <div className="mt-10">
@@ -138,7 +139,7 @@ export default async function AboutPage() {
               <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {aboutPage.values.map((value, index) => (
                   <li
-                    className="rounded-medium border border-border bg-surface p-6 sm:p-8"
+                    className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8"
                     key={`${value.title}-${index}`}
                   >
                     <p className="font-label text-label font-bold text-primary">
@@ -155,8 +156,8 @@ export default async function AboutPage() {
               </ol>
             ) : (
               <EmptyState
-                description="Our community values are being prepared and will be available here soon."
-                title="Our values are coming"
+                description="Các giá trị của cộng đồng đang được chuẩn bị và sẽ sớm có tại đây."
+                title="Giá trị của chúng mình sắp được cập nhật"
               />
             )}
           </div>
@@ -166,11 +167,11 @@ export default async function AboutPage() {
       <Section aria-labelledby="about-action-title" tone="calm">
         <Container size="reading">
           <SectionHeading
-            description="Whether you are visiting for the first time or ready to get more involved, we would love to help you connect."
-            eyebrow="Your next step"
+            description="Dù bạn mới ghé thăm lần đầu hay muốn tham gia nhiều hơn, chúng mình luôn sẵn lòng giúp bạn kết nối."
+            eyebrow="Bước tiếp theo"
             id="about-action-title"
             tone="calm"
-            title="Find your place in the community"
+            title="Tìm chỗ của bạn trong cộng đồng"
           />
           <div className="mt-8">
             <LinkButton href={callToAction.url} size="large">

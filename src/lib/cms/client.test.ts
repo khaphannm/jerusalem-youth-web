@@ -999,6 +999,106 @@ describe("CMS client", () => {
     });
   });
 
+  it("validates and maps the Home Page single type", async () => {
+    const intro = (title: string) => ({ eyebrow: "", title, description: null });
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: {
+          documentId: "home-page-1",
+          heroHeadline: "Grow together",
+          heroDescription: "A place to belong.",
+          primaryCta: { label: "Say hello", url: "https://social.example.test/" },
+          introduction: {
+            eyebrow: "Who we are",
+            title: "Faith together",
+            description: "We walk together.",
+          },
+          introductionHighlight: "together",
+          community: intro("Community"),
+          communityThemes: [{ title: "Worship", description: "We worship." }],
+          gathering: intro("Next gathering"),
+          weeklySchedule: [
+            { title: "Main gathering", schedule: "Sundays 14:30", note: "" },
+          ],
+          gatheringEmptyMessage: "Dates are coming soon.",
+          stories: intro("Stories"),
+          teaching: intro("Teaching"),
+          newcomer: intro("First time?"),
+          newcomerSteps: [{ title: "Ask", description: "Send a message." }],
+          invitation: intro("Join us"),
+          showStories: false,
+          showTeaching: null,
+          publishedAt: "2026-08-21T03:00:00.000Z",
+        },
+      }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.homePage()).resolves.toMatchObject({
+      heroHeadline: "Grow together",
+      callToAction: { label: "Say hello", url: "https://social.example.test/" },
+      introduction: {
+        eyebrow: "Who we are",
+        title: "Faith together",
+        description: "We walk together.",
+      },
+      introductionHighlight: "together",
+      community: { eyebrow: null, title: "Community", description: null },
+      communityThemes: [{ title: "Worship", description: "We worship." }],
+      newcomerSteps: [{ title: "Ask", description: "Send a message." }],
+      weeklySchedule: [
+        { title: "Main gathering", schedule: "Sundays 14:30", note: null },
+      ],
+      visibleSections: {
+        introduction: true,
+        community: true,
+        gathering: true,
+        stories: false,
+        teaching: true,
+        newcomer: true,
+        invitation: true,
+      },
+    });
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(requestedUrl.pathname).toBe("/api/home-page");
+    expect(requestedUrl.searchParams.getAll("populate")).toContain(
+      "communityThemes",
+    );
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      cache: "force-cache",
+      next: { revalidate: false, tags: [cmsCacheTags.homePage] },
+    });
+  });
+
+  it("returns null when the Home Page is unpublished and rejects unsafe invitation links", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: null }, 404));
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        data: {
+          documentId: "home-page-1",
+          heroHeadline: "Grow together",
+          primaryCta: { label: "Say hello", url: "javascript:alert(1)" },
+          publishedAt: "2026-08-21T03:00:00.000Z",
+        },
+      }),
+    );
+    const client = createCmsClient({
+      baseUrl: "https://cms.example.test",
+      fetch: fetchMock,
+    });
+
+    await expect(client.homePage()).resolves.toBeNull();
+    await expect(client.homePage()).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+    });
+  });
+
   it("rejects incomplete About Page content", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockResolvedValue(

@@ -88,7 +88,7 @@ export default async function SermonsPage({
               Watch and listen
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="sermons-title"
             >
               Messages for growing faith
@@ -122,7 +122,7 @@ export default async function SermonsPage({
               <>
                 <ul className="space-y-8">
                   {sermons.map((sermon) => (
-                    <li key={sermon.id}>
+                    <li className="motion-reveal" key={sermon.id}>
                       <SermonCard sermon={sermon} />
                     </li>
                   ))}

@@ -4,24 +4,24 @@ import { Section } from "@/components/ui/section";
 
 export default function ArticleNotFound() {
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="article-not-found-title" tone="calm">
         <Container size="reading">
           <p className="font-label text-label font-bold uppercase text-secondary">
-            Articles
+            Bài viết
           </p>
           <h1
-            className="mt-5 text-balance font-display text-display font-extrabold"
+            className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
             id="article-not-found-title"
           >
-            Article not found
+            Không tìm thấy bài viết
           </h1>
           <p className="mt-6 text-pretty text-body-large text-calm-foreground">
-            This article may have moved or may not be published. Browse the
-            article library to find more encouragement.
+            Bài viết này có thể đã được chuyển hoặc chưa được đăng. Hãy xem
+            thư viện bài viết để tìm thêm sự khích lệ.
           </p>
           <div className="mt-8">
-            <LinkButton href="/articles">Browse all articles</LinkButton>
+            <LinkButton href="/articles">Xem tất cả bài viết</LinkButton>
           </div>
         </Container>
       </Section>

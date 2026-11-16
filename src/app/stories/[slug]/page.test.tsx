@@ -194,10 +194,10 @@ describe("StoryPage", () => {
 
     render(<StoryNotFound />);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Story not found" }),
+      screen.getByRole("heading", { level: 1, name: "Không tìm thấy câu chuyện" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all stories" }),
+      screen.getByRole("link", { name: "Xem tất cả câu chuyện" }),
     ).toHaveAttribute("href", "/stories");
   });
 
@@ -221,7 +221,7 @@ describe("StoryPage", () => {
     loadStoryDetailMock.mockResolvedValueOnce({ status: "not-found" });
     await expect(generateMetadata(pageProps)).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Story not found",
+      title: "Không tìm thấy câu chuyện",
     });
 
     loadStoryDetailMock.mockResolvedValueOnce({ status: "error" });

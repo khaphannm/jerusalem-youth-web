@@ -1,8 +1,10 @@
 import type { ComponentPropsWithoutRef } from "react";
 
 const toneClasses = {
+  accentSoft: "bg-accent-soft text-foreground",
   background: "bg-background text-foreground",
   calm: "bg-calm text-calm-foreground",
+  primarySoft: "bg-primary-soft text-foreground",
   secondary: "bg-secondary text-secondary-foreground",
   surface: "bg-surface text-foreground",
   white: "bg-primary-foreground text-foreground",

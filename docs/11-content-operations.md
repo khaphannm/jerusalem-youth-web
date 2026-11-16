@@ -52,6 +52,13 @@ Before publication:
 
 ## Content freshness
 
+The selected [free-first publishing plan](production-deployment-guide.md) is
+pending implementation. Once enabled, editors must publish in CMS **and request
+a content release**; public changes, unpublish and delete take effect only after
+a successful snapshot deployment. The workflow below describes the current
+implemented live-CMS webhook behavior. Do not treat its successful response as
+proof that a new snapshot reached visitors.
+
 Assign recurring ownership for:
 - upcoming events
 - contact details
@@ -79,6 +86,48 @@ changes should still be published immediately and the public result checked.
 See `docs/cms-publication-revalidation.md` for configuration, response codes,
 secret rotation, and multi-instance deployment requirements.
 
+## Homepage copy
+
+1. Deploy/restart the CMS with the Home Page single type **before** deploying
+   the web release that reads it. Until an entry is published the website shows
+   its built-in copy, so the order is safe either way.
+2. In **Settings → Webhooks**, add **Home Page** to the entities sent by the
+   publication webhook so edits appear without a redeploy.
+3. Open **Content Manager → Home Page**. Each section has a small label
+   (eyebrow), a heading and an optional description. Community themes (up to
+   six) and newcomer steps (up to four) can be added, removed and reordered.
+4. The call to action sets the label and link of every invitation button on
+   the homepage. Use a site path such as `/join` or a full `https://` address.
+   The introduction heading is shown as the large vision statement. To mark
+   a phrase in it, copy that phrase exactly into **introductionHighlight**;
+   separate several phrases with `|` (for example `Vô số bạn trẻ|bạn thân`);
+   leave it empty for no highlight. Keep the statement under about 90
+   characters.
+   **Weekly schedule** lists recurring activities (for example the main
+   Sunday gathering): a name, when it meets, and an optional note. It appears
+   in the gathering section above the next event; leave it empty to hide it.
+5. To remove a section from the live homepage, switch off its **show…**
+   toggle; switch it back on to restore it. The wording stays saved either
+   way. The hero cannot be hidden.
+6. Save and publish, then check the homepage on mobile and desktop. Keep
+   headings short: they are displayed very large.
+
+To load approved wording for the Home Page and About Page in one step, edit a
+file in `cms/content/` and run, with the CMS stopped:
+
+```bash
+cd cms
+npm run import:content -- content/jerusalem-youth-2026.json --confirm-overwrite
+```
+
+This overwrites both drafts; review them in the Content Manager and publish.
+Add `--publish` to publish immediately. Fields that are not in the file are
+left as they are.
+
+New installations get a draft Home Page with the current Vietnamese copy from
+`npm run seed:launch`; rerunning the seed never overwrites an existing entry.
+Hero photographs are managed separately, below.
+
 ## Homepage photographs
 
 1. Deploy/restart the CMS with the `shared.hero-slide` component and updated
@@ -90,7 +139,8 @@ secret rotation, and multi-instance deployment requirements.
    components; three is a good starting point: Worship, Community, Serving.
 4. Choose each image, enter a short label (up to 40 characters), optionally add
    a caption (up to 160 characters), and drag components into the desired order.
-   The first photograph is the initial homepage image. Check its 4:3 crop.
+   The first photograph is the initial homepage image. Check its 16:9 crop
+   on desktop and 4:3 crop on mobile.
 5. Save and publish Site Settings. Check the homepage on mobile and desktop,
    test every control, and verify the existing primary CTA is correct. For
    production, verify the publication webhook succeeds using the

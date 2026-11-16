@@ -228,6 +228,46 @@ export type AboutPage = Readonly<{
   publishedAt: string;
 }>;
 
+export type SectionIntro = Readonly<{
+  eyebrow: string | null;
+  title: string;
+  description: string | null;
+}>;
+
+export type ScheduleItem = Readonly<{
+  title: string;
+  schedule: string;
+  note: string | null;
+}>;
+
+export type HomeSectionKey =
+  | "introduction"
+  | "community"
+  | "gathering"
+  | "stories"
+  | "teaching"
+  | "newcomer"
+  | "invitation";
+
+export type HomePage = Readonly<{
+  visibleSections: Readonly<Record<HomeSectionKey, boolean>>;
+  heroHeadline: string;
+  heroDescription: string;
+  callToAction: CallToAction;
+  introduction: SectionIntro;
+  introductionHighlight: string | null;
+  community: SectionIntro;
+  communityThemes: readonly MinistryValue[];
+  gathering: SectionIntro;
+  weeklySchedule: readonly ScheduleItem[];
+  gatheringEmptyMessage: string;
+  stories: SectionIntro;
+  teaching: SectionIntro;
+  newcomer: SectionIntro;
+  newcomerSteps: readonly MinistryValue[];
+  invitation: SectionIntro;
+}>;
+
 export type HeroSlide = Readonly<{
   image: MediaAsset;
   label: string;

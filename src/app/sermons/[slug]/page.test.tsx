@@ -187,10 +187,10 @@ describe("SermonPage", () => {
 
     render(<SermonNotFound />);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Sermon not found" }),
+      screen.getByRole("heading", { level: 1, name: "Không tìm thấy bài giảng" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse all sermons" }),
+      screen.getByRole("link", { name: "Xem tất cả bài giảng" }),
     ).toHaveAttribute("href", "/sermons");
   });
 
@@ -216,7 +216,7 @@ describe("SermonPage", () => {
       generateMetadata(pageProps, parentMetadata),
     ).resolves.toMatchObject({
       robots: { follow: false, index: false },
-      title: "Sermon not found",
+      title: "Không tìm thấy bài giảng",
     });
 
     loadSermonDetailMock.mockResolvedValueOnce({ status: "error" });

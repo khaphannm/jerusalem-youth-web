@@ -77,6 +77,24 @@ export const getOptionalUrlOrigin = (
   }
 };
 
+/**
+ * ACL parameter for uploaded objects.
+ * - unset: the provider applies its own default (`public-read`).
+ * - `none`: no ACL header is sent at all. Required for stores without ACL
+ *   support such as Cloudflare R2. The provider omits the header only when
+ *   the key is present with an empty value, so the key is kept on purpose.
+ * - anything else: sent as the canned ACL.
+ */
+export const resolveS3AclParams = (
+  acl: string | undefined,
+): { ACL?: string | undefined } => {
+  if (!acl) {
+    return {};
+  }
+
+  return { ACL: acl.toLowerCase() === 'none' ? undefined : acl };
+};
+
 export const getOptionalS3Credentials = (env: Environment) => {
   const accessKeyId = getOptionalEnvironmentValue(env, 'AWS_ACCESS_KEY_ID');
   const secretAccessKey = getOptionalEnvironmentValue(env, 'AWS_ACCESS_SECRET');

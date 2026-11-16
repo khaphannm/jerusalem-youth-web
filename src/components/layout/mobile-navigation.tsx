@@ -7,9 +7,13 @@ import type { NavigationItem } from "@/lib/cms/domain";
 
 type MobileNavigationProps = Readonly<{
   items: readonly NavigationItem[];
+  locale?: "en" | "vi";
 }>;
 
-export function MobileNavigation({ items }: MobileNavigationProps) {
+export function MobileNavigation({
+  items,
+  locale = "en",
+}: MobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -42,7 +46,15 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
         ref={triggerRef}
         type="button"
       >
-        <span>{isOpen ? "Close" : "Menu"}</span>
+        <span>
+          {locale === "vi"
+            ? isOpen
+              ? "Đóng"
+              : "Danh mục"
+            : isOpen
+              ? "Close"
+              : "Menu"}
+        </span>
         <svg
           aria-hidden="true"
           className="size-5"
@@ -72,12 +84,20 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
         hidden={!isOpen}
         id={panelId}
       >
-        <nav aria-label="Mobile navigation">
+        <nav
+          aria-label={
+            locale === "vi" ? "Điều hướng trên điện thoại" : "Mobile navigation"
+          }
+        >
           <div className="mx-auto max-w-wide px-gutter py-3 sm:px-gutter-sm lg:px-gutter-lg">
             <ul className="flex flex-col gap-1">
               {items.map((item, index) => (
                 <li key={`${item.label}-${item.url}-${index}`}>
-                  <NavigationLink item={item} onClick={closeMenu} />
+                  <NavigationLink
+                    item={item}
+                    locale={locale}
+                    onClick={closeMenu}
+                  />
                 </li>
               ))}
             </ul>

@@ -88,7 +88,7 @@ export default async function ResourcesPage({
               Practical support
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="resources-title"
             >
               Resources for everyday faith
@@ -122,7 +122,7 @@ export default async function ResourcesPage({
               <>
                 <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {resources.map((resource) => (
-                    <li key={resource.id}>
+                    <li className="motion-reveal" key={resource.id}>
                       <ResourceCard resource={resource} />
                     </li>
                   ))}

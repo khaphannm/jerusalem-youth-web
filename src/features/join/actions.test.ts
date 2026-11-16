@@ -16,7 +16,7 @@ describe("Join primary action", () => {
     "uses the events fallback for missing and self-referential actions",
     (action) => {
       expect(resolveJoinPrimaryAction(action)).toEqual({
-        label: "Find a gathering",
+        label: "Tìm một buổi gặp gỡ",
         url: "/events",
       });
     },

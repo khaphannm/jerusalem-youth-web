@@ -101,18 +101,18 @@ describe("EventsPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Events worth showing up for",
+        name: "Những buổi gặp gỡ đáng để có mặt",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/All event times are shown in UTC\.$/),
+      screen.getByText(/Thời gian hiển thị theo giờ Việt Nam\.$/),
     ).toBeInTheDocument();
 
     const upcomingSection = screen
-      .getByRole("heading", { level: 2, name: "Upcoming events" })
+      .getByRole("heading", { level: 2, name: "Sự kiện sắp tới" })
       .closest("section");
     const pastSection = screen
-      .getByRole("heading", { level: 2, name: "Past events" })
+      .getByRole("heading", { level: 2, name: "Sự kiện đã qua" })
       .closest("section");
 
     expect(upcomingSection).not.toBeNull();
@@ -120,20 +120,20 @@ describe("EventsPage", () => {
     expect(
       within(upcomingSection!).getByRole("link", { name: "Summer gathering" }),
     ).toHaveAttribute("href", "/events/summer-gathering");
-    expect(within(upcomingSection!).getByText("Upcoming")).toBeInTheDocument();
+    expect(within(upcomingSection!).getByText("Sắp diễn ra")).toBeInTheDocument();
     expect(within(upcomingSection!).getByText("Youth Hall")).toBeInTheDocument();
     expect(within(upcomingSection!).getByRole("img")).toHaveAttribute(
       "alt",
       "Young people gathering together",
     );
-    expect(within(upcomingSection!).getByText(/UTC$/)).toHaveAttribute(
+    expect(within(upcomingSection!).getByText(/tháng \d+, \d{4}$/)).toHaveAttribute(
       "datetime",
       upcomingEvent.startDateTime,
     );
     expect(
       within(pastSection!).getByRole("link", { name: "Service day" }),
     ).toBeInTheDocument();
-    expect(within(pastSection!).getByText("Past event")).toBeInTheDocument();
+    expect(within(pastSection!).getByText("Đã diễn ra")).toBeInTheDocument();
   });
 
   it("renders useful empty states for both event groups", async () => {
@@ -144,8 +144,8 @@ describe("EventsPage", () => {
 
     render(await EventsPage());
 
-    expect(screen.getByText("The next event is on the way")).toBeInTheDocument();
-    expect(screen.getByText("No past events yet")).toBeInTheDocument();
+    expect(screen.getByText("Sự kiện tiếp theo sắp được công bố")).toBeInTheDocument();
+    expect(screen.getByText("Chưa có sự kiện đã qua")).toBeInTheDocument();
   });
 
   it("distinguishes a CMS failure from valid empty groups", async () => {
@@ -154,14 +154,14 @@ describe("EventsPage", () => {
     render(await EventsPage());
 
     expect(
-      screen.getByText("Events are temporarily unavailable"),
+      screen.getByText("Tạm thời chưa xem được sự kiện"),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Try again" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Thử lại" })).toHaveAttribute(
       "href",
       "/events",
     );
     expect(
-      screen.queryByRole("heading", { level: 2, name: "Past events" }),
+      screen.queryByRole("heading", { level: 2, name: "Sự kiện đã qua" }),
     ).not.toBeInTheDocument();
   });
 
@@ -170,17 +170,17 @@ describe("EventsPage", () => {
 
     await expect(generateMetadata()).resolves.toMatchObject({
       description:
-        "Find upcoming youth ministry gatherings, see when and where we meet, and revisit past events.",
+        "Xem các buổi gặp gỡ sắp tới của ban thanh niên, thời gian, địa điểm và những sự kiện đã diễn ra.",
       openGraph: {
         images: [{ url: banner.url }],
         siteName: "Jerusalem Youth",
-        title: "Events | Jerusalem Youth",
+        title: "Sự kiện | Jerusalem Youth",
         type: "website",
       },
-      title: "Events",
+      title: "Sự kiện",
       twitter: {
         card: "summary_large_image",
-        title: "Events | Jerusalem Youth",
+        title: "Sự kiện | Jerusalem Youth",
       },
     });
   });

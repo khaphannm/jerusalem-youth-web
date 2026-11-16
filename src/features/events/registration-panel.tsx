@@ -7,26 +7,26 @@ export function RegistrationPanel({
 }: Readonly<{ state: EventRegistrationState }>) {
   const title =
     state.kind === "open"
-      ? "Registration is open"
+      ? "Đang mở đăng ký"
       : state.kind === "closed"
-        ? "Registration is closed"
-        : "Registration is not available online";
+        ? "Đã đóng đăng ký"
+        : "Không có đăng ký trực tuyến";
   const description =
     state.kind === "closed" && state.reason === "event-ended"
-      ? "This event has ended."
+      ? "Sự kiện này đã kết thúc."
       : state.kind === "closed"
-        ? "The registration deadline has passed."
+        ? "Đã qua hạn đăng ký."
         : state.kind === "unavailable"
-          ? "No online registration link is configured for this event."
-          : "Save your place for this gathering.";
+          ? "Sự kiện này chưa có đường dẫn đăng ký trực tuyến."
+          : "Giữ chỗ cho buổi gặp gỡ này.";
 
   return (
     <aside
       aria-labelledby="registration-title"
-      className="rounded-medium border border-border bg-surface p-6 sm:p-8"
+      className="motion-reveal rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8"
     >
       <p className="font-label text-label font-bold uppercase text-accent">
-        Registration
+        Đăng ký
       </p>
       <h2
         className="mt-3 font-heading text-heading-3 font-bold"
@@ -37,16 +37,16 @@ export function RegistrationPanel({
       <p className="mt-3 text-muted">{description}</p>
       {state.deadline ? (
         <p className="mt-4 text-body-small text-muted">
-          {state.kind === "open" ? "Register by " : "Deadline: "}
+          {state.kind === "open" ? "Đăng ký trước " : "Hạn đăng ký: "}
           <time dateTime={state.deadline}>
-            {formatEventDateTime(state.deadline)}
+            {formatEventDateTime(state.deadline, "vi")}
           </time>
         </p>
       ) : null}
       {state.kind === "open" ? (
         <div className="mt-6">
           <LinkButton href={state.registrationUrl} size="large">
-            Register for this event
+            Đăng ký tham gia
           </LinkButton>
         </div>
       ) : null}

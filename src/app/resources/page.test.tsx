@@ -141,7 +141,7 @@ describe("ResourcesPage", () => {
     const pagination = screen.getByRole("navigation", {
       name: "Resource pages",
     });
-    expect(within(pagination).getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(within(pagination).getByText("Trang 1 / 2")).toBeInTheDocument();
   });
 
   it("renders first-page, later-page, and failure states", async () => {

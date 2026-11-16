@@ -15,8 +15,8 @@ import {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await loadJoinSiteSettings();
   const siteName = settings?.siteName ?? siteConfig.name;
-  const title = `Join ${siteName}`;
-  const description = `Find a clear next step into gatherings, community, and everyday faith with ${siteName}.`;
+  const title = `Tham gia ${siteName}`;
+  const description = `Tìm bước tiếp theo để đến với các buổi gặp gỡ, cộng đồng và đời sống đức tin cùng ${siteName}.`;
   const socialImage =
     settings?.defaultSeo?.socialImage ?? settings?.defaultSocialImage;
   const image = socialImage
@@ -34,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       description,
       images: image ? [image] : undefined,
+      locale: "vi_VN",
       siteName,
       title,
       type: "website",
@@ -42,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: settings?.defaultSeo?.noIndex
       ? { follow: true, index: false }
       : undefined,
-    title: "Join Us",
+    title: "Tham gia",
     twitter: {
       card: image ? "summary_large_image" : "summary",
       description,
@@ -54,25 +55,25 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const nextSteps = [
   {
-    action: "Browse events",
+    action: "Xem sự kiện",
     description:
-      "Choose an upcoming gathering that works for you and see the practical details before you arrive.",
+      "Chọn một buổi gặp gỡ phù hợp và xem thông tin cần biết trước khi đến.",
     href: "/events",
-    title: "Find a gathering",
+    title: "Tìm một buổi gặp gỡ",
   },
   {
-    action: "Read community stories",
+    action: "Đọc câu chuyện cộng đồng",
     description:
-      "Meet the heart of the community through honest stories of faith, friendship, and belonging.",
+      "Cảm nhận cộng đồng qua những câu chuyện chân thật về đức tin, tình bạn và sự gắn bó.",
     href: "/stories",
-    title: "See what community feels like",
+    title: "Cảm nhận đời sống cộng đồng",
   },
   {
-    action: "Explore resources",
+    action: "Khám phá tài liệu",
     description:
-      "Take a next step in everyday faith with teaching, guides, and trusted resources.",
+      "Tiếp tục lớn lên trong đức tin mỗi ngày với bài giảng, hướng dẫn và tài liệu đáng tin cậy.",
     href: "/resources",
-    title: "Keep growing",
+    title: "Tiếp tục lớn lên",
   },
 ] as const;
 
@@ -83,27 +84,27 @@ export default async function JoinPage() {
     siteSettings?.primaryCallToAction ?? null,
   );
   const secondaryAction = primaryAction.url.startsWith("/events")
-    ? { label: "Learn about us", url: "/about" }
-    : { label: "See upcoming events", url: "/events" };
+    ? { label: "Tìm hiểu về chúng mình", url: "/about" }
+    : { label: "Xem sự kiện sắp tới", url: "/events" };
   const communityLinks = socialLinks?.links ?? [];
 
   return (
-    <main className="flex-1" id="main-content" tabIndex={-1}>
+    <main className="flex-1" id="main-content" lang="vi" tabIndex={-1}>
       <Section aria-labelledby="join-title" tone="secondary">
         <Container size="wide">
           <div className="max-w-reading">
             <p className="font-label text-label font-bold uppercase text-calm">
-              You are welcome
+              Chào đón bạn
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="join-title"
             >
-              Find your next step with {siteName}
+              Tìm bước tiếp theo cùng {siteName}
             </h1>
             <p className="mt-6 text-pretty text-body-large text-secondary-foreground">
-              Whether this is your first visit or you are ready to get more
-              involved, start with the step that feels right for you.
+              Dù đây là lần đầu bạn ghé thăm hay bạn muốn tham gia nhiều hơn,
+              hãy bắt đầu từ bước phù hợp với bạn.
             </p>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap">
               <LinkButton href={primaryAction.url} size="large">
@@ -124,17 +125,17 @@ export default async function JoinPage() {
       <Section aria-labelledby="join-steps-title" tone="white">
         <Container size="wide">
           <SectionHeading
-            description="There is no single right way to begin. These are three simple places to start."
-            eyebrow="Choose your next step"
+            description="Không có một cách bắt đầu duy nhất. Đây là ba nơi đơn giản để khởi đầu."
+            eyebrow="Chọn bước tiếp theo"
             id="join-steps-title"
             tone="white"
-            title="Start where you are"
+            title="Bắt đầu từ nơi bạn đang đứng"
           />
 
           <ol className="mt-10 grid gap-6 md:grid-cols-3">
             {nextSteps.map((step, index) => (
               <li
-                className="flex flex-col rounded-medium border border-border bg-surface p-6 sm:p-8"
+                className="motion-reveal flex flex-col rounded-large border border-border bg-surface p-6 sm:rounded-xlarge sm:p-8"
                 key={step.href}
               >
                 <p className="font-label text-label font-bold text-primary">
@@ -160,11 +161,11 @@ export default async function JoinPage() {
       <Section aria-labelledby="join-community-title" tone="calm">
         <Container size="reading">
           <SectionHeading
-            description="Use one of our official community channels. This page does not ask for or store your personal information."
-            eyebrow="Stay connected"
+            description="Kết nối qua các kênh chính thức của chúng mình. Trang này không yêu cầu hay lưu thông tin cá nhân của bạn."
+            eyebrow="Giữ kết nối"
             id="join-community-title"
             tone="calm"
-            title="Connect without another form"
+            title="Kết nối không cần điền biểu mẫu"
           />
 
           {communityLinks.length > 0 ? (
@@ -173,7 +174,7 @@ export default async function JoinPage() {
                 {communityLinks.map((item, index) => (
                   <li key={`${item.platform}-${item.url}-${index}`}>
                     <LinkButton href={item.url} variant="outline">
-                      Connect on {item.platform}
+                      Kết nối qua {item.platform}
                     </LinkButton>
                   </li>
                 ))}
@@ -182,11 +183,11 @@ export default async function JoinPage() {
           ) : (
             <div className="mt-8">
               <p className="text-muted">
-                Our official community links are being updated. You can still
-                begin by finding the next gathering.
+                Các kênh cộng đồng chính thức đang được cập nhật. Bạn vẫn có
+                thể bắt đầu bằng việc tìm buổi gặp gỡ sắp tới.
               </p>
               <div className="mt-6">
-                <LinkButton href="/events">See upcoming events</LinkButton>
+                <LinkButton href="/events">Xem sự kiện sắp tới</LinkButton>
               </div>
             </div>
           )}

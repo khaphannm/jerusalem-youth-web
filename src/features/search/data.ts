@@ -71,7 +71,7 @@ const articleResult = (article: Article): SearchResult => ({
   id: article.id,
   summary: article.excerpt,
   title: article.title,
-  typeLabel: "Article",
+  typeLabel: "Bài viết",
 });
 
 const eventResult = (event: Event): SearchResult => ({
@@ -80,7 +80,7 @@ const eventResult = (event: Event): SearchResult => ({
   id: event.id,
   summary: event.summary,
   title: event.title,
-  typeLabel: "Event",
+  typeLabel: "Sự kiện",
 });
 
 const resourceResult = (resource: Resource): SearchResult => ({
@@ -89,7 +89,7 @@ const resourceResult = (resource: Resource): SearchResult => ({
   id: resource.id,
   summary: resource.description,
   title: resource.title,
-  typeLabel: "Resource",
+  typeLabel: "Tài liệu",
 });
 
 const sermonResult = (sermon: Sermon): SearchResult => ({
@@ -98,7 +98,7 @@ const sermonResult = (sermon: Sermon): SearchResult => ({
   id: sermon.id,
   summary: sermon.summary,
   title: sermon.title,
-  typeLabel: "Sermon",
+  typeLabel: "Bài giảng",
 });
 
 const storyResult = (story: Story): SearchResult => ({
@@ -107,7 +107,7 @@ const storyResult = (story: Story): SearchResult => ({
   id: story.id,
   summary: story.summary,
   title: story.title,
-  typeLabel: "Story",
+  typeLabel: "Câu chuyện",
 });
 
 function logSearchError(source: string, error: unknown) {
@@ -140,7 +140,7 @@ export async function searchPublicContent(query: string): Promise<SearchData> {
     ) => {
       if (result.status === "rejected") {
         unavailableTypes.push(definition.label);
-        logSearchError(definition.label.toLowerCase(), result.reason);
+        logSearchError(definition.id, result.reason);
         return;
       }
 
@@ -158,19 +158,19 @@ export async function searchPublicContent(query: string): Promise<SearchData> {
 
     collect(results[0], {
       id: "articles",
-      label: "Articles",
+      label: "Bài viết",
       map: articleResult,
     });
-    collect(results[1], { id: "events", label: "Events", map: eventResult });
+    collect(results[1], { id: "events", label: "Sự kiện", map: eventResult });
     collect(results[2], {
       id: "sermons",
-      label: "Sermons",
+      label: "Bài giảng",
       map: sermonResult,
     });
-    collect(results[3], { id: "stories", label: "Stories", map: storyResult });
+    collect(results[3], { id: "stories", label: "Câu chuyện", map: storyResult });
     collect(results[4], {
       id: "resources",
-      label: "Resources",
+      label: "Tài liệu",
       map: resourceResult,
     });
 

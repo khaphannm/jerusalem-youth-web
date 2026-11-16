@@ -86,7 +86,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
               Our community
             </p>
             <h1
-              className="mt-5 text-balance font-display text-display font-extrabold"
+              className="motion-enter mt-5 text-balance font-display text-display font-extrabold"
               id="stories-title"
             >
               Stories of faith and belonging
@@ -124,9 +124,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
 
                     return (
                       <li
-                        className={
-                          featured ? "sm:col-span-2 lg:col-span-3" : undefined
-                        }
+                        className={`motion-reveal ${featured ? "sm:col-span-2 lg:col-span-3" : ""}`}
                         key={story.id}
                       >
                         <StoryCard featured={featured} story={story} />

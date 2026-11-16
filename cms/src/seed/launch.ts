@@ -307,6 +307,10 @@ export const seedLaunchReviewContent = async (
       data: launchSingles.aboutPage,
     },
     {
+      uid: 'api::home-page.home-page',
+      data: launchSingles.homePage,
+    },
+    {
       uid: 'api::navigation.navigation',
       data: launchSingles.navigation,
     },

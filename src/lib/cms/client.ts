@@ -4,6 +4,7 @@ import type { z } from "zod";
 
 import type {
   AboutPage,
+  HomePage,
   Article,
   Author,
   Category,
@@ -25,8 +26,10 @@ import {
   type CmsCacheTag,
 } from "./cache";
 import { CmsError } from "./errors";
+import { populate } from "./populate";
 import {
   mapAboutPage,
+  mapHomePage,
   mapArticle,
   mapAuthor,
   mapCategory,
@@ -41,6 +44,7 @@ import {
 } from "./mappers";
 import {
   aboutPageSchema,
+  homePageSchema,
   articleSchema,
   authorSchema,
   categorySchema,
@@ -55,6 +59,9 @@ import {
   socialLinksSchema,
   storySchema,
 } from "./schemas";
+import { createSnapshotFetch } from "./snapshot/fetch.ts";
+import { loadSnapshotFromDisk } from "./snapshot/load.ts";
+import { resolveCmsSource } from "./source.ts";
 import {
   minimumSearchQueryLength,
   normalizeSearchQuery,
@@ -107,39 +114,6 @@ type CollectionQuery = CollectionOptions &
   }>;
 
 const defaultTimeoutMs = 8_000;
-
-const populate = {
-  aboutPage: ["values", "primaryCta"],
-  article: [
-    "featuredImage",
-    "author.avatar",
-    "category",
-    "tags",
-    "bibleReferences",
-    "seo.socialImage",
-  ],
-  author: ["avatar"],
-  event: ["banner", "gallery", "seo.socialImage"],
-  navigation: ["primaryItems", "utilityItems", "footerItems"],
-  resource: [
-    "category",
-    "file",
-    "author.avatar",
-    "thumbnail",
-    "seo.socialImage",
-  ],
-  sermon: ["series.coverImage", "thumbnail", "seo.socialImage"],
-  sermonSeries: ["coverImage"],
-  siteSettings: [
-    "heroSlides.image",
-    "defaultSeo.socialImage",
-    "defaultSocialImage",
-    "organizationContact",
-    "primaryCta",
-  ],
-  socialLinks: ["links"],
-  story: ["featuredImage", "seo.socialImage"],
-} as const;
 
 const isLocalHostname = (hostname: string) =>
   hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
@@ -570,6 +544,14 @@ export const createCmsClient = ({
         z.infer<typeof aboutPageSchema>,
         AboutPage
       >),
+    homePage: () =>
+      readSingle({
+        cache: { revalidate: false, tags: [cmsCacheTags.homePage] },
+        endpoint: "home-page",
+        populate: populate.homePage,
+        schema: homePageSchema,
+        map: (homePage) => mapHomePage(homePage),
+      } satisfies SingleDefinition<z.infer<typeof homePageSchema>, HomePage>),
     articles: {
       list: (options?: CollectionOptions) =>
         readCollection(articles, {
@@ -796,7 +778,22 @@ export const createCmsClient = ({
 
 let defaultClient: ReturnType<typeof createCmsClient> | undefined;
 
+// In snapshot mode every read is answered from the content file bundled with
+// the deployment. The client never falls back to the live CMS.
+const createDefaultClient = () => {
+  if (resolveCmsSource(process.env) === "snapshot") {
+    const snapshot = loadSnapshotFromDisk();
+
+    return createCmsClient({
+      baseUrl: snapshot.sourceOrigin,
+      fetch: createSnapshotFetch(snapshot),
+    });
+  }
+
+  return createCmsClient({ baseUrl: process.env.CMS_BASE_URL ?? "" });
+};
+
 export const getCmsClient = () => {
-  defaultClient ??= createCmsClient({ baseUrl: process.env.CMS_BASE_URL ?? "" });
+  defaultClient ??= createDefaultClient();
   return defaultClient;
 };

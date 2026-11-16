@@ -14,7 +14,13 @@
 .env*
 !.env.example
 
+# Captured public content for snapshot deployments (built per release)
+/content-snapshot/
+
 # Tooling and operating-system files
 *.tsbuildinfo
 .DS_Store
 npm-debug.log*
+
+# Screenshots and previews saved by Claude
+Claude outputs/

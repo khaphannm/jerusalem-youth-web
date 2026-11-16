@@ -14,12 +14,14 @@ const {
   sermonsLatestMock,
   siteSettingsMock,
   storiesLatestMock,
+  homePageMock,
 } = vi.hoisted(() => ({
   articlesLatestMock: vi.fn(),
   eventsUpcomingMock: vi.fn(),
   sermonsLatestMock: vi.fn(),
   siteSettingsMock: vi.fn(),
   storiesLatestMock: vi.fn(),
+  homePageMock: vi.fn(),
 }));
 
 vi.mock("@/lib/cms", () => ({
@@ -29,6 +31,7 @@ vi.mock("@/lib/cms", () => ({
     sermons: { latest: sermonsLatestMock },
     siteSettings: siteSettingsMock,
     stories: { latest: storiesLatestMock },
+    homePage: homePageMock,
   }),
 }));
 
@@ -103,6 +106,7 @@ const collection = <T>(items: readonly T[]): CollectionResult<T> => ({
 describe("homepage data loading", () => {
   beforeEach(() => {
     articlesLatestMock.mockReset().mockResolvedValue(null);
+    homePageMock.mockReset().mockResolvedValue(null);
     eventsUpcomingMock.mockReset();
     sermonsLatestMock.mockReset().mockResolvedValue(null);
     siteSettingsMock.mockReset().mockResolvedValue(null);
@@ -121,9 +125,7 @@ describe("homepage data loading", () => {
       .mockResolvedValueOnce(collection([event]))
       .mockResolvedValueOnce(collection([event, otherEvent]));
 
-    const result = await loadHomePageData(
-      new Date("2026-08-22T00:00:00.000Z"),
-    );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
 
     expect(eventsUpcomingMock).toHaveBeenNthCalledWith(1, {
       featured: true,
@@ -146,14 +148,27 @@ describe("homepage data loading", () => {
       .spyOn(console, "error")
       .mockImplementation(() => undefined);
 
-    const result = await loadHomePageData(
-      new Date("2026-08-22T00:00:00.000Z"),
-    );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
 
     expect(result.latestArticle).toBeNull();
     expect(result.stories).toEqual([story]);
     expect(errorSpy).toHaveBeenCalledWith(
       "Homepage latest article could not be loaded: Articles offline",
     );
+  });
+
+  it("falls back when the Home Page is invalid and limits supporting events without duplicating the feature", async () => {
+    homePageMock.mockRejectedValue(new Error("Home Page is invalid."));
+    eventsUpcomingMock
+      .mockResolvedValueOnce(collection([event]))
+      .mockResolvedValueOnce(
+        collection([
+          event,
+          ...[2, 3, 4].map((id) => ({ ...event, id: String(id) })),
+        ]),
+      );
+    const result = await loadHomePageData(new Date("2026-08-22T00:00:00.000Z"));
+    expect(result.homePage).toBeNull();
+    expect(result.upcomingEvents.map((item) => item.id)).toEqual(["2", "3"]);
   });
 });

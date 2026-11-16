@@ -1,5 +1,11 @@
 # CMS Publication Revalidation
 
+This document describes implemented **live-CMS mode**. The selected
+[free-first deployment plan](production-deployment-guide.md) requires a separate,
+not-yet-implemented snapshot release workflow. `POST /api/revalidate` does not
+export snapshots or publish a deployment; continue using these instructions
+only for live mode until that work is complete.
+
 CMS-005 caches public Strapi reads with server-owned tags and exposes one
 authenticated endpoint for Strapi publication events:
 
@@ -35,6 +41,7 @@ The fixed UID mapping covers every public V1 CMS type:
 | `api::author.author` | `cms:authors` |
 | `api::category.category` | `cms:categories` |
 | `api::event.event` | `cms:events` |
+| `api::home-page.home-page` | `cms:home-page` |
 | `api::navigation.navigation` | `cms:navigation` |
 | `api::resource.resource` | `cms:resources` |
 | `api::sermon-series.sermon-series` | `cms:sermon-series` |

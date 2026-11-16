@@ -395,7 +395,57 @@ About-page hero.
 - Metadata uses Site Settings for the ministry name, default social image, and
   indexing preference while preserving safe fallbacks during CMS outages.
 
+### Home Page
+
+Single type (`api::home-page.home-page`, draft/publish) holding the landing-page
+copy. Section order and layout are fixed in code; editors change wording and
+switch sections on or off.
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| heroHeadline | string | required, max 80 |
+| heroDescription | text | required, max 400 |
+| primaryCta | `shared.cta` | required; site path or HTTP(S) URL. Used for every invitation button on the page |
+| introduction | `shared.section-intro` | required |
+| introductionHighlight | string | optional, max 80; one phrase, or several separated by `\|`, copied exactly from the introduction title, that get the highlighter stroke. A phrase that does not occur in the title, or overlaps an earlier match, is ignored |
+| community | `shared.section-intro` | required |
+| communityThemes | `shared.ministry-value`, repeatable | 1–6 |
+| gathering | `shared.section-intro` | required |
+| weeklySchedule | `shared.schedule-item`, repeatable | optional, max 6; recurring weekly activities shown as tiles in the gathering section: `title` (max 80), `schedule` (max 80), optional `note` (max 160) |
+| gatheringEmptyMessage | text | required, max 400; shown when no upcoming event is published |
+| stories | `shared.section-intro` | required |
+| teaching | `shared.section-intro` | required |
+| newcomer | `shared.section-intro` | required |
+| newcomerSteps | `shared.ministry-value`, repeatable | 1–4 |
+| invitation | `shared.section-intro` | required |
+
+Each of the seven sections after the hero also has a boolean toggle
+(`showIntroduction`, `showCommunity`, `showGathering`, `showStories`,
+`showTeaching`, `showNewcomer`, `showInvitation`; default on, unset counts as
+on). Switching one off removes that section and any in-page link pointing to
+it; its copy is kept for when it is switched back on. The hero is always shown.
+
+`shared.section-intro`: `eyebrow` (string, optional, max 80), `title` (string,
+required, max 120), `description` (text, optional, max 400).
+
+Web behavior:
+- Read through `client.homePage()` with the `cms:home-page` cache tag and
+  validated by `homePageSchema`; the UI consumes the `HomePage` domain type.
+- When the entry is unpublished, invalid, or the CMS is unreachable, the page
+  renders the checked-in fallback in `src/features/home/copy.ts`.
+- The mission grid is `communityThemes`; the homepage no longer reads the
+  About Page. Events, stories, sermon
+  and article cards still come from their collections; navigation link labels
+  inside the page ("Xem các câu chuyện" and similar) stay in code.
+- SEO title and description remain in Site Settings `defaultSeo`.
+
 ### Site Settings
+
+Site Settings supplies the homepage hero photographs (`heroSlides`) and site
+identity. Homepage copy lives in the Home Page single type below. Existing
+detail-page CTA behavior is unchanged. CMS content, alt text and slide captions
+remain as authored; English translation and language routing are a later phase.
+
 - siteName
 - siteDescription
 - defaultSeo

@@ -18,13 +18,17 @@ Optional provider settings:
 - `AWS_ACL`: provider-specific; for the installed provider with AWS S3 Bucket
   owner enforced, use `bucket-owner-full-control`. Omitting this value currently
   lets the provider default to `public-read`, which can fail on ACL-disabled
-  buckets. Do not assume omission disables ACL headers on other S3 vendors.
+  buckets. Set `AWS_ACL=none` to send no ACL header at all; this is required
+  for Cloudflare R2, which has no object ACLs.
 - `CDN_ROOT_PATH`: prefix all CMS-managed objects, for example `production`
 
 Use a dedicated identity with access limited to the configured bucket and prefix. It needs only the equivalent list, read, create, replace, and delete object operations required by the Media Library. CDN visitors receive read-only asset access and never receive the CMS storage credentials.
 
 For the AWS S3/CloudFront setup and the verified ACL compatibility caveat, follow
-the [production deployment guide](../../docs/production-deployment-guide.md).
+the [always-on alternative](../../docs/production-deployment-always-on.md).
+The selected [free-first plan](../../docs/production-deployment-guide.md) uses
+R2 plus a media Worker instead; its ACL-free upload handling and delivery are
+pending implementation. Do not apply the AWS-specific ACL value to R2.
 
 Configure bucket CORS to allow `GET` from the deployed Strapi admin origin. The CMS Content Security Policy automatically adds the configured `CDN_URL` origin for image and media previews. Use HTTPS for the CDN and production S3 endpoint.
 

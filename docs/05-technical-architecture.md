@@ -2,6 +2,13 @@
 
 ## System context
 
+The diagram below describes the implemented live-CMS architecture. The selected
+free-first launch direction adds deployment-bundled content snapshots so public
+reads do not depend on sleeping CMS compute. This change is **not implemented**;
+see [ADR-003](decisions/ADR-003-snapshot-publication.md) and the
+[execution plan](exec-plans/free-first-deployment.md). Live-mode cache/webhook
+behavior below remains the current code contract.
+
 ```text
 Visitor
   |

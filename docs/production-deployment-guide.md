@@ -1,438 +1,210 @@
-# Production deployment with a free web address
+# Free-first production deployment plan
 
-For Jerusalem Youth maintainers. Provider documentation checked on 8 September
-2026; confirm current limits and prices before creating billable resources.
-This is a deployment runbook, not evidence that a live deployment has passed.
+Updated 16 November 2026. Selected direction for Jerusalem Youth's current low
+traffic and infrequent editing. Snapshot publishing, the R2 media Worker and
+the hosting configuration are now implemented and unit-tested, **but have not
+been run on the real services**. Follow [free hosting setup](free-hosting-setup.md)
+and pass its checks before treating this as the public launch workflow.
+Sections 3 and 4 below are the original plan, kept as the checklist the
+implementation was built against.
 
-## 1. Choose the hosting arrangement
+Target $0 monthly service charges within free allowances, then upgrade services
+individually. Free tiers carry availability limits; no hosting resources have
+been provisioned or billing plans changed by this documentation update.
 
-Use **Netlify for the web**, **Render for Strapi and PostgreSQL**, and **AWS S3
-with CloudFront for media**. This follows the repository's existing architecture
-and does not require Docker or a purchased domain.
+## 1. Services and limits
 
-| Part | Hosting | Address / cost expectation |
+| Part | Starting service | Limits / qualifications |
 | --- | --- | --- |
-| Public website | Netlify | `https://jylovegod.netlify.app`, if available; free plan within its limits |
-| CMS admin and API | Render Node web service | Assigned HTTPS `*.onrender.com` address; budget for paid, always-on compute |
-| Content database | Render PostgreSQL | Private connection; budget for a paid, non-expiring database and backups |
-| Images and PDFs | S3 + CloudFront | Assigned HTTPS `*.cloudfront.net` address; storage/delivery charges depend on plan and usage |
+| Next.js web and address | Netlify Free, `https://jylovegod.netlify.app` if available | Currently 300 credits/month; deploys, traffic and compute consume credits. Exhaustion can pause the site. [Pricing](https://www.netlify.com/pricing/) |
+| Strapi editorial CMS | Render Free Node web service | Sleeps after 15 idle minutes; waking takes about a minute. Render advises against Free for production applications. Accept this for the noncritical editorial service only after resource testing. [Limits](https://render.com/docs/free) |
+| PostgreSQL | Neon Free | Currently 1 GB storage and 100 CU-hours/month/project; compute can suspend on allowance exhaustion. Use a claimed permanent account, not an unclaimed temporary database. [Pricing](https://neon.com/pricing) |
+| Images/PDFs | Cloudflare R2 Standard | Free allowance: 10 GB-month storage, 1 million Class A and 10 million Class B operations/month; excess is billable. [Pricing](https://developers.cloudflare.com/r2/pricing/) |
+| Media delivery | Workers Free with an R2 binding | Separate request/CPU allowances; the proposed small read-only handler must fit these limits. [Pricing](https://developers.cloudflare.com/workers/platform/pricing/) |
 
-These are provider-owned **subdomains**, not a free registration of
-`jylovegod.com`. `jylovegod` alone is not a complete website URL. Name availability
-has not been checked or reserved. Netlify supplies a default subdomain without
-requiring custom-domain DNS setup. See [Netlify domain basics](https://docs.netlify.com/manage/domains/domains-fundamentals/understand-domains/).
+The website address is a provider subdomain, not a registration of
+`jylovegod.com`. Availability of the chosen name is unverified. See
+[Netlify domains](https://docs.netlify.com/manage/domains/domains-fundamentals/understand-domains/).
 
-The free address does **not** make the whole system free:
+The proposed media address is `https://<worker>.<account>.workers.dev`. Cloudflare
+recommends a custom domain/route for production and describes `workers.dev` as
+suitable for personal/hobby projects that are not business critical. This is an
+initial availability compromise, to review before a high-profile launch. R2's
+direct `r2.dev` URL is development-only and rate limited; it is not the selected
+delivery endpoint. See [Worker domains](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/)
+and [R2 public access](https://developers.cloudflare.com/r2/buckets/public-buckets/).
 
-- Netlify's current Free plan has 300 monthly credits. Deploys, traffic, and
-  compute use credits; exhausting the allowance can pause the site until the
-  next cycle. Monitor usage and arrange an upgrade before a major outreach
-  event. See [Netlify pricing](https://www.netlify.com/pricing/).
-- Render Free web services sleep after 15 idle minutes, and Free PostgreSQL
-  expires after 30 days. Do not use that combination for this production CMS:
-  a sleeping CMS can make content reads fail, and the database is temporary.
-  See [Render free-service limits](https://render.com/docs/free).
-- The CloudFront hostname avoids a domain purchase, but is not a promise of
-  free storage or delivery. Review [CloudFront pricing](https://aws.amazon.com/cloudfront/pricing/)
-  and [S3 pricing](https://aws.amazon.com/s3/pricing/), including backups, requests,
-  and any usage outside allowances. Set billing alerts; alerts are not hard caps.
+Free allowance is not an enforced zero-billing guarantee everywhere. R2 requires
+a subscription and may require a payment method; confirm signup and overage
+terms before activation. Set notifications, keep paid auto-recharge off where
+supported, and monitor actual usage. Alerts are not hard spending caps. If
+guaranteed zero charges are required, resolve a hard-cap media arrangement
+before launch. See [R2 setup](https://developers.cloudflare.com/r2/get-started/).
+Do not use Render Free PostgreSQL: it expires after 30 days. Store data in Neon.
 
-Vercel is another web-host option, but do not assume its Hobby plan covers an
-organization's website: it is restricted to personal, non-commercial use.
-Confirm eligibility with Vercel or budget for its paid plan before substituting
-it. See [Vercel fair-use rules](https://vercel.com/docs/limits/fair-use-guidelines).
+## 2. Publishing architecture
 
-If the entire hosting budget must be zero, stop before provisioning paid
-services. That is a different constraint from a free domain and needs a separate
-hosting/reliability decision; this guide does not promise an always-on, entirely
-free Strapi production stack.
+```text
+Publisher -> wake CMS -> edit/publish -> request content release
+                                              |
+                          export -> validate snapshot -> build/check
+                                              |
+                                      publish Netlify deploy
 
-## 2. Prepare the release and accounts
-
-You need access to the Git repository, Netlify, Render, AWS, and a password
-manager. Use ministry-controlled accounts with recovery access and MFA where
-available. Have an engineer assist with database access and AWS permissions.
-
-1. Review and commit the release code, including CMS schemas/components and
-   generated declarations. Push the reviewed release through the normal PR
-   process. A provider cannot deploy uncommitted local changes.
-2. Require the existing GitHub Actions `quality` and `cms` jobs to pass. Follow
-   [release policy](10-git-cicd-release.md) and the
-   [Definition of Done](12-definition-of-done.md). A successful build alone does
-   not verify content, images, or publication delivery.
-3. Use the same Node major as `.github/workflows/ci.yml` (currently 24) for both
-   services. Install with the checked-in lockfiles; do not upgrade packages as
-   part of deployment.
-4. Choose the public web name and record the eventual CMS and CDN origins.
-   Every sample hostname and `<...>` value below must be replaced. Do not paste
-   placeholder secrets into a deployment.
-5. Keep `.env`, `.env.local`, database URLs, AWS credentials, and webhook secrets
-   out of Git. Use provider environment settings, not a committed production
-   `.env`. Never copy the development example secrets to production.
-6. Configure production deployment controls during provider setup: keep Render
-   automatic deploys and Netlify automatic production publishing disabled while
-   coordinating this first release. Deploy/publish a specific reviewed commit
-   manually after CI passes. Before enabling later automation, establish its CI
-   gate and CMS-before-web ordering; connecting Git alone does not enforce either.
-
-The order matters: **database and media → CMS → approved content → web → webhook
-→ public verification**. Deploy the updated CMS before a web release that
-populates new fields such as `heroSlides`.
-
-## 3. Provision durable PostgreSQL
-
-In Render, create a **paid PostgreSQL** database in the same region as the planned
-CMS. Select a PostgreSQL major supported by Strapi and exercised in CI (currently
-17), sufficient storage, and a backup/retention plan.
-
-Copy the **Internal Database URL** into the password manager. Use it only from
-the Render CMS in the same region; Netlify does not connect directly to the
-database. Restrict external database access and use the provider's TLS/certificate
-requirements. Internal and external endpoints are different; see
-[Render PostgreSQL connections](https://render.com/docs/postgresql-creating-connecting).
-
-In the CMS environment, set `DATABASE_URL` to that connection string instead of
-copying local `DATABASE_HOST`, `DATABASE_USERNAME`, or password values. This repo
-accepts the URL directly. Leave conflicting discrete connection variables unset.
-For the same-workspace, same-region Render internal connection, use
-`DATABASE_SSL=false` and no `sslmode` query parameter. This is specifically the
-private-network path, not a setting for public database connections. For an
-external endpoint, require TLS, verify the certificate, and reconcile any URL
-SSL parameters with the explicit options so they do not override certificate
-policy. See [Render internal versus external TLS](https://render.com/tutorials/postgres-on-render/connection-strings).
-
-Before launch, restore a backup into an isolated database and confirm that it
-opens correctly. Record who owns backups, their retention, and the recovery
-procedure. Never perform a restore test over the live database.
-
-## 4. Provision production images and documents
-
-The CMS already uses its S3 upload provider in production. Uploading to the
-application's local disk is not the production path.
-
-1. Create a dedicated S3 bucket, preferably near the CMS. Keep **Block Public
-   Access** enabled, use **Bucket owner enforced** ownership, and enable
-   versioning plus a reviewed retention/backup policy.
-2. Create a CloudFront distribution with that bucket's **S3 REST origin**, not
-   its static-website endpoint. Configure Origin Access Control (OAC), request
-   signing, and the generated bucket policy restricted to this distribution.
-   Allow public viewer reads without signed viewer URLs, redirect HTTP to HTTPS,
-   and leave the origin path empty. See [AWS OAC setup](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html).
-3. Use the distribution's assigned hostname, such as
-   `https://d123example.cloudfront.net`, as `CDN_URL`. No alternate/custom domain
-   is needed. CloudFront assigns a hostname when the distribution is created.
-   See [CloudFront distribution basics](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html).
-4. Create a dedicated CMS AWS identity, not an AWS root access key. Limit its
-   permissions to this bucket and the `production/` object prefix: object
-   read/write/delete and necessary list/multipart operations. Review the policy
-   with an AWS operator; do not attach account-wide S3 administrator permissions.
-   Store its access key ID and secret only in Render.
-5. Prepare CORS for media reads from the actual CMS admin origin, including
-   `GET`/`HEAD`; ensure CloudFront's origin request/cache and response-header
-   policies preserve the required CORS behavior. Do not enable anonymous upload
-   permissions to solve an image-preview problem. Follow the existing
-   [media operations guide](../cms/docs/media-permissions-operations.md).
-   The CMS hostname is allocated in Section 5; return to finish this configuration
-   with that exact origin before testing uploads. Do not use a guessed hostname.
-
-### Important compatibility setting for this checkout
-
-Set **`AWS_ACL=bucket-owner-full-control`** for this AWS setup. The installed
-Strapi S3 provider defaults to `public-read` when the `ACL` property is absent,
-and the repository omits that property when `AWS_ACL` is unset. That combination
-can fail on a Bucket-owner-enforced bucket. This was verified in the installed
-provider's `getConfig` implementation, not inferred from the environment example.
-
-AWS accepts `bucket-owner-full-control` uploads even when ACLs are disabled;
-access still comes from bucket/IAM policies. See
-[S3 object ownership behavior](https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html).
-Do not switch the bucket to public access as a workaround. Recheck this behavior
-when updating the provider. This setting is specific to AWS S3; do not copy it
-unreviewed to an S3-compatible vendor that rejects all ACL headers.
-
-## 5. Deploy the CMS on Render
-
-**Pre-launch engineering gate:** this checkout's `cms/config/server.ts` does not
-configure `proxy.koa`. Render terminates HTTPS before forwarding HTTP to the app;
-the installed Strapi admin derives its refresh-cookie `Secure` flag from whether
-the request is recognized as secure. Have an engineer review trusted-proxy
-configuration for this hosting boundary before staff use the production CMS.
-There is no existing application environment switch for that setting: do not
-invent a `PROXY` variable and assume it works. See
-[Strapi server configuration](https://docs.strapi.io/cms/configurations/server)
-and [Render HTTPS termination](https://render.com/docs/web-services).
-After a reviewed configuration change and deployment, verify HTTPS admin login,
-refresh/logout, and that auth cookies have `Secure` and `HttpOnly`. Missing
-`Secure` is a release blocker, not something to bypass. This documentation task
-does not change the server configuration or establish live cookie behavior.
-
-Create a **Web Service** from the repository, not a Static Site. Choose the Node
-runtime and a paid instance with enough memory for Strapi; verify build and
-runtime memory usage before selecting the smallest tier.
-
-| Setting | Value for this repository |
-| --- | --- |
-| Branch | Reviewed release branch, normally `main` |
-| Root directory | `cms` |
-| Build command | `npm ci --include=dev && npm run build` |
-| Start command | `npm run start` |
-| Health check path | `/_health` |
-| Node selector | Provider setting `NODE_VERSION=24` to match current CI |
-
-Commands are relative to `cms`; do not add another `cd cms`. Render documents
-[subdirectory deployment](https://render.com/docs/monorepo-support),
-[Node version selection](https://render.com/docs/node-version), and
-[web service settings](https://render.com/docs/web-services).
-Install development dependencies during the build because TypeScript and build
-tools need them; production still runs `strapi start`, not `strapi develop`.
-
-Generate a fresh value with this command for **each** secret:
-
-```bash
-openssl rand -base64 32
+Visitor -> Next.js -> snapshot bundled with that deployment
+        -> media Worker -> R2 images/PDFs
 ```
 
-Run it four times for `APP_KEYS` and join those four distinct outputs with commas
-and no spaces. Generate separate values for every other secret below. Save them
-in the password manager; keep them stable across ordinary restarts/deployments.
+Snapshot mode must serve all public data without Strapi/Neon requests, including
+metadata, layout/navigation, search, pagination, detail pages, structured data
+and sitemap. Keep Next.js server capabilities; this is not a static-export
+conversion. Media delivery remains a live dependency outside the snapshot.
 
-Enter these values in Render's environment settings, available during build and
-runtime. `NODE_VERSION` is a provider selector; the other names come from this
-repository's configuration or the Node/Strapi runtime.
+The exporter runs only for a requested content release, after bounded CMS
+warm-up/retries. The current eight-second CMS request timeout cannot reliably
+cover a roughly one-minute wake-up. Do not make visitors wait for this operation
+or add recurring keep-alive requests to defeat service sleep.
 
-```dotenv
-NODE_ENV=production
-HOST=0.0.0.0
-PORT=10000
-APP_KEYS=<key-1>,<key-2>,<key-3>,<key-4>
-API_TOKEN_SALT=<independent-random-value>
-ADMIN_JWT_SECRET=<independent-random-value>
-TRANSFER_TOKEN_SALT=<independent-random-value>
-ENCRYPTION_KEY=<independent-random-value>
-JWT_SECRET=<independent-random-value>
+Each snapshot is a complete validated set of approved public fields, packaged
+immutably with one web deployment. It is not a database backup or a public JSON
+download. Exclude drafts, admin data and secrets. Keep it server-side so full
+article bodies are not all shipped in client JavaScript.
 
-DATABASE_CLIENT=postgres
-DATABASE_URL=<render-internal-postgresql-connection-string>
-DATABASE_SCHEMA=public
-DATABASE_SSL=false
-DATABASE_SSL_REJECT_UNAUTHORIZED=true
-DATABASE_POOL_MIN=0
-DATABASE_POOL_MAX=5
-DATABASE_CONNECTION_TIMEOUT=60000
+## 3. Required implementation before deployment
 
-AWS_REGION=<actual-s3-region>
-AWS_BUCKET=<actual-bucket-name>
-AWS_ACCESS_KEY_ID=<dedicated-cms-access-key-id>
-AWS_ACCESS_SECRET=<dedicated-cms-secret-access-key>
-AWS_ACL=bucket-owner-full-control
-CDN_URL=https://<assigned-distribution>.cloudfront.net
-CDN_ROOT_PATH=production
-WEBHOOKS_POPULATE_RELATIONS=false
-```
+Follow the [execution plan](exec-plans/free-first-deployment.md). Environment
+changes alone do not enable this mode.
 
-Render can supply `PORT`; use its assigned value if different. For ordinary AWS
-S3, leave `AWS_ENDPOINT` unset and keep path-style addressing off. Note the repo
-uses **`AWS_ACCESS_SECRET`**, not `AWS_SECRET_ACCESS_KEY`. If the database provider
-requires an external TLS connection instead of this internal setup, enable
-`DATABASE_SSL=true`, keep certificate verification enabled, and add
-`DATABASE_SSL_CA` when its certificate chain requires it. Investigate failures
-with the provider instead of guessing security overrides. Size the connection pool to
-fit the database's limit across all CMS instances.
+1. Build a published-content exporter with full pagination, existing validation,
+   mapped relations and capture-consistency checks. Treat upstream errors as
+   release failures, not empty content. Explicitly define required launch records
+   and legitimate optional empty collections.
+2. Implement a snapshot adapter behind the typed CMS boundary, preserving every
+   existing query method and feature. Missing/incompatible snapshots must stop
+   the candidate release; never silently fall back to live CMS in snapshot mode.
+3. Implement and document source selection, artifact handling and release
+   commands. No snapshot command or environment switch exists yet.
+4. Add the read-only R2 Worker and test ACL-free S3 upload configuration. The
+   installed provider can default to `public-read` when `AWS_ACL` is omitted;
+   leaving it blank is not a verified R2 fix. Do not copy AWS S3's
+   `bucket-owner-full-control` value to R2.
+5. Review Strapi trusted-proxy configuration and verify HTTPS Admin login,
+   refresh/logout and `Secure`/`HttpOnly` auth cookies. The current server config
+   has no environment switch for proxy trust. See [Strapi server configuration](https://docs.strapi.io/cms/configurations/server).
+6. Add a manual batch-release workflow: capture, validate, build, verify, then
+   publish. Keep the previous deployment active on any failure. Serialize releases
+   so an older run cannot overwrite a newer published snapshot.
 
-Deploy, record the assigned HTTPS CMS origin, and immediately create the first
-administrator at `https://<cms-service>.onrender.com/admin`. Do not leave first
-admin registration unattended. Create least-privilege editorial accounts using
-the [role checklist](../cms/docs/media-permissions-operations.md).
-Complete the deferred CORS configuration in Section 4 with this assigned origin.
+The current `POST /api/revalidate` only expires live CMS cache tags. It cannot
+export snapshots or publish a web deployment. Keep that endpoint documented for
+live mode; a 200 response is not proof of snapshot publication. Automatic
+publication is a later option requiring authentication, retries, debouncing and
+ordering. Netlify supplies [build hooks](https://docs.netlify.com/build/configure-builds/build-hooks/),
+but their secret URLs must not be exposed in browsers or Git.
 
-Verify before continuing:
+## 4. Provisioning after implementation passes
 
-```bash
-curl --fail --silent --show-error --output /dev/null --write-out '%{http_code}\n' \
-  https://<cms-service>.onrender.com/_health
-curl --fail --silent --show-error \
-  'https://<cms-service>.onrender.com/api/articles?status=published'
-```
+Use ministry-controlled accounts, existing CI/review gates and the Node major
+tested in CI (currently 24). Docker is optional. Start with manual production
+publishing so provider auto-deploys cannot bypass validation or race schema changes.
 
-Expect HTTP 204 for health and a JSON `data` array for articles (initially empty
-is normal). Anonymous public reads are configured by bootstrap; do not grant
-public write, upload, authentication, or admin permissions. Upload one approved
-test photograph through the Media Library and open its persisted CloudFront URL
-in a signed-out browser. Confirm the preview, responsive variants, and public
-image all load over HTTPS. Resolve upload/permission failures before deploying web.
+1. Create Neon Free PostgreSQL. Keep the connection string with CMS and approved
+   backup tooling; neither visitors nor the exporter need database credentials.
+   Use Neon TLS with certificate verification, resolving URL SSL parameters/CA
+   requirements with the repository's database options. Configure conservative
+   pooling and confirm idle CMS activity lets database compute sleep.
+2. Create an R2 Standard bucket with scoped CMS S3 credentials. Deploy the tested
+   Worker with an R2 binding, safe object keys, GET/HEAD only, content metadata,
+   CORS and cache handling. No public uploads, deletes, listing or arbitrary
+   proxy targets. Use its HTTPS origin for persisted public media URLs.
+3. Create a Render Free **Web Service**, root `cms`, build
+   `npm ci --include=dev && npm run build`, start `npm run start`, health
+   `/_health`. Use its assigned port and independent production Strapi secrets.
+   Test actual build/runtime memory, wake-up and Admin behavior. If Strapi cannot
+   run reliably on the free instance, upgrade CMS compute or revisit the plan;
+   its suitability is an explicit launch gate, not an assumption.
+4. Finish CORS/CSP using the allocated CMS origin. Upload approved media through
+   Admin; verify previews, responsive variants and signed-out public URLs.
+   Local records/uploads do not migrate through Git. Recreate approved launch
+   content or use a separately verified transfer. Never bypass the review seed's
+   production restriction.
+5. Create the Netlify Next.js project at the repository root, retain the adapter
+   and `.next` publish directory, and integrate the implemented release pipeline
+   before `npm run build`. Snapshot export may need build credentials; serving
+   the snapshot must not need CMS/database connectivity. Keep production secrets
+   out of previews and scope them to authorized build/operator phases.
+6. Capture the first snapshot while editors pause changes. Validate and verify
+   the candidate before publication. Record web commit, CMS schema revision,
+   snapshot identity/time and media origin. Do not launch with fallback content.
 
-## 6. Create and publish approved content
+Current configuration is in `.env.example`, `cms/.env.example` and CMS config.
+The S3 secret name in this repo is `AWS_ACCESS_SECRET`. R2 needs its S3 HTTPS
+endpoint, bucket, region setting and public delivery origin; finalized values
+and snapshot commands must be documented/tested during implementation. Copying
+the old live-CMS environment is insufficient.
 
-A new production database does not contain the six articles or settings from
-your laptop. Git deployment copies code, **not** PostgreSQL records or local
-uploads. For a small launch, manually upload approved images and recreate the
-approved content in production. A bulk migration needs a separately planned,
-backed-up database/media transfer; do not point production at the local database.
+## 5. Publisher workflow after implementation
 
-Use [content operations](11-content-operations.md) to review and publish:
+1. Open CMS Admin, allow it to wake, and publish the approved batch, including
+   Site Settings/hero slides and supporting taxonomy where appropriate.
+2. Pause editing during capture and request one content release using the
+   operator workflow implementation will provide. CMS Publish alone does not
+   change the public snapshot.
+3. The release warms CMS, captures/validates all public records and references,
+   builds the candidate and reports the deployed revision or failure.
+4. Verify the actual public change after deployment. On failure, the previous
+   website remains active; correct the issue and retry.
 
-- Site Settings, ministry details, CTA, and default SEO/social image;
-- Navigation, Social Links, About Page, and current contact information;
-- approved articles, events, sermons, stories, and resources;
-- Site Settings → `heroSlides`, ordered images with alt text and final captions.
+Unpublish/delete also require a successful new snapshot release. Until then,
+old content remains public. For an urgent privacy removal, expedite a release;
+if it fails, restrict the affected page/media at the host and purge retained
+caches/deploy URLs as needed. CMS unpublish does not revoke old deployments or
+public images automatically. Document an operator and escalation path.
 
-Use Save **and Publish** for publishable content. The website requests published
-entries only. The launch seed is explicitly non-production and must not be
-enabled with a production bypass. Do not publish fictional review text or
-generated scenes as real ministry activity. Review all placeholder hostnames,
-SEO canonical overrides, `noIndex` flags, image consent, and event dates/timezones.
+Upcoming/past event classification and registration deadlines must continue to
+use current server time with bounded cache freshness. Do not freeze status in
+the snapshot or require daily full builds just for date transitions. Date/venue
+edits still require a content release.
 
-## 7. Deploy the web on Netlify
+## 6. Launch verification and recovery
 
-Import the repository through Netlify's Git integration and choose the web
-package at the **repository root**, not `cms`. Set the project name to
-`jylovegod` if available; otherwise choose an available alternative and use its
-actual origin consistently below. A failed initial deploy can be retried after
-the environment is set; do not announce the URL until validation passes.
+- [ ] Complete export, public-field validation, relation/media coverage and
+      exclusion of drafts/secrets are tested.
+- [ ] Timeouts, invalid records, truncated pagination and inconsistent capture
+      fail before replacing the active release.
+- [ ] With CMS stopped, both a fresh web instance and warm caches serve every
+      public feature, metadata and sitemap; event/deadline transitions still work.
+- [ ] Publish/edit/unpublish/delete and failed-release/rollback scenarios pass.
+- [ ] Secure Admin/proxy behavior, least-privilege permissions, R2 uploads,
+      Worker errors/cache policy and public media are verified.
+- [ ] Mobile/gallery/a11y/SEO/performance checks pass. Verify preview protections:
+      production-mode preview builds are not automatically noindex in this repo.
+- [ ] Usage notifications, backup owner and an isolated restore test are recorded.
 
-| Setting | Value |
+Keep database and media backups under ministry control; free restore windows
+are not the backup policy. Record compatible commits, database/media recovery
+points, preserved object keys and public origin, restore validation and cutover
+steps in the operator's recovery record. Snapshots cannot restore the editable
+CMS database. Do not delete media still needed by retained releases during
+ordinary editing; an emergency privacy withdrawal overrides retention.
+
+Rollback republishes the known-good artifact with its exact snapshot and
+compatible configuration. Rebuilding the same Git commit against today's CMS
+does not reproduce the prior release. Confirm old content is still approved
+before rollback. Snapshot rollback cannot restore deleted R2 objects.
+
+## 7. Upgrade triggers
+
+| Trigger | Next action |
 | --- | --- |
-| Base / package directory | Repository root (leave blank or use `.`) |
-| Framework | Next.js, with Netlify's automatically detected adapter |
-| Build command | `npm run build` |
-| Publish directory | `.next` (retain the Next.js preset) |
-| Production branch | Reviewed `main` |
-| Node version | Match current CI: 24 |
+| Strapi does not fit/run on Free, wake delays disrupt editors, or availability matters | Upgrade CMS compute first; snapshots can stay |
+| Frequent immediate updates or urgent removals become normal | Add authenticated release automation or intentionally restore live mode with always-on CMS |
+| Netlify credits approach allowance, especially before an outreach event | Upgrade web allowance; review release frequency and payloads |
+| Neon compute, transfer or storage approaches allowance | Upgrade database and review queries/pooling |
+| R2/Worker allowance or media availability becomes limiting | Review paid delivery allowances and a custom media domain |
 
-Netlify supports App Router, server rendering, route handlers, and tag-based
-revalidation through its adapter. Keep the default adapter unless compatibility
-testing requires otherwise. See [Next.js on Netlify](https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/)
-and [build configuration](https://docs.netlify.com/build/configure-builds/overview/).
-Verify the build log uses the root lockfile. Do not run the CMS build here.
-
-In Netlify environment settings, set the following for **Production**, available
-to **Builds and Functions** (or all scopes if narrower scopes are unavailable):
-
-```dotenv
-CMS_BASE_URL=https://<cms-service>.onrender.com
-SITE_URL=https://jylovegod.netlify.app
-CMS_REVALIDATION_SECRET=<new-independent-random-secret-at-least-32-characters>
-```
-
-Use the actual allocated name, not the sample if it was taken. Origins must not
-include `/admin`, `/api`, paths, credentials, query strings, or fragments. Generate
-the webhook secret separately from Strapi's keys and salts. These three variables
-are server-only: do **not** add `NEXT_PUBLIC_` prefixes. Netlify's Functions scope
-is the relevant server execution scope, not its separately named Runtime scope.
-See [Netlify environment settings](https://docs.netlify.com/build/environment-variables/overview/).
-
-Deploy and check both the generated pages and server-rendered content routes.
-Rebuild/redeploy after changing environment variables. The repo needs a server
-for CMS reads, search, and `POST /api/revalidate`: do not use static export,
-GitHub Pages, or drag-and-drop only a static output folder.
-
-Keep production secrets out of deploy previews and untrusted PR builds. Use a
-separate review CMS and secret if previews are enabled. Until that separation is
-configured, disable preview/branch deployments. This repository's `robots.txt`
-uses `NODE_ENV`, so a production-mode preview build is **not automatically**
-non-indexable; verify host preview protections/noindex behavior rather than
-assuming the development robots policy applies.
-
-## 8. Connect publication to the web cache
-
-In Strapi **Settings → Webhooks**, add:
-
-| Field | Value |
-| --- | --- |
-| Name | Frontend publication revalidation |
-| URL | `https://jylovegod.netlify.app/api/revalidate` (actual web origin) |
-| Custom header name | `Authorization` |
-| Custom header value | `Bearer <the exact Netlify CMS_REVALIDATION_SECRET>` |
-| Events | Entry create, update, delete, publish, unpublish |
-
-The secret is a webhook header configured in Strapi Admin, not a new CMS
-environment variable. Keep the production endpoint reachable by the CMS; access
-protection must not replace the endpoint's own bearer authentication.
-
-On an approved test entry, publish a reversible title/caption edit. Inspect the
-delivery result and then load the affected public page in a fresh browser
-request. Expect HTTP **200** for publication. A draft-only save returns **202**
-and intentionally does not update public content. Restore and republish the
-approved value afterward. Test both an article and Site Settings hero slides.
-
-Production stable-content reads are cached until the matching webhook expires
-them; restarting your local dev server has no effect here. Event reads also
-have a five-minute fallback, but articles/settings do not rely on that timer.
-Full setup, response codes, replay, and rotation instructions are in
-[publication revalidation](cms-publication-revalidation.md). A generic dashboard
-test payload may be rejected; a real publication delivery is the meaningful test.
-
-## 9. Launch checklist
-
-Record the release commit, deployed URLs, date, operator, and results:
-
-- [ ] CI web/CMS checks pass for the deployed commit.
-- [ ] CMS health/admin work; trusted-proxy review and `Secure`/`HttpOnly` auth
-      cookie verification pass; roles and anonymous read-only permissions verified.
-- [ ] Production images survive a CMS restart and load without an admin session.
-- [ ] Homepage, articles, event/sermon/story/resource detail pages, search, join,
-      and contact show approved content, not just successful fallback pages.
-- [ ] Publish/update/unpublish invalidate public content correctly; hero slide
-      changes update without rebuilding web. No failed webhook deliveries remain.
-- [ ] Mobile/desktop gallery crops, keyboard controls, touch scrolling, reduced
-      motion, and image failure states reviewed. Measure production performance;
-      see [performance/SEO/accessibility](07-performance-seo-accessibility.md).
-- [ ] `/robots.txt` allows the public site; `/sitemap.xml` and canonical/Open
-      Graph URLs use the real HTTPS origin. Review-seed canonical/noindex values
-      are removed where content is approved to be public.
-- [ ] HTTPS, security headers, console errors, and externally hosted embeds
-      checked. No production credentials appear in browser assets or logs.
-- [ ] Database/media restore tested, monitoring/billing alerts configured, and a
-      named maintainer can perform the rollback below.
-
-Then share the free web address. A page returning HTTP 200 while CMS fetches fail
-is not evidence that the launch is ready.
-
-## 10. Updates, rollback, and troubleshooting
-
-For content edits, use CMS Save/Publish; no code deployment is normally needed.
-For code, use reviewed PRs and passing CI. Coordinate schema changes manually:
-backup first, deploy backward-compatible CMS changes, verify, then deploy web.
-Do not let independent auto-deploys race a CMS/frontend contract change.
-
-For a web-only regression, stop further auto-publishing and use the host's
-previous known-good deploy or redeploy the known-good commit. Confirm its
-environment, CMS compatibility, and content freshness; replay relevant
-publication events if needed. For a CMS regression, first assess database/schema
-compatibility. A Git rollback does not roll back PostgreSQL or uploaded files.
-Use the tested restore procedure with a maintenance window when a restore is
-required; never overwrite the live database casually. Re-run the launch checks.
-
-Before signing off launch, the database/media operator must create a recovery
-record in the ministry's controlled operations location and give the backup
-maintainer access. This is required operational work, not a procedure already
-implemented by this repository. Record:
-
-- the known-good CMS commit and compatible web commit;
-- the database backup identifier/time and corresponding media recovery point;
-- the bucket, object prefix, preserved object keys, and persisted CDN origin;
-- references to credentials in the password manager, never the values;
-- exact provider restore steps tested into an isolated database/media target;
-- how to validate content, admin roles, and public images in that isolated target;
-- the approved maintenance/cutover procedure to switch the CMS database target
-  and recover media while preserving URLs, plus how to undo the cutover;
-- the test date, recovery duration, expected data-loss window, and responsible
-  operator. Rehearse this before launch, not during the first outage.
-
-| Symptom | Check / action |
-| --- | --- |
-| Build says a variable is missing | Set all three web values in Builds and Functions; CMS needs its separate secret/database/media values |
-| Homepage loads but articles are empty | Check production `/api/articles?status=published`, publication state, production data entry, and web CMS errors; local content was not copied |
-| API has content but web is stale | Verify real publish delivery, exact bearer header, and response code; correct configuration and republish |
-| Webhook 401 / 202 / 400 | Respectively: mismatched secret; draft-only save; invalid event/payload/UID. See the revalidation guide |
-| Hero still text-only | Updated CMS schema must be deployed; add images to production Site Settings → `heroSlides` and publish |
-| `AccessControlListNotSupported` or upload access denied | Verify `AWS_ACL=bucket-owner-full-control`, bucket ownership, and scoped AWS policy; do not enable public bucket writes |
-| Image returns 403 or is blocked in Admin | Verify OAC bucket policy, object key/prefix, HTTPS `CDN_URL`, CORS and CSP; do not use a signed/private viewer URL |
-| Database certificate/connection error | Verify endpoint, network access, URL, CA and SSL settings; do not paste localhost settings or disable public TLS verification |
-| CMS build killed / slow startup | Inspect memory and logs; increase instance/build resources if needed, and avoid sleeping free compute |
-| Website pauses | Check Netlify credits and host billing status before changing application code |
-
-If you later buy a domain, configure it on the web host, select it as the primary
-domain, update `SITE_URL` and the CMS webhook URL, review CMS canonical overrides,
-redeploy, and verify redirects, sitemap, metadata, and publication delivery.
-Existing provider subdomains are not portable assets you own independently.
+Visitor counts alone are insufficient: deployments, media requests, database
+activity and editorial needs also matter. Preserve the
+[always-on deployment guide](production-deployment-always-on.md) as an alternative,
+without requiring every provider to change at once. Any media-host move must
+preserve URLs or intentionally migrate persisted references.

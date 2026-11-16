@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Home, { generateMetadata } from "@/app/page";
+import { defaultHomePage } from "@/features/home/copy";
 import type { HomePageData } from "@/features/home/data";
 import type {
   Article,
@@ -162,6 +163,7 @@ const siteSettings = {
 } satisfies SiteSettings;
 
 const fullPageData = {
+  homePage: null,
   featuredEvent,
   latestArticle,
   latestSermon,
@@ -181,20 +183,34 @@ describe("Home", () => {
       ...fullPageData,
       siteSettings: {
         ...siteSettings,
-        heroSlides: [{ image: media, label: "Community", caption: "Gather together" }],
+        heroSlides: [
+          { image: media, label: "Community", caption: "Gather together" },
+        ],
       },
     });
 
     render(await Home());
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    const gallery = screen.getByRole("region", { name: "Life at Jerusalem Youth" });
-    expect(within(gallery).getByRole("img")).toHaveAttribute("fetchpriority", "high");
+    const gallery = screen.getByRole("region", {
+      name: "Khoảnh khắc tại Jerusalem Youth",
+    });
+    expect(within(gallery).getByRole("img")).toHaveAttribute(
+      "fetchpriority",
+      "high",
+    );
     expect(within(gallery).queryByRole("button")).not.toBeInTheDocument();
-    for (const action of screen.getAllByRole("link", { name: "Plan your visit" })) {
-      expect(action).toHaveAttribute("href", "/join");
+    for (const action of screen.getAllByRole("link", {
+      name: "Nhắn tin qua Facebook",
+    })) {
+      expect(action).toHaveAttribute(
+        "href",
+        "https://www.facebook.com/jerusalemyouth20",
+      );
     }
-    expect(screen.getByRole("heading", { name: "Next gathering" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Buổi gặp gỡ sắp tới" }),
+    ).toBeInTheDocument();
   });
 
   it("renders the CMS-driven homepage hierarchy and primary actions", async () => {
@@ -203,21 +219,25 @@ describe("Home", () => {
     render(await Home());
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Jerusalem Youth" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Cùng lớn lên trong đức tin.",
+      }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveAttribute("lang", "vi");
     expect(
-      screen.getByRole("link", { name: "Plan your visit" }),
-    ).toHaveAttribute("href", "/join");
+      screen.getAllByRole("link", { name: "Nhắn tin qua Facebook" })[0],
+    ).toHaveAttribute("href", "https://www.facebook.com/jerusalemyouth20");
     expect(
-      screen.getByRole("heading", { level: 2, name: "Next gathering" }),
+      screen.getByRole("heading", { level: 2, name: "Buổi gặp gỡ sắp tới" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { level: 3, name: "Friday Youth Night" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Upcoming")).toHaveLength(2);
+    expect(screen.getAllByText("Sắp diễn ra")).toHaveLength(2);
 
     const upcomingSection = screen.getByRole("region", {
-      name: "Upcoming events",
+      name: "Buổi gặp gỡ sắp tới",
     });
     expect(
       within(upcomingSection).getByRole("heading", {
@@ -241,12 +261,157 @@ describe("Home", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Join the community" }),
+      screen.getByRole("link", { name: /Tìm hiểu cách tham gia/ }),
     ).toHaveAttribute("href", "/join");
+  });
+
+  it("renders landing copy and the invitation link published in the CMS", async () => {
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      featuredEvent: null,
+      upcomingEvents: [],
+      homePage: {
+        ...defaultHomePage,
+        heroHeadline: "Lớn lên cùng nhau.",
+        callToAction: { label: "Kết nối với chúng mình", url: "/join" },
+        community: {
+          eyebrow: null,
+          title: "Nhịp sống của nhóm",
+          description: "Ba điều chúng mình cùng làm mỗi tuần.",
+        },
+        communityThemes: [{ title: "Phục vụ", description: "Cùng phục vụ." }],
+        weeklySchedule: [
+          {
+            title: "Giờ nhóm chính",
+            schedule: "Chúa Nhật hằng tuần · 14:30 – 16:30",
+            note: null,
+          },
+          {
+            title: "Lem English Speak Club",
+            schedule: "Thứ Ba hằng tuần · 19:00",
+            note: "Khai giảng 3 tháng một lần.",
+          },
+        ],
+        gatheringEmptyMessage: "Lịch mới sẽ sớm được cập nhật.",
+      },
+    } satisfies HomePageData);
+
+    render(await Home());
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Lớn lên cùng nhau." }),
+    ).toBeInTheDocument();
+    for (const action of screen.getAllByRole("link", {
+      name: "Kết nối với chúng mình",
+    })) {
+      expect(action).toHaveAttribute("href", "/join");
+    }
+    const community = screen.getByRole("region", { name: "Nhịp sống của nhóm" });
+    expect(within(community).getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      within(community).getByRole("heading", { level: 3, name: "Phục vụ" }),
+    ).toBeInTheDocument();
+    const schedule = screen.getByRole("list", {
+      name: "Lịch sinh hoạt hằng tuần",
+    });
+    expect(within(schedule).getAllByRole("listitem")).toHaveLength(2);
+    expect(
+      within(schedule).getByText("Chúa Nhật hằng tuần · 14:30 – 16:30"),
+    ).toBeInTheDocument();
+    expect(
+      within(schedule).getByText("Khai giảng 3 tháng một lần."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Lịch mới sẽ sớm được cập nhật."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Nhắn tin qua Facebook" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("leaves out sections switched off in the CMS and their jump links", async () => {
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      homePage: {
+        ...defaultHomePage,
+        visibleSections: {
+          ...defaultHomePage.visibleSections,
+          introduction: false,
+          stories: false,
+          newcomer: false,
+        },
+      },
+    } satisfies HomePageData);
+
+    const { container } = render(await Home());
+
+    expect(container.querySelectorAll("main > section")).toHaveLength(5);
+    expect(
+      screen.queryByRole("heading", { name: "Bắt đầu từ một lời chào." }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Finding a place to belong" }),
+    ).not.toBeInTheDocument();
+    const jump = screen.getByRole("navigation", {
+      name: "Khám phá Jerusalem Youth",
+    });
+    expect(within(jump).getAllByRole("link")).toHaveLength(1);
+    expect(
+      within(jump).getByRole("link", { name: "Buổi gặp gỡ" }),
+    ).toHaveAttribute("href", "#gap-go");
+    expect(
+      screen.queryByRole("link", { name: /Khám phá cộng đồng/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("rotates navy, light and sage backgrounds across whichever sections are shown", async () => {
+    const backgrounds = (container: HTMLElement) =>
+      [...container.querySelectorAll("main > section")].map((section) =>
+        [...section.classList].find((name) => name.startsWith("bg-")),
+      );
+
+    loadHomePageDataMock.mockResolvedValue(fullPageData);
+    const all = render(await Home());
+    expect(backgrounds(all.container)).toEqual([
+      "bg-background",
+      "bg-secondary",
+      "bg-primary-soft",
+      "bg-calm",
+      "bg-accent-soft",
+      "bg-secondary",
+      "bg-surface",
+      "bg-calm",
+    ]);
+    all.unmount();
+
+    loadHomePageDataMock.mockResolvedValue({
+      ...fullPageData,
+      stories: [],
+      homePage: {
+        ...defaultHomePage,
+        visibleSections: {
+          ...defaultHomePage.visibleSections,
+          introduction: false,
+        },
+      },
+    } satisfies HomePageData);
+    const some = render(await Home());
+    expect(backgrounds(some.container)).toEqual([
+      "bg-background",
+      "bg-secondary",
+      "bg-primary-soft",
+      "bg-calm",
+      "bg-accent-soft",
+      "bg-secondary",
+    ]);
+    expect(
+      screen.queryByRole("link", { name: "Xem tất cả sự kiện" }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders useful empty states when homepage content is unavailable", async () => {
     loadHomePageDataMock.mockResolvedValue({
+      homePage: null,
       featuredEvent: null,
       latestArticle: null,
       latestSermon: null,
@@ -258,19 +423,23 @@ describe("Home", () => {
     render(await Home());
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Youth Ministry" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Cùng lớn lên trong đức tin.",
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Join us" })).toHaveAttribute(
-      "href",
-      "/join",
-    );
-    expect(screen.getByText("A new event is on the way")).toBeInTheDocument();
-    expect(screen.getByText("More events are coming")).toBeInTheDocument();
-    expect(screen.getByText("A new article is coming")).toBeInTheDocument();
-    expect(screen.getByText("A new sermon is coming")).toBeInTheDocument();
     expect(
-      screen.getByText("Community stories are coming"),
+      screen.getByText(/Thời gian cho buổi gặp gỡ tiếp theo/),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", {
+        name: "Mỗi hành trình đều có một câu chuyện.",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Khám phá tài liệu" }),
+    ).toHaveAttribute("href", "/resources");
   });
 
   it("builds canonical and social metadata from validated site settings", async () => {

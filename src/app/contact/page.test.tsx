@@ -71,21 +71,21 @@ describe("ContactPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Contact Jerusalem Youth",
+        name: "Liên hệ Jerusalem Youth",
       }),
     ).toBeInTheDocument();
 
     const channels = screen.getByRole("region", {
-      name: "Official contact channels",
+      name: "Các kênh liên hệ chính thức",
     });
     expect(
       within(channels).getByRole("link", {
-        name: "Email Jerusalem Youth at hello@example.test",
+        name: "Gửi email cho Jerusalem Youth qua hello@example.test",
       }),
     ).toHaveAttribute("href", "mailto:hello@example.test");
     expect(
       within(channels).getByRole("link", {
-        name: "Call Jerusalem Youth at +84 123 456 789",
+        name: "Gọi Jerusalem Youth theo số +84 123 456 789",
       }),
     ).toHaveAttribute("href", "tel:+84 123 456 789");
     expect(
@@ -95,15 +95,15 @@ describe("ContactPage", () => {
     ).toBeInTheDocument();
 
     const communityChannels = screen.getByRole("navigation", {
-      name: "Connect through an official channel",
+      name: "Kết nối qua kênh chính thức",
     });
     expect(
       within(communityChannels).getByRole("link", {
-        name: "Visit Instagram",
+        name: "Mở Instagram",
       }),
     ).toHaveAttribute("href", socialLinks.links[0].url);
     expect(
-      within(communityChannels).getByRole("link", { name: "Visit YouTube" }),
+      within(communityChannels).getByRole("link", { name: "Mở YouTube" }),
     ).toHaveAttribute("href", socialLinks.links[1].url);
     expect(screen.queryByRole("form")).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
@@ -126,15 +126,15 @@ describe("ContactPage", () => {
 
     expect(
       screen.getByRole("link", {
-        name: "Email Jerusalem Youth at hello@example.test",
+        name: "Gửi email cho Jerusalem Youth qua hello@example.test",
       }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Phone" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Điện thoại" })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", { name: "Address" }),
+      screen.queryByRole("heading", { name: "Địa chỉ" }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText(/Our public community links are being updated\./),
+      screen.getByText(/Các kênh cộng đồng đang được cập nhật\./),
     ).toBeInTheDocument();
   });
 
@@ -149,16 +149,16 @@ describe("ContactPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Contact Youth Ministry",
+        name: "Liên hệ Youth Ministry",
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: "Contact details are being updated",
+        name: "Thông tin liên hệ đang được cập nhật",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Explore ways to join" }),
+      screen.getByRole("link", { name: "Xem cách tham gia" }),
     ).toHaveAttribute("href", "/join");
   });
 
@@ -169,14 +169,14 @@ describe("ContactPage", () => {
       openGraph: {
         images: [{ url: socialImage.url }],
         siteName: "Jerusalem Youth",
-        title: "Contact Jerusalem Youth",
+        title: "Liên hệ Jerusalem Youth",
         type: "website",
       },
-      title: "Contact",
+      title: "Liên hệ",
       twitter: {
         card: "summary_large_image",
         images: [socialImage.url],
-        title: "Contact Jerusalem Youth",
+        title: "Liên hệ Jerusalem Youth",
       },
     });
   });
